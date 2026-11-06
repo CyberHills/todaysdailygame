@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Out of Place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4ede1; --ink:#2b2118; --muted:#7a6a58; --line:#d9ccb6;
+    --accent:#b5452b; --good:#3f7d4e; --bad:#b5452b; --card:#fffaf1;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+  .wrap{max-width:900px;margin:0 auto;padding:18px 16px 60px}
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px}
+  .brand{font-family:Fraunces,serif;font-weight:700;font-size:26px;letter-spacing:-.5px}
+  .brand em{font-style:italic;font-weight:500;color:var(--accent)}
+  .meta{font-size:13px;color:var(--muted);text-align:right}
+  .placard{margin:18px 0 12px}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-family:Fraunces,serif;font-weight:500;font-size:clamp(24px,4.4vw,36px);line-height:1.15;margin:4px 0 6px}
+  .sub{color:var(--muted);font-size:15px;margin:0}
+  .stage{position:relative;border:1px solid var(--ink);border-radius:6px;overflow:hidden;background:#000;box-shadow:0 2px 0 var(--ink)}
+  .stage.zoom{overflow:auto;-webkit-overflow-scrolling:touch;max-height:70vh}
+  .stage svg{display:block;width:100%;height:auto;cursor:crosshair;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+  .stage.zoom svg{width:230%}
+  .mark circle{fill:var(--accent);stroke:#fff;stroke-width:3}
+  .mark text{fill:#fff;font:700 17px Inter,sans-serif;text-anchor:middle;dominant-baseline:central;stroke:none}
+  .mark.good circle{fill:var(--good)}
+  .ring{fill:none;stroke:#fff;stroke-width:3;stroke-dasharray:7 5}
+  .ring2{fill:none;stroke:var(--bad);stroke-width:3;stroke-dasharray:7 5;stroke-dashoffset:6}
+  .peek{fill:none;stroke:#fff;stroke-width:3;stroke-dasharray:4 4;opacity:.95}
+  .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0}
+  .slots{display:flex;gap:8px;margin-right:auto}
+  .slot{width:34px;height:34px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-weight:700;color:var(--muted)}
+  .slot.on{border:2px solid var(--accent);background:var(--accent);color:#fff}
+  button{font:600 14px Inter,sans-serif;border-radius:999px;padding:10px 16px;border:1px solid var(--ink);background:var(--card);color:var(--ink);cursor:pointer}
+  button.primary{background:var(--ink);color:var(--paper)}
+  button:disabled{opacity:.35;cursor:not-allowed}
+  button.small{padding:6px 12px;font-size:13px}
+  .toast{min-height:20px;font-size:14px;color:var(--muted);margin-top:-4px}
+  .result{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;margin:16px 0}
+  .score{font-family:Fraunces,serif;font-size:40px;line-height:1}
+  .score small{font-size:16px;color:var(--muted);font-family:Inter}
+  .grid{font-size:24px;letter-spacing:4px;margin:8px 0}
+  .stats{display:flex;gap:22px;font-size:13px;color:var(--muted);margin:10px 0 14px}
+  .stats b{display:block;font-size:20px;color:var(--ink);font-family:Fraunces,serif}
+  .notes{display:grid;gap:10px;margin-top:12px}
+  .note{border-left:4px solid var(--line);padding:8px 12px;background:#fff;border-radius:0 6px 6px 0}
+  .note.out{border-color:var(--bad)} .note.in{border-color:var(--good)}
+  .note h3{margin:0 0 3px;font-size:15px}
+  .note .tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+  .note.out .tag{color:var(--bad)} .note.in .tag{color:var(--good)}
+  .note p{margin:4px 0;font-size:14px;line-height:1.45}
+  .note a{font-size:12px;color:var(--muted)}
+  h2{font-family:Fraunces,serif;font-weight:500;font-size:20px;margin:22px 0 6px}
+  .others{display:flex;flex-wrap:wrap;gap:8px}
+  .hint{font-size:13px;color:var(--muted)}
+  .info{position:sticky;bottom:10px}
+  .howto{font-size:14px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);margin-top:28px;padding-top:12px}
+  .practice-banner{background:#efe3cc;border:1px solid var(--line);padding:6px 12px;border-radius:6px;font-size:13px;display:none;justify-content:space-between;align-items:center;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Out <em>of</em> Place</div>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <div class="practice-banner" id="practiceBanner"><span>Practice scene — doesn't count toward your streak.</span><button class="small" id="backToday">Back to today</button></div>
+
+  <div class="placard">
+    <div class="kicker" id="kicker"></div>
+    <h1 id="title"></h1>
+    <p class="sub">Three things don't belong in this year. Tap them to mark them.</p>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="controls">
+    <div class="slots" id="slots"></div>
+    <button id="zoomBtn" title="Zoom in and pan around">🔍 Magnify</button>
+    <button id="clearBtn">Clear</button>
+    <button class="primary" id="submitBtn" disabled>Lock in 3</button>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <div id="resultBox"></div>
+  <div id="infoBox" class="info"></div>
+
+  <h2>Other scenes</h2>
+  <div class="others" id="others"></div>
+
+  <div class="howto">
+    <b>How it works.</b> Every scene has exactly three things that didn't exist yet at that date. Rare isn't wrong: a gadget that was new or expensive at the time still belongs. Pick all three before you get any feedback. One point each, no speed bonus; a perfect 3/3 keeps your streak alive. After you lock in, tap anything in the scene to read why it does or doesn't belong.
+  </div>
+</div>
+
+<script>
+/* ---------- SCENES ---------- */
+const W = (l, u) => ({label:l, url:u});
+const SCENES = [
+{
+  id:'kitchen', kicker:'Suburban USA', title:'An ordinary American kitchen, 1978.', short:'Kitchen, 1978',
+  svg:`
+  <defs>
+    <pattern id="k-wp" width="48" height="48" patternUnits="userSpaceOnUse"><rect width="48" height="48" fill="#e9c46a"/><circle cx="24" cy="24" r="10" fill="none" stroke="#d98a3d" stroke-width="4"/><circle cx="0" cy="0" r="10" fill="none" stroke="#c96f2d" stroke-width="4"/><circle cx="48" cy="0" r="10" fill="none" stroke="#c96f2d" stroke-width="4"/><circle cx="0" cy="48" r="10" fill="none" stroke="#c96f2d" stroke-width="4"/><circle cx="48" cy="48" r="10" fill="none" stroke="#c96f2d" stroke-width="4"/></pattern>
+    <pattern id="k-lino" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#a8754c"/><rect width="30" height="30" fill="#c79668"/><rect x="30" y="30" width="30" height="30" fill="#c79668"/></pattern>
+  </defs>
+  <g stroke="#2b2118" stroke-width="2" stroke-linejoin="round">
+  <rect width="800" height="410" fill="url(#k-wp)" stroke="none"/>
+  <rect y="405" width="800" height="95" fill="url(#k-lino)" stroke="none"/>
+  <!-- upper cabinets -->
+  <rect x="15" y="30" width="290" height="125" fill="#8b5a2b"/>
+  <rect x="27" y="42" width="78" height="101" fill="#9c6a37"/><rect x="117" y="42" width="78" height="101" fill="#9c6a37"/><rect x="207" y="42" width="86" height="101" fill="#9c6a37"/>
+  <circle cx="98" cy="125" r="3" fill="#e0c27a"/><circle cx="124" cy="125" r="3" fill="#e0c27a"/>
+  <!-- window -->
+  <rect x="330" y="60" width="170" height="135" fill="#bfe3ef"/>
+  <line x1="415" y1="60" x2="415" y2="195"/><line x1="330" y1="128" x2="500" y2="128"/>
+  <path d="M322 52 h186 v16 h-186z" fill="#c9622a"/>
+  <path d="M322 68 q20 60 4 132 h22 q-10 -70 10 -132z" fill="#e07b39"/>
+  <path d="M508 68 q-20 60 -4 132 h-22 q10 -70 -10 -132z" fill="#e07b39"/>
+  <!-- pendant lamp -->
+  <line x1="415" y1="0" x2="415" y2="22"/><path d="M385 40 q30 -36 60 0z" fill="#d9692e"/>
+  <!-- base cabinets + counter -->
+  <rect x="0" y="304" width="570" height="104" fill="#8b5a2b"/>
+  <rect x="14" y="316" width="120" height="80" fill="#9c6a37"/><rect x="146" y="316" width="120" height="80" fill="#9c6a37"/><rect x="278" y="316" width="130" height="80" fill="#9c6a37"/><rect x="420" y="316" width="138" height="80" fill="#9c6a37"/>
+  <rect x="0" y="289" width="575" height="16" fill="#9aa84a"/>
+
+  <g data-id="microwave">
+    <rect x="28" y="214" width="128" height="76" rx="5" fill="#d9d2bf"/>
+    <rect x="38" y="224" width="80" height="56" rx="3" fill="#3b3a33"/>
+    <rect x="44" y="230" width="68" height="44" fill="#55534a" stroke="none"/>
+    <rect x="124" y="222" width="26" height="60" fill="#7a5a3a"/>
+    <circle cx="137" cy="236" r="8" fill="#e8e1cf"/><line x1="137" y1="236" x2="137" y2="229"/>
+    <circle cx="137" cy="258" r="6" fill="#e8e1cf"/>
+    <rect x="129" y="270" width="16" height="7" fill="#e8e1cf"/>
+  </g>
+  <g data-id="coffee">
+    <rect x="172" y="280" width="50" height="10" fill="#e9e4d7"/>
+    <rect x="203" y="222" width="20" height="60" fill="#f2efe6"/>
+    <rect x="172" y="216" width="51" height="16" rx="2" fill="#f2efe6"/>
+    <path d="M178 248 h24 l-2 32 h-20z" fill="#cfe6ee" opacity=".9"/>
+    <path d="M179 262 h22 l-1 18 h-20z" fill="#5a3418"/>
+    <rect x="183" y="232" width="14" height="14" fill="#7b4a26"/>
+  </g>
+  <g data-id="speaker">
+    <rect x="240" y="236" width="26" height="54" rx="5" fill="#3d4148"/>
+    <ellipse cx="253" cy="237" rx="13" ry="4" fill="#4cc3ff"/>
+    <line x1="244" y1="252" x2="262" y2="252" stroke="#5a5f68"/><line x1="244" y1="262" x2="262" y2="262" stroke="#5a5f68"/><line x1="244" y1="272" x2="262" y2="272" stroke="#5a5f68"/>
+  </g>
+  <g data-id="crockpot">
+    <path d="M286 254 h68 v28 q0 8 -8 8 h-52 q-8 0 -8 -8z" fill="#f4ead6"/>
+    <circle cx="302" cy="270" r="5" fill="#e07b39"/><circle cx="320" cy="273" r="5" fill="#c9622a"/><circle cx="338" cy="269" r="5" fill="#e07b39"/>
+    <ellipse cx="320" cy="253" rx="38" ry="7" fill="#6b3d1e"/><rect x="314" y="240" width="12" height="8" rx="3" fill="#2b2118"/>
+    <rect x="279" y="258" width="8" height="6" fill="#2b2118"/><rect x="353" y="258" width="8" height="6" fill="#2b2118"/>
+  </g>
+  <g data-id="charger">
+    <path d="M384 290 l10 -18 h48 l10 18z" fill="#e9eef2"/>
+    <ellipse cx="418" cy="283" rx="22" ry="3" fill="#7fd3ff" stroke="none"/>
+    <rect x="399" y="214" width="38" height="68" rx="6" fill="#111"/>
+    <rect x="402" y="221" width="32" height="54" rx="2" fill="#4b8fd6"/>
+    <g fill="#fff" stroke="none" opacity=".9">
+      <rect x="405" y="226" width="7" height="7" rx="2"/><rect x="414.5" y="226" width="7" height="7" rx="2"/><rect x="424" y="226" width="7" height="7" rx="2"/>
+      <rect x="405" y="237" width="7" height="7" rx="2"/><rect x="414.5" y="237" width="7" height="7" rx="2"/><rect x="424" y="237" width="7" height="7" rx="2"/>
+      <rect x="405" y="248" width="7" height="7" rx="2"/><rect x="414.5" y="248" width="7" height="7" rx="2"/>
+    </g>
+  </g>
+  <g data-id="toaster">
+    <rect x="466" y="244" width="76" height="46" rx="14" fill="#cfd6dc"/>
+    <line x1="482" y1="250" x2="510" y2="250" stroke-width="4"/><line x1="498" y1="256" x2="526" y2="256" stroke-width="4"/>
+    <rect x="538" y="262" width="10" height="6" fill="#2b2118"/>
+    <path d="M474 278 q30 6 60 0" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>
+  </g>
+  <g data-id="phone">
+    <rect x="522" y="128" width="40" height="64" rx="6" fill="#e8e0c8"/>
+    <rect x="514" y="126" width="12" height="62" rx="5" fill="#d8ceb2"/>
+    <circle cx="544" cy="165" r="14" fill="#f6f0dc"/>
+    <g fill="#2b2118" stroke="none"><circle cx="544" cy="155" r="2"/><circle cx="552" cy="159" r="2"/><circle cx="554" cy="167" r="2"/><circle cx="549" cy="174" r="2"/><circle cx="540" cy="175" r="2"/><circle cx="534" cy="168" r="2"/><circle cx="535" cy="159" r="2"/></g>
+    <path d="M520 188 q-14 8 0 14 q14 6 0 14 q-14 8 0 14 q14 6 0 14 q-14 8 0 14 q14 6 0 14" fill="none" stroke="#bfb393" stroke-width="3"/>
+  </g>
+  <!-- fridge -->
+  <g data-id="fridge">
+    <rect x="598" y="108" width="150" height="300" rx="10" fill="#7d8f3a"/>
+    <line x1="598" y1="196" x2="748" y2="196"/>
+    <rect x="728" y="130" width="8" height="46" rx="3" fill="#d8dcc4"/><rect x="728" y="216" width="8" height="80" rx="3" fill="#d8dcc4"/>
+  </g>
+  <g data-id="menu">
+    <rect x="622" y="210" width="76" height="102" fill="#fff8e8" transform="rotate(-3 660 260)"/>
+    <circle cx="658" cy="211" r="6" fill="#c33"/>
+    <g transform="rotate(-3 660 260)">
+      <text x="660" y="232" font-family="Georgia,serif" font-size="11" font-weight="700" text-anchor="middle" fill="#a3221b" stroke="none">GOLDEN WOK</text>
+      <text x="660" y="244" font-family="Georgia,serif" font-size="8" text-anchor="middle" fill="#2b2118" stroke="none">TAKE-OUT MENU</text>
+      <g stroke="none" fill="#111">
+        <rect x="644" y="252" width="32" height="32" fill="#fff"/>
+        <rect x="645" y="253" width="10" height="10"/><rect x="665" y="253" width="10" height="10"/><rect x="645" y="273" width="10" height="10"/>
+        <rect x="647" y="255" width="6" height="6" fill="#fff"/><rect x="667" y="255" width="6" height="6" fill="#fff"/><rect x="647" y="275" width="6" height="6" fill="#fff"/>
+        <rect x="648.5" y="256.5" width="3" height="3"/><rect x="668.5" y="256.5" width="3" height="3"/><rect x="648.5" y="276.5" width="3" height="3"/>
+        <rect x="658" y="254" width="3" height="3"/><rect x="658" y="260" width="4" height="3"/><rect x="657" y="266" width="3" height="4"/><rect x="662" y="266" width="4" height="3"/><rect x="668" y="266" width="3" height="3"/><rect x="672" y="270" width="3" height="4"/><rect x="660" y="272" width="3" height="3"/><rect x="665" y="276" width="4" height="3"/><rect x="671" y="279" width="4" height="4"/><rect x="660" y="279" width="3" height="4"/><rect x="646" y="266" width="4" height="3"/><rect x="651" y="268" width="3" height="3"/>
+      </g>
+      <text x="660" y="298" font-family="Georgia,serif" font-size="7" text-anchor="middle" fill="#2b2118" stroke="none">Scan to order</text>
+    </g>
+  </g>
+  <g data-id="calendar">
+    <rect x="626" y="16" width="92" height="82" fill="#fffdf6"/>
+    <rect x="626" y="16" width="92" height="20" fill="#c9622a"/>
+    <text x="672" y="31" font-family="Georgia,serif" font-size="12" font-weight="700" text-anchor="middle" fill="#fff" stroke="none">MARCH 1978</text>
+    <g stroke="#c9b99a" stroke-width="1"><line x1="626" y1="52" x2="718" y2="52"/><line x1="626" y1="66" x2="718" y2="66"/><line x1="626" y1="80" x2="718" y2="80"/><line x1="652" y1="36" x2="652" y2="98"/><line x1="678" y1="36" x2="678" y2="98"/><line x1="704" y1="36" x2="704" y2="98"/></g>
+    <circle cx="665" cy="59" r="6" fill="none" stroke="#c33" stroke-width="2"/>
+  </g>
+  </g>`,
+  objects:{
+    microwave:{name:'Countertop microwave', out:false, note:"Belongs. Amana's countertop Radarange went on sale in 1967 and microwaves spread fast through the 1970s, so by 1978 millions of American kitchens had one. Note the dial timer.", src:W('Microwave oven — history','https://en.wikipedia.org/wiki/Microwave_oven#History')},
+    coffee:{name:'Automatic drip coffee maker', out:false, note:"Belongs. Mr. Coffee brought the home automatic drip machine to market in 1972 and it was a 1970s best-seller.", src:W('Mr. Coffee','https://en.wikipedia.org/wiki/Mr._Coffee')},
+    speaker:{name:'Smart speaker', out:true, note:"Out of place. Voice-assistant smart speakers began with the Amazon Echo in November 2014, 36 years after this scene.", src:W('Amazon Echo','https://en.wikipedia.org/wiki/Amazon_Echo')},
+    crockpot:{name:'Slow cooker', out:false, note:"Belongs. Rival launched the Crock-Pot in 1971, and the flowery pattern is pure 1970s.", src:W('Slow cooker','https://en.wikipedia.org/wiki/Slow_cooker')},
+    charger:{name:'Wireless charging stand and smartphone', out:true, note:"Out of place. Touchscreen smartphones arrived with the iPhone in 2007, and the Qi wireless-charging standard was published in 2008.", src:W('Qi (standard)','https://en.wikipedia.org/wiki/Qi_(standard)')},
+    toaster:{name:'Chrome pop-up toaster', out:false, note:"Belongs. Automatic pop-up toasters had been a standard appliance since the 1920s–30s.", src:W('Toaster','https://en.wikipedia.org/wiki/Toaster')},
+    phone:{name:'Rotary wall phone', out:false, note:"Belongs. Touch-tone phones existed by 1963, but rotary-dial wall phones with long coiled cords were still everywhere in 1978.", src:W('Rotary dial','https://en.wikipedia.org/wiki/Rotary_dial')},
+    fridge:{name:'Avocado-green refrigerator', out:false, note:"Belongs. Avocado green and harvest gold were the signature appliance colors of the late 1960s and 1970s.", src:W('Avocado (color)','https://en.wikipedia.org/wiki/Avocado_(color)')},
+    menu:{name:'QR code on the take-out menu', out:true, note:"Out of place. Paper take-out menus on the fridge are fine, but QR codes were invented by Denso Wave in Japan in 1994, and 'scan to order' needs a smartphone camera.", src:W('QR code','https://en.wikipedia.org/wiki/QR_code')},
+    calendar:{name:'Wall calendar', out:false, note:"Belongs. Just the date: March 1978.", src:null}
+  }
+},
+{
+  id:'railway', kicker:'A country station, England', title:'A railway platform, 1927.', short:'Railway, 1927',
+  svg:`
+  <defs>
+    <linearGradient id="r-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8ccd2"/><stop offset="1" stop-color="#f0e6cf"/></linearGradient>
+    <pattern id="r-brick" width="40" height="20" patternUnits="userSpaceOnUse"><rect width="40" height="20" fill="#a5523a"/><path d="M0 10 H40 M20 0 V10 M0 10 V20 M40 10 V20" stroke="#7d3a28" stroke-width="2"/></pattern>
+  </defs>
+  <g stroke="#2b2118" stroke-width="2" stroke-linejoin="round">
+  <rect width="800" height="400" fill="url(#r-sky)" stroke="none"/>
+  <g fill="#fff" stroke="none" opacity=".75"><ellipse cx="200" cy="120" rx="60" ry="14"/><ellipse cx="240" cy="110" rx="40" ry="14"/><ellipse cx="460" cy="90" rx="50" ry="12"/></g>
+  <path d="M0 250 q120 -40 260 -10 t260 0 v40 h-520z" fill="#9fb08a"/>
+  <!-- contrail -->
+  <line x1="150" y1="58" x2="300" y2="56" stroke="#fff" stroke-width="5" opacity=".8" stroke-linecap="round"/>
+  <g data-id="biplane">
+    <rect x="62" y="68" width="80" height="6" rx="2" fill="#c9b48a"/>
+    <rect x="62" y="88" width="80" height="6" rx="2" fill="#c9b48a"/>
+    <line x1="74" y1="74" x2="74" y2="88"/><line x1="130" y1="74" x2="130" y2="88"/>
+    <path d="M86 80 h48 l10 4 -10 4 h-48 l-18 -4z" fill="#8a6a45"/>
+    <path d="M70 78 l-6 -10 h6 l6 10z" fill="#8a6a45"/>
+    <line x1="146" y1="74" x2="146" y2="94" stroke-width="3"/>
+  </g>
+  <g data-id="jet">
+    <path d="M300 56 q0 -6 10 -6 h88 q14 0 18 6 q-4 6 -18 6 h-88 q-10 0 -10 -6z" fill="#dfe4e8"/>
+    <path d="M350 58 l-26 26 h12 l34 -26z" fill="#c4cbd1"/>
+    <path d="M354 54 l-16 -14 h10 l22 14z" fill="#c4cbd1"/>
+    <path d="M306 52 l-8 -16 h10 l12 16z" fill="#c4cbd1"/>
+    <g fill="#2b2118" stroke="none"><circle cx="330" cy="55" r="1.5"/><circle cx="340" cy="55" r="1.5"/><circle cx="350" cy="55" r="1.5"/><circle cx="360" cy="55" r="1.5"/><circle cx="370" cy="55" r="1.5"/><circle cx="380" cy="55" r="1.5"/></g>
+  </g>
+  <!-- smoke -->
+  <g fill="#8d8d8a" stroke="none" opacity=".8"><ellipse cx="262" cy="200" rx="22" ry="16"/><ellipse cx="280" cy="172" rx="28" ry="20"/><ellipse cx="300" cy="142" rx="34" ry="22"/><ellipse cx="320" cy="118" rx="26" ry="16"/></g>
+  <g data-id="loco">
+    <rect x="18" y="228" width="80" height="120" fill="#2f4f3a"/><rect x="10" y="220" width="96" height="14" fill="#1f3427"/>
+    <rect x="32" y="244" width="30" height="34" fill="#f0d98a"/>
+    <rect x="96" y="256" width="200" height="74" rx="34" fill="#2f4f3a"/>
+    <rect x="250" y="214" width="22" height="46" fill="#1f3427"/>
+    <path d="M178 256 q14 -26 28 0z" fill="#b8913a"/>
+    <rect x="96" y="326" width="216" height="18" fill="#1f3427"/>
+    <rect x="296" y="268" width="14" height="60" fill="#1f3427"/>
+    <g fill="#8a2b20"><circle cx="130" cy="352" r="30"/><circle cx="208" cy="352" r="30"/><circle cx="276" cy="362" r="18"/><circle cx="54" cy="362" r="18"/></g>
+    <g stroke="#e8c27a" stroke-width="2"><line x1="100" y1="352" x2="160" y2="352"/><line x1="130" y1="322" x2="130" y2="382"/><line x1="178" y1="352" x2="238" y2="352"/><line x1="208" y1="322" x2="208" y2="382"/></g>
+    <line x1="130" y1="352" x2="208" y2="352" stroke="#cfcfcf" stroke-width="5"/>
+  </g>
+  <!-- building + canopy -->
+  <rect x="520" y="130" width="280" height="262" fill="url(#r-brick)"/>
+  <rect x="540" y="150" width="14" height="242" fill="#4b5d3a"/><rect x="776" y="150" width="14" height="242" fill="#4b5d3a"/>
+  <rect x="500" y="108" width="300" height="26" fill="#6b4a2e"/>
+  <path d="M500 134 h300 v8 l-10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10 -10 10 -10 -10z" fill="#e8dcc0"/>
+  <!-- platform -->
+  <path d="M0 384 h800 v116 h-800z" fill="#a9a39a"/>
+  <rect x="0" y="384" width="800" height="12" fill="#8b857c"/>
+  <g stroke="#958f85" stroke-width="1.5"><line x1="0" y1="440" x2="800" y2="440"/><line x1="120" y1="396" x2="100" y2="500"/><line x1="320" y1="396" x2="310" y2="500"/><line x1="520" y1="396" x2="530" y2="500"/><line x1="720" y1="396" x2="740" y2="500"/></g>
+
+  <g data-id="clock">
+    <line x1="660" y1="152" x2="660" y2="166" stroke-width="4"/>
+    <circle cx="660" cy="188" r="23" fill="#fffdf4" stroke-width="4"/>
+    <line x1="660" y1="188" x2="650" y2="180" stroke-width="3"/><line x1="660" y1="188" x2="672" y2="176" stroke-width="2"/>
+  </g>
+  <g data-id="poster">
+    <rect x="556" y="206" width="72" height="104" fill="#ead8a4"/>
+    <path d="M562 270 l18 -26 14 16 10 -12 18 22z" fill="#5d7a8c"/>
+    <rect x="562" y="272" width="60" height="12" fill="#7d9a5a" stroke="none"/>
+    <text x="592" y="224" font-family="Georgia,serif" font-size="14" font-weight="700" text-anchor="middle" fill="#7a1f1a" stroke="none">LMS</text>
+    <text x="592" y="300" font-family="Georgia,serif" font-size="9" text-anchor="middle" fill="#2b2118" stroke="none">SCOTLAND</text>
+  </g>
+  <g data-id="brsign">
+    <rect x="690" y="216" width="80" height="58" fill="#c8102e"/>
+    <g stroke="#fff" stroke-width="5" stroke-linecap="square" fill="none">
+      <polyline points="702,232 740,232"/><polyline points="732,226 744,232 732,238"/>
+      <polyline points="758,256 720,256"/><polyline points="728,250 716,256 728,262"/>
+      <polyline points="718,232 744,256"/>
+    </g>
+    <text x="730" y="270" font-family="Arial,sans-serif" font-size="7" font-weight="700" text-anchor="middle" fill="#fff" stroke="none" letter-spacing="1">WAY OUT</text>
+  </g>
+  <g data-id="lamp">
+    <rect x="349" y="236" width="8" height="152" fill="#2c3a2a"/>
+    <path d="M336 206 h34 l-6 32 h-22z" fill="#f6dc7a"/>
+    <path d="M332 206 l21 -16 21 16z" fill="#2c3a2a"/><rect x="342" y="236" width="22" height="6" fill="#2c3a2a"/>
+    <line x1="353" y1="206" x2="353" y2="238"/>
+  </g>
+  <g data-id="man">
+    <path d="M396 300 h40 l4 70 h-48z" fill="#454a52"/>
+    <rect x="400" y="368" width="12" height="20" fill="#2f3237"/><rect x="420" y="368" width="12" height="20" fill="#2f3237"/>
+    <circle cx="416" cy="284" r="14" fill="#e6c3a0"/>
+    <path d="M400 278 h32 v-4 q-2 -16 -16 -16 q-14 0 -16 16z" fill="#1f2226"/><rect x="396" y="276" width="40" height="5" rx="2" fill="#1f2226"/>
+    <path d="M432 306 l18 6 -4 14 -18 -8" fill="#454a52"/>
+    <path d="M446 312 l-16 -12 6 -6 16 12z" fill="#454a52"/>
+    <circle cx="447" cy="310" r="5.5" fill="#fffdf4"/><line x1="447" y1="310" x2="447" y2="307" stroke-width="1.2"/>
+    <circle cx="431" cy="298" r="5" fill="#e6c3a0"/>
+  </g>
+  <g data-id="woman">
+    <path d="M470 300 h34 l4 58 h-42z" fill="#3e8a85"/>
+    <rect x="466" y="330" width="42" height="6" fill="#2d6a66"/>
+    <rect x="475" y="358" width="7" height="28" fill="#e6c3a0"/><rect x="492" y="358" width="7" height="28" fill="#e6c3a0"/>
+    <rect x="472" y="384" width="12" height="5" fill="#2b2118"/><rect x="490" y="384" width="12" height="5" fill="#2b2118"/>
+    <circle cx="487" cy="286" r="13" fill="#e6c3a0"/>
+    <path d="M471 290 q0 -24 16 -24 q16 0 16 24 l-4 -2 h-24z" fill="#6d2f5a"/>
+    <rect x="474" y="282" width="26" height="3" fill="#c9a3c2" stroke="none"/>
+  </g>
+  <rect x="590" y="342" width="130" height="10" fill="#8a5f36"/><rect x="590" y="356" width="130" height="10" fill="#8a5f36"/>
+  <rect x="598" y="366" width="8" height="22" fill="#2c3a2a"/><rect x="704" y="366" width="8" height="22" fill="#2c3a2a"/>
+  <rect x="590" y="316" width="130" height="10" fill="#8a5f36"/><rect x="600" y="326" width="6" height="16" fill="#2c3a2a"/><rect x="704" y="326" width="6" height="16" fill="#2c3a2a"/>
+  <g data-id="radio">
+    <rect x="636" y="314" width="38" height="28" rx="5" fill="#c4372c"/>
+    <circle cx="648" cy="328" r="8" fill="#e8d9c0"/>
+    <g fill="#2b2118" stroke="none"><circle cx="645" cy="325" r="1.2"/><circle cx="651" cy="325" r="1.2"/><circle cx="645" cy="331" r="1.2"/><circle cx="651" cy="331" r="1.2"/><circle cx="648" cy="328" r="1.2"/></g>
+    <circle cx="665" cy="328" r="5" fill="#e8c27a"/>
+    <text x="665" y="340" font-family="Arial" font-size="5" text-anchor="middle" fill="#fff" stroke="none">AM</text>
+  </g>
+  <g data-id="trolley">
+    <rect x="722" y="372" width="74" height="8" fill="#6b4a2e"/>
+    <circle cx="734" cy="386" r="8" fill="#2b2118"/><circle cx="784" cy="386" r="8" fill="#2b2118"/>
+    <rect x="728" y="338" width="62" height="34" fill="#7a4a24"/>
+    <line x1="742" y1="338" x2="742" y2="372" stroke="#c9a36a" stroke-width="3"/><line x1="776" y1="338" x2="776" y2="372" stroke="#c9a36a" stroke-width="3"/>
+    <rect x="734" y="314" width="48" height="24" rx="4" fill="#5a3a1e"/>
+    <path d="M750 314 q8 -10 16 0" fill="none" stroke-width="3"/>
+    <line x1="796" y1="380" x2="796" y2="330" stroke-width="4"/>
+  </g>
+  </g>`,
+  objects:{
+    biplane:{name:'Biplane', out:false, note:"Belongs. Biplanes were the everyday aircraft of the 1920s; the Wright brothers had first flown in 1903.", src:W('Biplane','https://en.wikipedia.org/wiki/Biplane')},
+    jet:{name:'Jet airliner with contrail', out:true, note:"Out of place. The first jet-powered flight was the Heinkel He 178 in 1939, and the first jet airliner, the de Havilland Comet, flew in 1949.", src:W('de Havilland Comet','https://en.wikipedia.org/wiki/De_Havilland_Comet')},
+    loco:{name:'Steam locomotive', out:false, note:"Belongs. Steam locomotives ran almost every British passenger train in 1927.", src:W('Steam locomotive','https://en.wikipedia.org/wiki/Steam_locomotive')},
+    clock:{name:'Platform clock', out:false, note:"Belongs. Hanging station clocks were standard; railway timekeeping is what gave Britain a single standard time in the 1840s.", src:W('Railway time','https://en.wikipedia.org/wiki/Railway_time')},
+    poster:{name:'LMS holiday poster', out:false, note:"Belongs. The London, Midland and Scottish Railway was one of the 'Big Four' companies formed in 1923, and it famously advertised holidays with art posters.", src:W('London, Midland and Scottish Railway','https://en.wikipedia.org/wiki/London,_Midland_and_Scottish_Railway')},
+    brsign:{name:'British Rail double-arrow sign', out:true, note:"Out of place. In 1927 four private companies ran Britain's railways. British Railways only came with nationalisation in 1948, and its double-arrow symbol was introduced in 1965.", src:W('British Rail','https://en.wikipedia.org/wiki/British_Rail')},
+    lamp:{name:'Gas lamp', out:false, note:"Belongs. Gas lighting was still common at stations, especially country ones, in the 1920s.", src:W('Gas lighting','https://en.wikipedia.org/wiki/Gas_lighting')},
+    man:{name:'Man checking his wristwatch', out:false, note:"Belongs, and it's a common trap. Wristwatches were once mainly worn by women, but the First World War made them standard for men, and by the 1920s they had overtaken pocket watches.", src:W('Watch — wristwatch history','https://en.wikipedia.org/wiki/Watch#Wristwatch')},
+    woman:{name:'Cloche hat and drop-waist dress', out:false, note:"Belongs. The bell-shaped cloche was the defining women's hat of the 1920s.", src:W('Cloche hat','https://en.wikipedia.org/wiki/Cloche_hat')},
+    radio:{name:'Pocket transistor radio', out:true, note:"Out of place. The 1920s did have radios, even 'portable' ones, but they were suitcase-sized valve sets with heavy batteries. The first commercial transistor radio, the Regency TR-1, came out in 1954.", src:W('Transistor radio','https://en.wikipedia.org/wiki/Transistor_radio')},
+    trolley:{name:"Porter's luggage trolley", out:false, note:"Belongs. Porters wheeling trunks and leather cases were part of every 1920s station.", src:null}
+  }
+},
+{
+  id:'market', kicker:'Bruges, County of Flanders', title:'A market square, 1340.', short:'Market, 1340',
+  svg:`
+  <defs><linearGradient id="m-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9dde6"/><stop offset="1" stop-color="#f3ead2"/></linearGradient></defs>
+  <g stroke="#2b2118" stroke-width="2" stroke-linejoin="round">
+  <rect width="800" height="380" fill="url(#m-sky)" stroke="none"/>
+  <path d="M600 210 q90 -70 200 -40 v60 h-200z" fill="#9fb08a"/>
+  <g data-id="windmill">
+    <rect x="693" y="122" width="30" height="44" fill="#8a6a45"/>
+    <path d="M690 122 l18 -14 18 14z" fill="#6b4a2e"/>
+    <line x1="708" y1="166" x2="708" y2="196" stroke-width="4"/>
+    <line x1="690" y1="196" x2="726" y2="196" stroke-width="3"/>
+    <g transform="rotate(20 708 130)">
+      <line x1="708" y1="130" x2="708" y2="72" stroke-width="3"/><line x1="708" y1="130" x2="708" y2="188" stroke-width="3"/>
+      <line x1="708" y1="130" x2="650" y2="130" stroke-width="3"/><line x1="708" y1="130" x2="766" y2="130" stroke-width="3"/>
+      <rect x="710" y="76" width="12" height="46" fill="#efe3c6"/><rect x="694" y="138" width="12" height="46" fill="#efe3c6"/>
+      <rect x="654" y="118" width="46" height="10" fill="#efe3c6"/><rect x="716" y="132" width="46" height="10" fill="#efe3c6"/>
+    </g>
+    <circle cx="708" cy="130" r="4" fill="#2b2118"/>
+  </g>
+  <!-- buildings -->
+  <path d="M130 300 v-120 l15 0 v-15 l15 0 v-15 l15 0 v-15 l15 0 v15 l15 0 v15 l15 0 v15 l15 0 v120z" fill="#c98f62"/>
+  <path d="M235 300 v-140 l12 0 v-14 l12 0 v-14 l12 0 v-14 l12 0 v-14 l12 0 v14 l12 0 v14 l12 0 v14 l12 0 v14 l12 0 v140z" fill="#b06e4a"/>
+  <path d="M355 300 v-110 l14 0 v-14 l14 0 v-14 l14 0 v-14 l14 0 v14 l14 0 v14 l14 0 v14 l14 0 v110z" fill="#d8b48a"/>
+  <path d="M467 300 v-130 l14 0 v-14 l14 0 v-14 l14 0 v-14 l14 0 v14 l14 0 v14 l14 0 v14 l14 0 v130z" fill="#a8613f"/>
+  <rect x="579" y="210" width="221" height="90" fill="#c98f62"/><path d="M579 210 l110 -18 111 18z" fill="#7a3f2a"/>
+  <g fill="#3a2a1e"><rect x="160" y="200" width="16" height="24"/><rect x="200" y="200" width="16" height="24"/><rect x="270" y="180" width="14" height="24"/><rect x="306" y="180" width="14" height="24"/><rect x="392" y="206" width="14" height="22"/><rect x="430" y="206" width="14" height="22"/><rect x="502" y="190" width="14" height="22"/><rect x="540" y="190" width="14" height="22"/><rect x="610" y="228" width="16" height="20"/><rect x="680" y="228" width="16" height="20"/><rect x="750" y="228" width="16" height="20"/></g>
+  <g data-id="church">
+    <rect x="36" y="80" width="86" height="230" fill="#b9ac92"/>
+    <path d="M30 80 l49 -70 49 70z" fill="#6b6a6e"/>
+    <path d="M62 130 q17 -26 34 0 v40 h-34z" fill="#3a3a44"/>
+    <path d="M66 220 q13 -20 26 0 v30 h-26z" fill="#3a3a44"/>
+    <line x1="79" y1="10" x2="79" y2="-6" stroke-width="3"/><line x1="72" y1="-1" x2="86" y2="-1" stroke-width="3"/>
+  </g>
+  <!-- ground -->
+  <rect y="370" width="800" height="130" fill="#a39582" stroke="none"/>
+  <g fill="#b3a692" stroke="#8f826f" stroke-width="1.5"><ellipse cx="40" cy="400" rx="22" ry="8"/><ellipse cx="110" cy="420" rx="22" ry="8"/><ellipse cx="200" cy="395" rx="22" ry="8"/><ellipse cx="470" cy="420" rx="22" ry="8"/><ellipse cx="610" cy="398" rx="22" ry="8"/><ellipse cx="700" cy="430" rx="22" ry="8"/><ellipse cx="760" cy="470" rx="22" ry="8"/><ellipse cx="60" cy="470" rx="22" ry="8"/><ellipse cx="170" cy="480" rx="22" ry="8"/><ellipse cx="580" cy="480" rx="22" ry="8"/></g>
+
+  <!-- stall 1 -->
+  <line x1="40" y1="260" x2="40" y2="372" stroke-width="5"/><line x1="245" y1="260" x2="245" y2="372" stroke-width="5"/>
+  <path d="M28 232 h230 l-10 32 h-210z" fill="#efe3c6"/>
+  <g fill="#b3392b" stroke="none"><path d="M48 233 h24 l-4 30 h-24z"/><path d="M96 233 h24 l-3 30 h-24z"/><path d="M144 233 h24 l-2 30 h-24z"/><path d="M192 233 h24 l-1 30 h-24z"/></g>
+  <rect x="34" y="328" width="218" height="16" fill="#7a5434"/>
+  <rect x="44" y="344" width="8" height="28" fill="#5a3a20"/><rect x="236" y="344" width="8" height="28" fill="#5a3a20"/>
+  <g data-id="cabbage">
+    <path d="M46 312 h66 l-6 18 h-54z" fill="#a8823e"/>
+    <circle cx="62" cy="304" r="12" fill="#8fb35a"/><circle cx="84" cy="300" r="13" fill="#9cc066"/><circle cx="102" cy="305" r="11" fill="#86a852"/>
+    <path d="M56 302 q6 -6 12 0 M78 298 q6 -7 12 0" fill="none" stroke="#5f7d36" stroke-width="1.5"/>
+  </g>
+  <g data-id="tomato">
+    <path d="M122 314 h62 l-6 16 h-50z" fill="#a8823e"/>
+    <g fill="#d63a2a"><circle cx="134" cy="308" r="8"/><circle cx="150" cy="306" r="8"/><circle cx="166" cy="308" r="8"/><circle cx="142" cy="298" r="8"/><circle cx="158" cy="297" r="8"/></g>
+    <g fill="#3f7d4e" stroke="none"><path d="M138 291 l4 3 4 -3 -2 4z"/><path d="M154 290 l4 3 4 -3 -2 4z"/><path d="M130 301 l4 3 4 -3 -2 4z"/><path d="M146 299 l4 3 4 -3 -2 4z"/><path d="M162 301 l4 3 4 -3 -2 4z"/></g>
+  </g>
+  <g data-id="onion">
+    <path d="M190 314 h54 l-5 16 h-44z" fill="#a8823e"/>
+    <g fill="#d9a65a"><path d="M202 312 q-10 -10 0 -18 q10 8 0 18z"/><path d="M218 312 q-10 -10 0 -18 q10 8 0 18z"/><path d="M234 312 q-10 -10 0 -18 q10 8 0 18z"/><path d="M210 302 q-9 -9 0 -16 q9 7 0 16z"/><path d="M226 302 q-9 -9 0 -16 q9 7 0 16z"/></g>
+  </g>
+  <!-- stall 2 -->
+  <line x1="286" y1="260" x2="286" y2="372" stroke-width="5"/><line x1="488" y1="260" x2="488" y2="372" stroke-width="5"/>
+  <path d="M274 232 h226 l-10 32 h-206z" fill="#efe3c6"/>
+  <g fill="#2e5f8a" stroke="none"><path d="M294 233 h24 l-4 30 h-24z"/><path d="M342 233 h24 l-3 30 h-24z"/><path d="M390 233 h24 l-2 30 h-24z"/><path d="M438 233 h24 l-1 30 h-24z"/></g>
+  <g data-id="merchant">
+    <path d="M412 300 q24 -20 48 0 v30 h-48z" fill="#7a2e3a"/>
+    <circle cx="436" cy="284" r="14" fill="#e6c3a0"/>
+    <path d="M420 280 q0 -24 18 -22 q22 2 14 30 l10 18 -14 -8 q-2 -14 -10 -22 q-10 4 -18 4z" fill="#3d4a6b"/>
+    <circle cx="430" cy="284" r="4.5" fill="#dfeef2"/><circle cx="442" cy="284" r="4.5" fill="#dfeef2"/><line x1="434.5" y1="283" x2="437.5" y2="283" stroke-width="2"/>
+  </g>
+  <rect x="280" y="328" width="214" height="16" fill="#7a5434"/>
+  <rect x="290" y="344" width="8" height="28" fill="#5a3a20"/><rect x="476" y="344" width="8" height="28" fill="#5a3a20"/>
+  <g data-id="cloth">
+    <rect x="296" y="312" width="44" height="16" rx="8" fill="#b3392b"/><rect x="342" y="312" width="44" height="16" rx="8" fill="#2e5f8a"/><rect x="318" y="296" width="44" height="16" rx="8" fill="#5f7d36"/>
+    <ellipse cx="296" cy="320" rx="4" ry="8" fill="#8a2a20"/><ellipse cx="342" cy="320" rx="4" ry="8" fill="#1f4466"/><ellipse cx="318" cy="304" rx="4" ry="8" fill="#465d28"/>
+    <path d="M390 328 l10 -22 h4 l-6 22z" fill="#d8b48a"/>
+  </g>
+  <!-- stall 3 -->
+  <line x1="566" y1="260" x2="566" y2="372" stroke-width="5"/><line x1="780" y1="260" x2="780" y2="372" stroke-width="5"/>
+  <path d="M554 232 h238 l-10 32 h-218z" fill="#efe3c6"/>
+  <g fill="#5f7d36" stroke="none"><path d="M574 233 h24 l-4 30 h-24z"/><path d="M624 233 h24 l-3 30 h-24z"/><path d="M674 233 h24 l-2 30 h-24z"/><path d="M724 233 h24 l-1 30 h-24z"/></g>
+  <rect x="560" y="328" width="226" height="16" fill="#7a5434"/>
+  <rect x="570" y="344" width="8" height="28" fill="#5a3a20"/><rect x="766" y="344" width="8" height="28" fill="#5a3a20"/>
+  <g data-id="fish">
+    <g fill="#b9c4cc"><path d="M574 322 q20 -12 44 0 q-24 12 -44 0z"/><path d="M618 322 l10 -7 v14z"/><path d="M584 310 q20 -12 44 0 q-24 12 -44 0z"/><path d="M628 310 l10 -7 v14z"/></g>
+    <circle cx="582" cy="321" r="1.6" fill="#2b2118"/><circle cx="592" cy="309" r="1.6" fill="#2b2118"/>
+  </g>
+  <g data-id="cheese">
+    <ellipse cx="682" cy="322" rx="26" ry="6" fill="#e8b84a"/><rect x="656" y="310" width="52" height="12" fill="#e8b84a" stroke="none"/><line x1="656" y1="310" x2="656" y2="322"/><line x1="708" y1="310" x2="708" y2="322"/><ellipse cx="682" cy="310" rx="26" ry="6" fill="#f2cf6a"/>
+    <ellipse cx="682" cy="300" rx="20" ry="5" fill="#f2cf6a"/><rect x="662" y="292" width="40" height="8" fill="#e8b84a" stroke="none"/><ellipse cx="682" cy="292" rx="20" ry="5" fill="#f6dc86"/>
+  </g>
+  <g data-id="scale">
+    <line x1="746" y1="328" x2="746" y2="276" stroke-width="3"/><line x1="726" y1="280" x2="766" y2="280" stroke-width="3"/>
+    <line x1="726" y1="280" x2="720" y2="304"/><line x1="726" y1="280" x2="732" y2="304"/><path d="M716 304 h20 q-10 8 -20 0z" fill="#b8913a"/>
+    <line x1="766" y1="280" x2="760" y2="300"/><line x1="766" y1="280" x2="772" y2="300"/><path d="M756 300 h20 q-10 8 -20 0z" fill="#b8913a"/>
+    <rect x="738" y="324" width="16" height="4" fill="#5a3a20"/>
+  </g>
+  <g data-id="piper">
+    <rect x="510" y="410" width="9" height="56" fill="#5a4a3a"/><rect x="527" y="410" width="9" height="56" fill="#5a4a3a"/>
+    <path d="M504 344 h38 l6 70 h-50z" fill="#8a5f36"/>
+    <rect x="502" y="388" width="44" height="5" fill="#3a2a1e"/>
+    <circle cx="523" cy="330" r="13" fill="#e6c3a0"/>
+    <path d="M506 334 q-2 -26 17 -26 q19 0 17 26 l-5 -2 q0 -14 -12 -16 q-12 2 -12 16z" fill="#5f7d36"/>
+    <path d="M530 336 l20 4" stroke="#f4f0e6" stroke-width="3"/><path d="M548 340 h8 v-8 h-8z" fill="#f4f0e6"/>
+    <path d="M552 330 q-6 -8 2 -14 q8 -6 0 -14" fill="none" stroke="#fff" stroke-width="2.5" opacity=".9"/>
+    <rect x="504" y="464" width="16" height="6" fill="#2b2118"/><rect x="524" y="464" width="16" height="6" fill="#2b2118"/>
+  </g>
+  <g data-id="turkey">
+    <path d="M250 440 a42 42 0 0 1 84 0z" fill="#6b4a2e"/>
+    <path d="M258 440 a34 34 0 0 1 68 0" fill="none" stroke="#e8dcc0" stroke-width="3"/>
+    <path d="M268 440 a24 24 0 0 1 48 0" fill="none" stroke="#2b2118" stroke-width="3"/>
+    <ellipse cx="292" cy="446" rx="22" ry="18" fill="#3a2a1e"/>
+    <path d="M300 438 q16 -6 14 -26" fill="none" stroke="#3a2a1e" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="314" cy="410" r="7" fill="#8fb7d6"/>
+    <path d="M320 410 l7 2 -7 3z" fill="#e8c27a"/>
+    <path d="M316 416 q4 10 -2 14 q-4 -6 -2 -14z" fill="#d63a2a"/>
+    <line x1="286" y1="462" x2="282" y2="480" stroke-width="3"/><line x1="298" y1="462" x2="302" y2="480" stroke-width="3"/>
+  </g>
+  <g data-id="hens">
+    <ellipse cx="386" cy="458" rx="20" ry="14" fill="#f4f0e6"/><circle cx="402" cy="440" r="8" fill="#f4f0e6"/>
+    <path d="M398 432 q4 -6 8 0z" fill="#d63a2a"/><path d="M409 440 l6 2 -6 2z" fill="#e8c27a"/>
+    <path d="M366 452 l-8 -10 4 14z" fill="#f4f0e6"/>
+    <line x1="382" y1="471" x2="380" y2="482" stroke-width="2"/><line x1="392" y1="471" x2="394" y2="482" stroke-width="2"/>
+    <ellipse cx="436" cy="466" rx="18" ry="12" fill="#b36a2e"/><circle cx="452" cy="452" r="7" fill="#b36a2e"/>
+    <path d="M448 445 q4 -6 8 0z" fill="#d63a2a"/><path d="M458 452 l6 2 -6 2z" fill="#e8c27a"/>
+    <line x1="432" y1="477" x2="430" y2="486" stroke-width="2"/><line x1="442" y1="477" x2="444" y2="486" stroke-width="2"/>
+  </g>
+  </g>`,
+  objects:{
+    windmill:{name:'Post windmill', out:false, note:"Belongs. Post mills had spread across north-western Europe from the late 12th century, and the flat Flemish countryside was full of them.", src:W('Windmill — post mill','https://en.wikipedia.org/wiki/Windmill#Post_mill')},
+    church:{name:'Stone church tower', out:false, note:"Belongs. Bruges was building and rebuilding big stone churches throughout the 13th and 14th centuries.", src:null},
+    cabbage:{name:'Basket of cabbages', out:false, note:"Belongs. Cabbages and other brassicas were everyday food across medieval Europe.", src:W('Cabbage — history','https://en.wikipedia.org/wiki/Cabbage#History')},
+    tomato:{name:'Basket of tomatoes', out:true, note:"Out of place. Tomatoes are native to the Americas and only reached Europe after Columbus. The earliest European description comes from Italy in 1544, two centuries after this scene.", src:W('Tomato — history','https://en.wikipedia.org/wiki/Tomato#History')},
+    onion:{name:'Basket of onions', out:false, note:"Belongs. Onions had been grown in Europe since antiquity.", src:W('Onion','https://en.wikipedia.org/wiki/Onion')},
+    merchant:{name:'Cloth merchant wearing spectacles', out:false, note:"Belongs, and it's the trap. Eyeglasses were invented in northern Italy around 1286, and a 1352 fresco by Tommaso da Modena already shows a friar wearing them. In 1340 they were new and pricey, but real.", src:W('Glasses — history','https://en.wikipedia.org/wiki/Glasses#History')},
+    cloth:{name:'Bolts of dyed wool cloth', out:false, note:"Belongs. Flemish woollen cloth was the backbone of Bruges's wealth.", src:W('Bruges — history','https://en.wikipedia.org/wiki/Bruges#History')},
+    fish:{name:'Herring', out:false, note:"Belongs. Herring was a staple trade good along the North Sea coast, eaten heavily on the Church's many fast days.", src:W('Herring — as food','https://en.wikipedia.org/wiki/Herring#As_food')},
+    cheese:{name:'Wheels of cheese', out:false, note:"Belongs. The Low Countries were already making and trading cheese.", src:null},
+    scale:{name:'Balance scale', out:false, note:"Belongs. Merchants have used balance scales since ancient times.", src:null},
+    piper:{name:'Man smoking a clay pipe', out:true, note:"Out of place. Tobacco is a New World plant. Europeans only took up pipe smoking in the second half of the 1500s.", src:W('Tobacco pipe — history','https://en.wikipedia.org/wiki/Tobacco_pipe#History')},
+    turkey:{name:'Turkey', out:true, note:"Out of place. Turkeys were domesticated in Mesoamerica, and Spanish traders brought them to Europe in the early 1500s.", src:W('Domestic turkey','https://en.wikipedia.org/wiki/Domestic_turkey')},
+    hens:{name:'Chickens', out:false, note:"Belongs. Chickens had been kept across Europe for well over a thousand years.", src:null}
+  }
+},
+{
+  id:'bedroom', kicker:'Suburban USA', title:"A teenager's bedroom, 2002.", short:'Bedroom, 2002',
+  svg:`
+  <g stroke="#2b2118" stroke-width="2" stroke-linejoin="round">
+  <rect width="800" height="405" fill="#93bde4" stroke="none"/>
+  <rect y="400" width="800" height="100" fill="#cdbb9c" stroke="none"/>
+  <line x1="0" y1="400" x2="800" y2="400"/>
+  <rect x="0" y="390" width="800" height="10" fill="#f4f0e6"/>
+  <!-- poster -->
+  <rect x="56" y="46" width="132" height="168" fill="#1e1e24"/>
+  <path d="M120 70 l-22 50 h20 l-14 50 40 -64 h-22 l16 -36z" fill="#f2d14a"/>
+  <text x="122" y="190" font-family="Impact,Arial Black,sans-serif" font-size="20" text-anchor="middle" fill="#ff5e8a" stroke="none">THE STATIC</text>
+  <text x="122" y="204" font-family="Arial,sans-serif" font-size="8" text-anchor="middle" fill="#fff" stroke="none">SUMMER TOUR 2002</text>
+  <!-- window -->
+  <rect x="300" y="54" width="146" height="156" fill="#dfeef6"/>
+  <g stroke="#c4ccd2" stroke-width="3"><line x1="302" y1="66" x2="444" y2="66"/><line x1="302" y1="80" x2="444" y2="80"/><line x1="302" y1="94" x2="444" y2="94"/><line x1="302" y1="108" x2="444" y2="108"/><line x1="302" y1="122" x2="444" y2="122"/><line x1="302" y1="136" x2="444" y2="136"/></g>
+  <rect x="296" y="50" width="154" height="8" fill="#f4f0e6"/>
+  <!-- bed -->
+  <rect x="26" y="232" width="22" height="196" fill="#7a5434"/>
+  <rect x="44" y="300" width="350" height="58" fill="#fff"/>
+  <path d="M44 314 h350 v90 h-350z" fill="#5b6abf"/>
+  <g fill="#7684d6" stroke="none"><circle cx="120" cy="360" r="10"/><circle cx="200" cy="380" r="10"/><circle cx="280" cy="350" r="10"/><circle cx="350" cy="384" r="10"/><circle cx="80" cy="390" r="10"/></g>
+  <ellipse cx="96" cy="300" rx="44" ry="16" fill="#f4f0e6"/>
+  <g data-id="discman">
+    <circle cx="140" cy="334" r="22" fill="#c0c4c8"/><circle cx="140" cy="334" r="15" fill="#d8dce0"/><circle cx="140" cy="334" r="4" fill="#8a9096"/>
+    <path d="M166 342 q16 -34 36 0" fill="none" stroke-width="4"/><ellipse cx="166" cy="344" rx="6" ry="8" fill="#333"/><ellipse cx="202" cy="344" rx="6" ry="8" fill="#333"/>
+    <path d="M160 334 q4 6 6 10" fill="none" stroke="#333" stroke-width="1.5"/>
+  </g>
+  <g data-id="smartphone">
+    <g transform="rotate(14 262 344)">
+      <rect x="246" y="314" width="32" height="60" rx="6" fill="#111"/>
+      <rect x="249" y="320" width="26" height="48" rx="2" fill="#5aa0e6"/>
+      <g fill="#fff" stroke="none" opacity=".9"><rect x="252" y="324" width="6" height="6" rx="1.5"/><rect x="260" y="324" width="6" height="6" rx="1.5"/><rect x="268" y="324" width="5" height="6" rx="1.5"/><rect x="252" y="333" width="6" height="6" rx="1.5"/><rect x="260" y="333" width="6" height="6" rx="1.5"/><rect x="268" y="333" width="5" height="6" rx="1.5"/><rect x="252" y="342" width="6" height="6" rx="1.5"/><rect x="260" y="342" width="6" height="6" rx="1.5"/></g>
+    </g>
+  </g>
+  <!-- scooter -->
+  <g data-id="scooter">
+    <rect x="398" y="428" width="64" height="7" rx="3" fill="#b8bec4"/>
+    <circle cx="402" cy="440" r="7" fill="#7cd36a"/><circle cx="462" cy="440" r="7" fill="#7cd36a"/>
+    <line x1="458" y1="430" x2="438" y2="260" stroke="#b8bec4" stroke-width="6"/>
+    <line x1="420" y1="262" x2="456" y2="258" stroke="#b8bec4" stroke-width="6"/>
+    <line x1="420" y1="262" x2="428" y2="261" stroke="#333" stroke-width="8"/><line x1="448" y1="259" x2="456" y2="258" stroke="#333" stroke-width="8"/>
+  </g>
+  <!-- desk -->
+  <rect x="482" y="286" width="312" height="14" fill="#efe9de"/>
+  <rect x="492" y="300" width="12" height="96" fill="#d9d2c4"/><rect x="772" y="300" width="12" height="96" fill="#d9d2c4"/>
+  <rect x="680" y="300" width="94" height="60" fill="#e4ddd0"/><line x1="680" y1="330" x2="774" y2="330"/>
+  <g data-id="monitor">
+    <path d="M530 170 h110 l-14 -6 h-82z" fill="#d6cfbc"/>
+    <rect x="504" y="164" width="150" height="116" rx="8" fill="#e6dfcc"/>
+    <rect x="518" y="174" width="122" height="88" rx="4" fill="#1b3f8a"/>
+    <rect x="532" y="184" width="88" height="64" fill="#f1f1f1"/>
+    <rect x="532" y="184" width="88" height="10" fill="#f2c94a"/>
+    <g stroke="#9aa" stroke-width="2"><line x1="538" y1="204" x2="596" y2="204"/><line x1="538" y1="214" x2="610" y2="214"/><line x1="538" y1="224" x2="580" y2="224"/></g>
+    <rect x="538" y="234" width="76" height="8" fill="#fff" stroke="#9aa" stroke-width="1"/>
+    <rect x="562" y="280" width="34" height="6" fill="#d6cfbc"/>
+    <rect x="512" y="274" width="132" height="10" rx="2" fill="#f2efe6" transform="translate(0 4)"/>
+  </g>
+  <g data-id="earbuds">
+    <rect x="658" y="268" width="30" height="18" rx="7" fill="#fafafa"/>
+    <path d="M658 270 q15 -14 30 0z" fill="#f0f0f0"/>
+    <line x1="660" y1="270" x2="686" y2="270" stroke="#ccc" stroke-width="1"/>
+    <circle cx="667" cy="263" r="4.5" fill="#fff"/><rect x="665.5" y="263" width="3" height="9" fill="#fff"/>
+    <circle cx="679" cy="263" r="4.5" fill="#fff"/><rect x="677.5" y="263" width="3" height="9" fill="#fff"/>
+  </g>
+  <g data-id="flipphone">
+    <rect x="696" y="266" width="20" height="20" rx="3" fill="#8aa0c2"/>
+    <g fill="#2b2118" stroke="none"><circle cx="701" cy="271" r="1.3"/><circle cx="706" cy="271" r="1.3"/><circle cx="711" cy="271" r="1.3"/><circle cx="701" cy="276" r="1.3"/><circle cx="706" cy="276" r="1.3"/><circle cx="711" cy="276" r="1.3"/><circle cx="701" cy="281" r="1.3"/><circle cx="706" cy="281" r="1.3"/><circle cx="711" cy="281" r="1.3"/></g>
+    <path d="M697 266 l-4 -22 h20 l4 22z" fill="#8aa0c2"/>
+    <path d="M697 260 l-2 -12 h14 l2 12z" fill="#b8e0a0"/>
+  </g>
+  <g data-id="mp3">
+    <rect x="724" y="252" width="22" height="34" rx="3" fill="#f7f7f7"/>
+    <rect x="727" y="255" width="16" height="11" fill="#cfe0ea"/>
+    <circle cx="735" cy="276" r="6.5" fill="#fff"/><circle cx="735" cy="276" r="2.4" fill="#e6e6e6"/>
+    <path d="M746 270 q14 4 6 16" fill="none" stroke="#fff" stroke-width="2"/>
+  </g>
+  <g data-id="lavalamp">
+    <path d="M760 286 h28 l-6 -22 h-16z" fill="#b8bec4"/>
+    <path d="M766 264 h16 l8 -56 h-32z" fill="#6a3fa0"/>
+    <g fill="#ff6a3d" stroke="none"><ellipse cx="772" cy="246" rx="5" ry="7"/><ellipse cx="778" cy="226" rx="4" ry="6"/><ellipse cx="770" cy="258" rx="4" ry="3"/></g>
+    <path d="M764 208 h24 l-4 -10 h-16z" fill="#b8bec4"/>
+  </g>
+  <g data-id="console">
+    <rect x="500" y="440" width="88" height="22" rx="2" fill="#1e1e24"/>
+    <line x1="500" y1="451" x2="588" y2="451" stroke="#3a3a44"/>
+    <circle cx="580" cy="446" r="2" fill="#3fa0ff" stroke="none"/>
+    <path d="M588 456 q18 8 16 22" fill="none" stroke-width="2"/>
+    <path d="M592 478 q0 -8 14 -8 h14 q14 0 14 8 l4 12 q-4 6 -10 0 l-6 -6 h-18 l-6 6 q-6 6 -10 0z" fill="#1e1e24"/>
+  </g>
+  <g data-id="hoverboard">
+    <circle cx="656" cy="464" r="19" fill="#2b2b30"/><circle cx="656" cy="464" r="8" fill="#6a6a72"/>
+    <circle cx="762" cy="464" r="19" fill="#2b2b30"/><circle cx="762" cy="464" r="8" fill="#6a6a72"/>
+    <rect x="664" y="446" width="90" height="24" rx="12" fill="#d63a5a"/>
+    <rect x="676" y="452" width="28" height="8" rx="3" fill="#2b2118"/><rect x="714" y="452" width="28" height="8" rx="3" fill="#2b2118"/>
+    <rect x="672" y="464" width="74" height="3" rx="1.5" fill="#7fe0ff" stroke="none"/>
+  </g>
+  </g>`,
+  objects:{
+    discman:{name:'Portable CD player', out:false, note:"Belongs. Sony's Discman line dates to 1984, and portable CD players were still everywhere in 2002.", src:W('Discman','https://en.wikipedia.org/wiki/Discman')},
+    smartphone:{name:'Touchscreen smartphone', out:true, note:"Out of place. Some 2002 'smartphones' existed, with keyboards and styluses, but the all-glass touchscreen phone with a grid of app icons arrived with the iPhone in 2007.", src:W('iPhone (1st generation)','https://en.wikipedia.org/wiki/IPhone_(1st_generation)')},
+    scooter:{name:'Aluminum kick scooter', out:false, note:"Belongs, and it's the trap. Folding aluminum kick scooters like the Razor were a huge craze in 2000.", src:W('Razor USA','https://en.wikipedia.org/wiki/Razor_USA')},
+    monitor:{name:'Beige CRT monitor with a chat window', out:false, note:"Belongs. Bulky CRT monitors were still the norm, and instant-messenger chats (AIM launched in 1997) were peak teenage life.", src:W('AIM (software)','https://en.wikipedia.org/wiki/AIM_(software)')},
+    earbuds:{name:'Wireless earbuds in a charging case', out:true, note:"Out of place. In 2002 Bluetooth meant a single-ear headset, if anything. Truly wireless stereo earbuds in a charging case arrived around 2015–2016; Apple's AirPods shipped in December 2016.", src:W('AirPods','https://en.wikipedia.org/wiki/AirPods')},
+    flipphone:{name:'Flip phone', out:false, note:"Belongs. Clamshell phones had been around since Motorola's StarTAC in 1996, and color screens were just arriving in 2002.", src:W('Motorola StarTAC','https://en.wikipedia.org/wiki/Motorola_StarTAC')},
+    mp3:{name:'Click-wheel MP3 player', out:false, note:"Belongs, barely. The iPod launched in October 2001. It was new and expensive in 2002, but new isn't wrong.", src:W('iPod','https://en.wikipedia.org/wiki/IPod')},
+    lavalamp:{name:'Lava lamp', out:false, note:"Belongs. Invented in 1963, with a big revival among teens in the late 1990s and 2000s.", src:W('Lava lamp','https://en.wikipedia.org/wiki/Lava_lamp')},
+    console:{name:'Game console and wired controller', out:false, note:"Belongs. The PlayStation 2 came out in 2000, and the Xbox and GameCube in 2001. Controllers were still mostly wired.", src:W('PlayStation 2','https://en.wikipedia.org/wiki/PlayStation_2')},
+    hoverboard:{name:'Self-balancing "hoverboard"', out:true, note:"Out of place. Two-wheeled self-balancing boards appeared in the early 2010s and became a craze in 2015.", src:W('Self-balancing scooter','https://en.wikipedia.org/wiki/Self-balancing_scooter')}
+  }
+}
+];
+
+/* ---------- STATE ---------- */
+const store = {
+  get(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+const todayKey = (d=new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const EPOCH = new Date(2026,10,1);
+function dayNumber(d=new Date()){ const t = new Date(d.getFullYear(), d.getMonth(), d.getDate()); return Math.round((t - EPOCH)/864e5); }
+const TODAY = todayKey();
+const DAYNUM = dayNumber();
+const dailyIndex = ((DAYNUM % SCENES.length) + SCENES.length) % SCENES.length;
+
+let scene, sel = [], done = false, practice = false, zoom = false;
+
+const $ = id => document.getElementById(id);
+const stage = $('stage');
+
+function load(idx, isPractice){
+  scene = SCENES[idx]; practice = isPractice;
+  $('practiceBanner').style.display = practice ? 'flex' : 'none';
+  $('kicker').textContent = scene.kicker;
+  $('title').textContent = scene.title;
+  $('meta').innerHTML = practice ? 'Practice' : `No. ${DAYNUM+1}<br>${new Date().toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}`;
+  stage.innerHTML = `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">${scene.svg}<g id="overlay"></g></svg>`;
+  const saved = practice ? null : store.get('oop-'+TODAY, null);
+  if(saved && saved.scene === scene.id){ sel = saved.sel; done = saved.done; } else { sel = []; done = false; }
+  $('resultBox').innerHTML = ''; $('infoBox').innerHTML = ''; $('toast').textContent='';
+  stage.querySelector('svg').addEventListener('click', onTap);
+  renderOthers();
+  draw();
+}
+
+function bbox(id){ const g = stage.querySelector(`[data-id="${id}"]`); return g.getBBox(); }
+
+function draw(){
+  const ov = stage.querySelector('#overlay'); ov.innerHTML='';
+  const ns='http://www.w3.org/2000/svg';
+  if(done){
+    // rings on missed anachronisms
+    Object.entries(scene.objects).forEach(([id,o])=>{
+      if(o.out && !sel.includes(id)){
+        const b = bbox(id);
+        const e = document.createElementNS(ns,'ellipse');
+        e.setAttribute('cx', b.x+b.width/2); e.setAttribute('cy', b.y+b.height/2);
+        e.setAttribute('rx', b.width/2+12); e.setAttribute('ry', b.height/2+12);
+        const e2 = e.cloneNode();
+        e.setAttribute('class','ring'); e2.setAttribute('class','ring2');
+        ov.appendChild(e); ov.appendChild(e2);
+      }
+    });
+  }
+  sel.forEach((id,i)=>{
+    const b = bbox(id);
+    const g = document.createElementNS(ns,'g');
+    const ok = scene.objects[id].out;
+    g.setAttribute('class','mark'+(done && ok ? ' good':''));
+    const cx = Math.min(780, Math.max(20, b.x+b.width/2)), cy = Math.max(20, b.y-4);
+    g.innerHTML = `<circle cx="${cx}" cy="${cy}" r="15"/><text x="${cx}" y="${cy+1}">${done ? (ok?'✓':'✗') : i+1}</text>`;
+    ov.appendChild(g);
+  });
+  // slots
+  $('slots').innerHTML = [0,1,2].map(i=>`<div class="slot ${sel[i]?'on':''}">${i+1}</div>`).join('');
+  $('submitBtn').disabled = done || sel.length !== 3;
+  $('submitBtn').textContent = done ? 'Locked' : (sel.length===3 ? 'Lock in 3' : `Pick ${3-sel.length} more`);
+  $('clearBtn').disabled = done || sel.length===0;
+  if(done) renderResult();
+}
+
+function onTap(e){
+  const g = e.target.closest('[data-id]');
+  if(done){
+    if(g) showInfo(g.dataset.id);
+    return;
+  }
+  if(!g){ toast(''); return; }
+  const id = g.dataset.id;
+  const i = sel.indexOf(id);
+  if(i>=0){ sel.splice(i,1); toast(''); }
+  else if(sel.length>=3){ toast('You already have three. Tap a numbered one to undo it.'); return; }
+  else { sel.push(id); toast(''); }
+  persist(); draw();
+}
+function toast(t){ $('toast').textContent = t; }
+function persist(){ if(!practice) store.set('oop-'+TODAY, {scene:scene.id, sel, done}); }
+
+function submit(){
+  if(sel.length!==3 || done) return;
+  done = true; persist();
+  if(!practice) updateStats(sel.filter(id=>scene.objects[id].out).length);
+  draw();
+  $('resultBox').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function updateStats(score){
+  const s = store.get('oop-stats', {played:0, perfect:0, streak:0, best:0, last:null, lastPlayed:null});
+  if(s.lastPlayed === TODAY) return;
+  s.played++; s.lastPlayed = TODAY;
+  if(score===3){
+    const y = new Date(); y.setDate(y.getDate()-1);
+    s.streak = (s.last === todayKey(y)) ? s.streak+1 : 1;
+    s.perfect++; s.last = TODAY; s.best = Math.max(s.best, s.streak);
+  } else s.streak = 0;
+  store.set('oop-stats', s);
+}
+
+function noteHTML(id){
+  const o = scene.objects[id];
+  return `<div class="note ${o.out?'out':'in'}"><div class="tag">${o.out?'Out of place':'Belongs'}</div><h3>${o.name}</h3><p>${o.note.replace(/^(Out of place|Belongs)\.\s+/,'')}</p>${o.src?`<a href="${o.src.url}" target="_blank" rel="noopener">Source: ${o.src.label} ↗</a>`:''}</div>`;
+}
+
+function renderResult(){
+  const score = sel.filter(id=>scene.objects[id].out).length;
+  const grid = sel.map(id=>scene.objects[id].out?'🟩':'🟥').join('');
+  const missed = Object.keys(scene.objects).filter(id=>scene.objects[id].out && !sel.includes(id));
+  const s = store.get('oop-stats', {played:0,perfect:0,streak:0,best:0});
+  const verdict = ['Lost in time.','One for three.','So close.','Perfect eye.'][score];
+  $('resultBox').innerHTML = `
+    <div class="result">
+      <div class="score">${score}/3 <small>${verdict}</small></div>
+      <div class="grid">${grid}</div>
+      ${practice?'<div class="hint">Practice round: no stats recorded.</div>':`
+      <div class="stats"><div><b>${s.streak}</b>Perfect streak</div><div><b>${s.best}</b>Best</div><div><b>${s.perfect}/${s.played}</b>Perfect days</div></div>
+      <button class="small" id="shareBtn">Copy result</button> <span class="hint" id="shareMsg"></span>`}
+      <h2>Your picks</h2>
+      <div class="notes">${sel.map(noteHTML).join('')}</div>
+      ${missed.length?`<h2>What you missed</h2><div class="notes">${missed.map(noteHTML).join('')}</div>`:''}
+      <p class="hint" style="margin-top:14px">Tap anything else in the scene to see why it does or doesn't belong.</p>
+    </div>`;
+  const sb = $('shareBtn');
+  if(sb) sb.onclick = async ()=>{
+    const txt = `Out of Place No. ${DAYNUM+1} · ${scene.short}\n${grid} ${score}/3`;
+    try{ await navigator.clipboard.writeText(txt); $('shareMsg').textContent='Copied!'; }
+    catch(e){ $('shareMsg').textContent = txt; }
+  };
+}
+
+function showInfo(id){
+  const ov = stage.querySelector('#overlay');
+  ov.querySelectorAll('.peek').forEach(n=>n.remove());
+  const b = bbox(id);
+  const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  r.setAttribute('class','peek'); r.setAttribute('x',b.x-6); r.setAttribute('y',b.y-6); r.setAttribute('width',b.width+12); r.setAttribute('height',b.height+12); r.setAttribute('rx',8);
+  ov.appendChild(r);
+  $('infoBox').innerHTML = `<div class="notes">${noteHTML(id)}</div>`;
+}
+
+function renderOthers(){
+  $('others').innerHTML = SCENES.map((s,i)=>{
+    const label = i===dailyIndex ? `${s.short} · today` : s.short;
+    return `<button class="small" data-i="${i}" ${s.id===scene.id?'disabled':''}>${label}</button>`;
+  }).join('');
+  $('others').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const i = +b.dataset.i; load(i, i!==dailyIndex); window.scrollTo({top:0,behavior:'smooth'});
+  });
+}
+
+$('submitBtn').onclick = submit;
+$('clearBtn').onclick = ()=>{ if(done) return; sel=[]; persist(); draw(); toast(''); };
+$('backToday').onclick = ()=>load(dailyIndex,false);
+$('zoomBtn').onclick = ()=>{
+  zoom=!zoom; stage.classList.toggle('zoom',zoom);
+  $('zoomBtn').textContent = zoom ? '🔍 Zoom out' : '🔍 Magnify';
+  if(zoom){ stage.scrollLeft = (stage.scrollWidth-stage.clientWidth)/2; stage.scrollTop=(stage.scrollHeight-stage.clientHeight)/2; }
+};
+
+load(dailyIndex,false);
+</script>
+</body>
+</html>

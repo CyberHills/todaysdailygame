@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ripple — One event. Predict the aftermath.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#efe9df; --ink:#2b2a33; --muted:#77727a; --card:#fbf8f3; --line:#d9d1c4;
+  --red:#e2483d; --blue:#3a6fd8; --yellow:#f2b632; --felt:#5d9b6a; --ice:#bfe3f2; --wall:#8d8a93;
+  --accent:#2b2a33;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif}
+body{min-height:100vh;display:flex;justify-content:center}
+.app{width:100%;max-width:760px;padding:18px 14px 40px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px}
+h1{margin:0;font-size:30px;letter-spacing:-.5px}
+h1 span{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--red);margin-left:4px;box-shadow:0 0 0 4px rgba(226,72,61,.18),0 0 0 9px rgba(226,72,61,.08)}
+.tag{color:var(--muted);font-size:14px}
+.hbtns{display:flex;gap:6px}
+.iconbtn{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:6px 10px;font:500 13px "Space Grotesk";cursor:pointer;color:var(--ink)}
+.iconbtn:hover{border-color:var(--ink)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted);margin:2px 0 12px}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
+.mode-practice .pill.mode{background:#2b2a33;color:#fff;border-color:#2b2a33}
+.trigger{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;gap:12px;align-items:center}
+.trigger .ico{flex:0 0 44px;height:44px;border-radius:10px;background:#2b2a33;color:#fff;display:grid;place-items:center;font-size:22px}
+.trigger .lbl{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.trigger .txt{font-size:17px;font-weight:500;line-height:1.3}
+.stage-wrap{perspective:1100px;margin:6px 0 4px}
+.board{position:relative;border-radius:16px;background:#b9946a;padding:12px;box-shadow:0 14px 30px -12px rgba(60,40,20,.45),inset 0 2px 0 rgba(255,255,255,.25);transition:transform .7s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d;touch-action:none;user-select:none}
+.board .inner{position:relative;border-radius:8px;overflow:visible}
+canvas{display:block;width:100%;border-radius:8px}
+svg.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.marker{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:3px solid;background:#fff;display:grid;place-items:center;font:700 15px "JetBrains Mono";cursor:grab;touch-action:none;box-shadow:0 4px 10px rgba(0,0,0,.25);z-index:5;transition:transform .12s}
+.marker::after{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:currentColor;bottom:-11px;left:50%;margin-left:-3px;opacity:.0}
+.marker.drag{cursor:grabbing;transform:scale(1.15);z-index:9}
+.marker.locked{cursor:default}
+.marker .pin{position:absolute;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.0}
+.dock{display:flex;gap:10px;align-items:center;justify-content:center;min-height:56px;margin-top:10px;background:var(--card);border:1.5px dashed var(--line);border-radius:14px;padding:8px;font-size:13px;color:var(--muted);position:relative}
+.dock .slot{position:relative;width:40px;height:40px}
+.dock .marker{position:absolute;left:20px;top:20px}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:12px 0}
+.leg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:13px;line-height:1.35}
+.leg>b.t{display:flex;align-items:center;gap:7px;font-size:14px;margin-bottom:3px}
+.sw{width:16px;height:16px;flex:0 0 16px;display:inline-grid;place-items:center;font:700 10px "JetBrains Mono";color:#fff}
+.sw.ball{border-radius:50%;background:var(--red)} .sw.block{border-radius:3px;background:var(--blue)} .sw.puck{border-radius:50%;background:var(--yellow);box-shadow:inset 0 0 0 2px rgba(0,0,0,.15)}
+.sw.felt{border-radius:3px;background:var(--felt)} .sw.ice{border-radius:3px;background:var(--ice);box-shadow:inset 0 0 0 1px #8cc5dc} .sw.wall{border-radius:2px;background:var(--wall)}
+.leg.dim{opacity:.45}
+.actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.btn{border:none;border-radius:12px;padding:13px 22px;font:700 16px "Space Grotesk";cursor:pointer;background:var(--ink);color:#fff;box-shadow:0 4px 0 #000}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #000}
+.btn:disabled{background:#b8b2ab;box-shadow:0 4px 0 #8f8983;cursor:not-allowed}
+.btn.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--ink);box-shadow:0 4px 0 var(--ink)}
+.hint{text-align:center;font-size:13px;color:var(--muted);margin-top:8px;min-height:18px}
+.results{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
+.results.show{display:block;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+.big{font:700 44px "JetBrains Mono";text-align:center;line-height:1}
+.big small{font-size:18px;color:var(--muted)}
+.verdict{text-align:center;color:var(--muted);margin:4px 0 12px}
+.rows{display:grid;gap:8px}
+.row{display:grid;grid-template-columns:28px 1fr 48px;gap:10px;align-items:center;font-size:14px}
+.bar{height:10px;border-radius:9px;background:#e7e0d5;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px;width:0;transition:width 1s ease}
+.row .n{font:700 15px "JetBrains Mono";text-align:right}
+.row .why{grid-column:2/4;font-size:12.5px;color:var(--muted);margin-top:-4px}
+.stats{display:flex;justify-content:center;gap:22px;margin:14px 0 6px;font-size:12px;color:var(--muted);text-align:center}
+.stats b{display:block;font:700 20px "JetBrains Mono";color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;transition:transform .3s,opacity .3s;opacity:0;z-index:50}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.modal{position:fixed;inset:0;background:rgba(30,28,35,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:40}
+.modal.show{display:flex}
+.modal .box{background:var(--card);border-radius:18px;max-width:440px;padding:22px;font-size:15px;line-height:1.45;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal h2{margin:0 0 8px}
+.modal ol{padding-left:20px;margin:8px 0 14px}
+.modal li{margin-bottom:6px}
+.phase{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(43,42,51,.85);color:#fff;font-size:13px;padding:5px 12px;border-radius:99px;z-index:8;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
+.phase.show{opacity:1}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+@media (max-width:520px){h1{font-size:25px}.trigger .txt{font-size:15px}.marker{width:30px;height:30px;margin:-15px 0 0 -15px;font-size:13px}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div><h1>Ripple<span></span></h1><div class="tag">One event. Predict the aftermath.</div></div>
+    <div class="hbtns"><button class="iconbtn" id="helpBtn">How to play</button><button class="iconbtn" id="modeBtn">Practice</button></div>
+  </header>
+  <div class="meta"><span class="pill mode" id="modePill">Daily #1</span><span id="dateLbl"></span></div>
+
+  <div class="trigger"><div class="ico" id="trigIco">↗</div><div><div class="lbl">The event</div><div class="txt" id="trigTxt">…</div></div></div>
+
+  <div class="stage-wrap">
+    <div class="board" id="board">
+      <div class="inner" id="inner">
+        <div class="phase" id="phase"></div>
+        <canvas id="cv"></canvas>
+        <svg class="overlay" id="ov"></svg>
+      </div>
+    </div>
+  </div>
+  <div class="dock" id="dock"><span id="dockTxt">Drag each numbered marker to where that object will come to rest →</span></div>
+
+  <div class="actions">
+    <button class="btn" id="goBtn" disabled>Lock predictions &amp; run</button>
+  </div>
+  <div class="hint" id="hint">Place all three markers. You can move them as much as you like before you lock in.</div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="results" id="results">
+    <div class="big" id="bigScore">0<small>/100</small></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="rows" id="rows"></div>
+    <div class="stats" id="stats"></div>
+    <div class="actions"><button class="btn" id="shareBtn">Copy result</button><button class="btn ghost" id="replayBtn">Watch again</button><button class="btn ghost" id="practiceBtn">Practice tray</button></div>
+  </div>
+  <footer>Prototype · same tray for everyone each day · physics is precomputed and identical on every device</footer>
+</div>
+
+<div class="modal" id="modal"><div class="box">
+  <h2>How to play</h2>
+  <ol>
+    <li>Read <b>the event</b> — which edge of the tray rises, how steeply, and for how long.</li>
+    <li>Check the <b>legend</b>: each object and surface behaves by a few simple, consistent rules.</li>
+    <li>Drag markers <b>1, 2, 3</b> to where you think each object will finally stop.</li>
+    <li>Lock in. The tray tilts once, in slow motion. Each guess scores up to 100 by distance; your daily score is the average.</li>
+  </ol>
+  <p style="color:var(--muted);font-size:13px;margin:0 0 14px">No timer — take as long as you want to reason it out. One new tray every day at midnight.</p>
+  <button class="btn" id="closeModal" style="width:100%">Got it</button>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+// ---------- constants ----------
+const W=12, H=8, N=10, DT=1/240;
+const S2=0.7071067811865476;
+const TYPES={
+  ball:{name:'Ball',shape:'circle',r:0.42,mus:0.02,mu:0.02,e:0.55,m:1,color:'#e2483d'},
+  block:{name:'Block',shape:'box',h:0.44,mus:0.30,mu:0.25,e:0.05,m:2,color:'#3a6fd8'},
+  puck:{name:'Puck',shape:'circle',r:0.45,mus:0.08,mu:0.08,e:0.2,m:1,color:'#f2b632'}
+};
+const ORDER=['ball','block','puck'];
+const ZONE={felt:4,ice:0.15};
+const TILT={gentle:2,steep:4};
+const DIRS=[
+  {k:'R',v:[1,0],raised:'left side',ico:'→'},{k:'L',v:[-1,0],raised:'right side',ico:'←'},
+  {k:'D',v:[0,1],raised:'top edge',ico:'↓'},{k:'U',v:[0,-1],raised:'bottom edge',ico:'↑'},
+  {k:'DR',v:[S2,S2],raised:'top-left corner',ico:'↘'},{k:'DL',v:[-S2,S2],raised:'top-right corner',ico:'↙'},
+  {k:'UR',v:[S2,-S2],raised:'bottom-left corner',ico:'↗'},{k:'UL',v:[-S2,-S2],raised:'bottom-right corner',ico:'↖'}
+];
+
+// ---------- rng ----------
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+
+// ---------- puzzle generation ----------
+function genPuzzle(seed){
+  for(let attempt=0;attempt<400;attempt++){
+    const rnd=mulberry32(seed*7919+attempt*104729+13);
+    const ri=(a,b)=>a+Math.floor(rnd()*(b-a+1));
+    const half=(a,b)=>ri(a*2,b*2)/2;
+    const p={walls:[],zones:[],objs:[],stages:[]};
+    // zones
+    const nz=ri(1,2);
+    for(let i=0;i<nz;i++){
+      const w=half(2,4),h=half(1.5,3),x=half(0.5,W-0.5-w),y=half(0.5,H-0.5-h);
+      const z={type:rnd()<0.62?'felt':'ice',x0:x,y0:y,x1:x+w,y1:y+h};
+      if(p.zones.some(o=>!(z.x1<=o.x0||z.x0>=o.x1||z.y1<=o.y0||z.y0>=o.y1)))continue;
+      p.zones.push(z);
+    }
+    // barriers
+    const nw=ri(1,2);
+    for(let i=0;i<nw;i++){
+      const len=half(1.5,3.5),th=0.4,vert=rnd()<0.5;
+      const w=vert?th:len,h=vert?len:th;
+      const x=half(1,W-1-w),y=half(1,H-1-h);
+      p.walls.push({x0:x,y0:y,x1:x+w,y1:y+h});
+    }
+    // objects
+    let ok=true;
+    for(const t of ORDER){
+      let placed=false;
+      for(let k=0;k<60&&!placed;k++){
+        const x=half(1,W-1),y=half(1,H-1);
+        if(p.objs.some(o=>Math.abs(o.x-x)+Math.abs(o.y-y)<2))continue;
+        if(p.walls.some(w=>x>w.x0-0.9&&x<w.x1+0.9&&y>w.y0-0.9&&y<w.y1+0.9))continue;
+        p.objs.push({t,x,y});placed=true;
+      }
+      if(!placed){ok=false;break}
+    }
+    if(!ok)continue;
+    // event
+    const d1=DIRS[ri(0,7)],s1=rnd()<0.55?'steep':'gentle';
+    if(rnd()<0.3){
+      let d2=DIRS[ri(0,7)];
+      if(d2.v[0]*d1.v[0]+d2.v[1]*d1.v[1]>0.1)continue; // second tilt must change direction meaningfully
+      const s2=rnd()<0.5?'steep':'gentle';
+      const dur=[1.5,2,2.5][ri(0,2)];
+      p.stages=[{d:d1,s:s1,dur},{d:d2,s:s2,dur:null}];
+    }else p.stages=[{d:d1,s:s1,dur:null}];
+    const sim=simulate(p);
+    if(!sim.rest)continue;
+    // interest checks
+    const moved=sim.final.map((f,i)=>Math.hypot(f.x-p.objs[i].x,f.y-p.objs[i].y));
+    if(moved.filter(m=>m>1.2).length<2)continue;
+    if(moved[1]<0.3&&rnd()<0.8)continue; // a block that never budges is a fun twist, but only occasionally
+    if(!sim.flags.some(f=>f.wall||f.zone))continue;
+    // avoid everyone simply piled into the same corner
+    let spread=0;for(let i=0;i<3;i++)for(let j=i+1;j<3;j++)spread+=Math.hypot(sim.final[i].x-sim.final[j].x,sim.final[i].y-sim.final[j].y);
+    if(spread<4)continue;
+    p.sim=sim;p.moved=moved;
+    return p;
+  }
+  return null;
+}
+
+// ---------- deterministic physics ----------
+function zoneAt(p,x,y){for(const z of p.zones){if(x>=z.x0&&x<=z.x1&&y>=z.y0&&y<=z.y1)return z}return null}
+function simulate(p){
+  const os=p.objs.map(o=>({t:o.t,T:TYPES[o.t],x:o.x,y:o.y,vx:0,vy:0,c:[]}));
+  const flags=os.map(()=>({wall:false,zone:false,hit:false}));
+  const frames=[];const stageAt=[];
+  let t=0,still=0,rest=false,si=0,st=0;
+  const MAXT=25;
+  for(let step=0;t<MAXT;step++){
+    const stg=p.stages[si];
+    const mag=TILT[stg.s];const ax0=stg.d.v[0]*mag,ay0=stg.d.v[1]*mag;
+    let allStill=true;
+    for(const o of os){
+      let ax=ax0,ay=ay0;
+      for(const n of o.c){const d=ax*n[0]+ay*n[1];if(d<0){ax-=n[0]*d;ay-=n[1]*d}}
+      const z=zoneAt(p,o.x,o.y);const mult=z?ZONE[z.type]:1;
+      if(z&&(Math.abs(o.vx)+Math.abs(o.vy))>0.05)flags[os.indexOf(o)].zone=true;
+      const sp=Math.sqrt(o.vx*o.vx+o.vy*o.vy);
+      const am=Math.sqrt(ax*ax+ay*ay);
+      if(sp<0.01){
+        if(am<=o.T.mus*mult*N){o.vx=0;o.vy=0;continue}
+        const net=am-o.T.mu*mult*N;
+        o.vx+=ax/am*net*DT;o.vy+=ay/am*net*DT;
+      }else{
+        o.vx+=ax*DT;o.vy+=ay*DT;
+        const f=o.T.mu*mult*N*DT;const s2=Math.sqrt(o.vx*o.vx+o.vy*o.vy);
+        if(s2<=f){o.vx=0;o.vy=0}else{const k=(s2-f)/s2;o.vx*=k;o.vy*=k}
+      }
+      o.x+=o.vx*DT;o.y+=o.vy*DT;
+      if(Math.abs(o.vx)+Math.abs(o.vy)>0.004)allStill=false;
+    }
+    // collisions
+    for(const o of os)o.c=[];
+    for(let it=0;it<2;it++){
+      for(let i=0;i<os.length;i++){const o=os[i];collideBounds(o);for(const w of p.walls){if(collideRect(o,w))flags[i].wall=true}}
+      for(let i=0;i<os.length;i++)for(let j=i+1;j<os.length;j++){if(collidePair(os[i],os[j])){flags[i].hit=flags[j].hit=true}}
+    }
+    if(step%4===0)frames.push(os.map(o=>[o.x,o.y]));
+    stageAt.push(si);
+    t+=DT;st+=DT;
+    if(stg.dur!==null&&st>=stg.dur){si++;st=0;still=0;continue}
+    if(stg.dur===null){
+      if(allStill){still++;if(still>72){rest=true;break}}else still=0;
+    }
+  }
+  frames.push(os.map(o=>[o.x,o.y]));
+  return {rest,frames,final:os.map(o=>({x:o.x,y:o.y})),flags,stageSwitch:p.stages[0].dur!==null?Math.round(p.stages[0].dur/DT/4):null,T:t};
+}
+function rad(o){return o.T.shape==='box'?o.T.h:o.T.r}
+function bounce(o,nx,ny){
+  const vn=o.vx*nx+o.vy*ny;
+  if(vn<0){const e=Math.abs(vn)>0.4?o.T.e:0;o.vx-=(1+e)*vn*nx;o.vy-=(1+e)*vn*ny}
+  o.c.push([nx,ny]);
+}
+function collideBounds(o){
+  const r=rad(o);
+  if(o.x-r<0){o.x=r;bounce(o,1,0)} if(o.x+r>W){o.x=W-r;bounce(o,-1,0)}
+  if(o.y-r<0){o.y=r;bounce(o,0,1)} if(o.y+r>H){o.y=H-r;bounce(o,0,-1)}
+}
+function collideRect(o,w){
+  if(o.T.shape==='box'){
+    const h=o.T.h;
+    const ox=Math.min(o.x+h-w.x0,w.x1-(o.x-h)),oy=Math.min(o.y+h-w.y0,w.y1-(o.y-h));
+    if(ox<=0||oy<=0)return false;
+    if(ox<oy){const left=(o.x<(w.x0+w.x1)/2);o.x+=left?-ox:ox;bounce(o,left?-1:1,0)}
+    else{const up=(o.y<(w.y0+w.y1)/2);o.y+=up?-oy:oy;bounce(o,0,up?-1:1)}
+    return true;
+  }
+  const r=o.T.r;
+  const cx=Math.max(w.x0,Math.min(o.x,w.x1)),cy=Math.max(w.y0,Math.min(o.y,w.y1));
+  let dx=o.x-cx,dy=o.y-cy;const d2=dx*dx+dy*dy;
+  if(d2>=r*r)return false;
+  if(d2<1e-12){ // centre inside
+    const ox=Math.min(o.x-w.x0,w.x1-o.x),oy=Math.min(o.y-w.y0,w.y1-o.y);
+    if(ox<oy){const left=o.x-w.x0<w.x1-o.x;o.x=left?w.x0-r:w.x1+r;bounce(o,left?-1:1,0)}
+    else{const up=o.y-w.y0<w.y1-o.y;o.y=up?w.y0-r:w.y1+r;bounce(o,0,up?-1:1)}
+    return true;
+  }
+  const d=Math.sqrt(d2);const nx=dx/d,ny=dy/d;
+  o.x=cx+nx*r;o.y=cy+ny*r;bounce(o,nx,ny);return true;
+}
+function collidePair(a,b){
+  const ra=a.T.shape==='box'?a.T.h*1.12:a.T.r,rb=b.T.shape==='box'?b.T.h*1.12:b.T.r;
+  let dx=b.x-a.x,dy=b.y-a.y;const d2=dx*dx+dy*dy,R=ra+rb;
+  if(d2>=R*R||d2<1e-12)return false;
+  const d=Math.sqrt(d2),nx=dx/d,ny=dy/d,pen=R-d;
+  const ia=1/a.T.m,ib=1/b.T.m,sum=ia+ib;
+  a.x-=nx*pen*ia/sum;a.y-=ny*pen*ia/sum;b.x+=nx*pen*ib/sum;b.y+=ny*pen*ib/sum;
+  const vn=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;
+  if(vn<0){const e=Math.abs(vn)>0.4?Math.min(a.T.e,b.T.e):0;const j=-(1+e)*vn/sum;
+    a.vx-=j*ia*nx;a.vy-=j*ia*ny;b.vx+=j*ib*nx;b.vy+=j*ib*ny}
+  a.c.push([-nx,-ny]);b.c.push([nx,ny]);
+  return true;
+}
+
+// ---------- state ----------
+const EPOCH=Date.UTC(2026,10,5);
+function todayKey(){const d=new Date();return Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())}
+const dayNum=Math.floor((todayKey()-EPOCH)/864e5)+1;
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let mode='daily',puzzle=null,seed=0,guesses=[null,null,null],locked=false,result=null,anim=null,pathAlpha=0;
+
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d'),ov=$('ov'),inner=$('inner'),board=$('board'),dock=$('dock');
+let unit=50;
+
+function stageText(p){
+  const a=p.stages[0];const how=a.s==='steep'?'steeply':'gently';
+  let t=`The ${a.d.raised} of the tray rises ${how}`;
+  if(p.stages.length>1){const b=p.stages[1];t+=`. After ${a.dur} seconds it drops, and the ${b.d.raised} rises ${b.s==='steep'?'steeply':'gently'} instead.`}
+  else t+=' and stays raised.';
+  return t;
+}
+
+function load(newMode,newSeed){
+  mode=newMode;seed=newSeed;
+  document.body.classList.toggle('mode-practice',mode==='practice');
+  puzzle=genPuzzle(seed);
+  locked=false;result=null;guesses=[null,null,null];pathAlpha=0;anim&&cancelAnimationFrame(anim.raf);anim=null;
+  board.style.transform='';
+  $('modePill').textContent=mode==='daily'?`Daily #${dayNum}`:'Practice';
+  $('modeBtn').textContent=mode==='daily'?'Practice':'Daily';
+  $('dateLbl').textContent=mode==='daily'?new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'}):'Unlimited random trays · not scored';
+  $('trigTxt').textContent=stageText(puzzle);
+  $('trigIco').textContent=puzzle.stages.map(s=>s.d.ico).join(' ');
+  $('results').classList.remove('show');
+  $('goBtn').style.display='';dock.style.display='';
+  buildLegend();buildMarkers();
+  if(mode==='daily'){
+    const saved=store.get('ripple-day-'+dayNum);
+    if(saved&&saved.seed===seed){guesses=saved.guesses;locked=true;result=saved.result;placeAll();finish(true);return}
+  }
+  resize();updateUI();
+}
+
+function buildLegend(){
+  const hasFelt=puzzle.zones.some(z=>z.type==='felt'),hasIce=puzzle.zones.some(z=>z.type==='ice');
+  const items=[
+    ['ball',1,'Ball','Rolls on any tilt, barely slows. Bounces off walls and other objects.'],
+    ['block',2,'Block','Grippy. Won\'t budge on a <b>gentle</b> tilt; slides on a <b>steep</b> one. Heavy, doesn\'t bounce.'],
+    ['puck',3,'Puck','Glides on any tilt with light drag. Barely bounces.'],
+    ['felt','','Felt patch','Grabs everything: stops the block dead, stops the puck on a gentle tilt, only slows the ball.',!hasFelt],
+    ['ice','','Ice patch','Almost no friction — even the block slides on a gentle tilt.',!hasIce],
+    ['wall','','Barrier','Fixed. Objects stop against it or slide along it.']
+  ];
+  $('legend').innerHTML=items.map(([c,n,t,d,dim])=>`<div class="leg${dim?' dim':''}"><b class="t"><span class="sw ${c}">${n}</span>${t}</b>${d}</div>`).join('');
+}
+
+// ---------- markers ----------
+let markers=[];
+function buildMarkers(){
+  markers.forEach(m=>m.el.remove());markers=[];
+  dock.querySelectorAll('.slot').forEach(s=>s.remove());
+  ORDER.forEach((t,i)=>{
+    const slot=document.createElement('div');slot.className='slot';dock.appendChild(slot);
+    const el=document.createElement('div');el.className='marker';el.textContent=i+1;
+    el.style.borderColor=TYPES[t].color;el.style.color='#2b2a33';
+    slot.appendChild(el);
+    const m={el,slot,i};markers.push(m);
+    el.addEventListener('pointerdown',e=>startDrag(e,m));
+  });
+}
+function placeAll(){markers.forEach(m=>{if(guesses[m.i])attach(m)})}
+function attach(m){
+  inner.appendChild(m.el);
+  m.el.style.left=(guesses[m.i].x*unit)+'px';m.el.style.top=(guesses[m.i].y*unit)+'px';
+}
+function toDock(m){m.slot.appendChild(m.el);m.el.style.left='20px';m.el.style.top='20px'}
+let drag=null;
+function startDrag(e,m){
+  if(locked)return;e.preventDefault();
+  const r=m.el.getBoundingClientRect();
+  document.body.appendChild(m.el);
+  m.el.style.position='fixed';m.el.classList.add('drag');
+  drag={m,id:e.pointerId};
+  moveDrag(e);
+  m.el.setPointerCapture(e.pointerId);
+  m.el.onpointermove=moveDrag;m.el.onpointerup=endDrag;m.el.onpointercancel=endDrag;
+}
+function moveDrag(e){if(!drag)return;const el=drag.m.el;el.style.left=e.clientX+'px';el.style.top=(e.clientY-14)+'px';
+  const g=clientToUnit(e.clientX,e.clientY-14);
+  if(g){guesses[drag.m.i]=g}else guesses[drag.m.i]=null;draw();}
+function endDrag(e){
+  if(!drag)return;const m=drag.m;drag=null;
+  m.el.classList.remove('drag');m.el.style.position='';m.el.onpointermove=m.el.onpointerup=m.el.onpointercancel=null;
+  if(guesses[m.i])attach(m);else toDock(m);
+  draw();updateUI();
+}
+function clientToUnit(cx,cy){
+  const r=cv.getBoundingClientRect();
+  const x=(cx-r.left)/r.width*W,y=(cy-r.top)/r.height*H;
+  if(x<-0.3||y<-0.3||x>W+0.3||y>H+0.3)return null;
+  return {x:Math.max(0.2,Math.min(W-0.2,x)),y:Math.max(0.2,Math.min(H-0.2,y))};
+}
+function updateUI(){
+  const n=guesses.filter(Boolean).length;
+  $('goBtn').disabled=n<3||locked;
+  $('dockTxt').style.display=n===3?'none':'';
+  if(!locked)$('hint').textContent=n<3?`Place all three markers (${n}/3). Move them freely until you lock in.`:'Happy with your guesses? Lock in — the tray tilts once.';
+}
+
+// ---------- drawing ----------
+function resize(){
+  const w=inner.clientWidth;unit=w/W;
+  const dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(w*dpr);cv.height=Math.round(w*H/W*dpr);cv.style.height=(w*H/W)+'px';
+  ctx.setTransform(dpr*unit,0,0,dpr*unit,0,0);
+  ov.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  markers.forEach(m=>{if(guesses[m.i]&&m.el.parentNode===inner)attach(m)});
+  draw();
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function draw(frame){
+  const p=puzzle;if(!p)return;
+  ctx.clearRect(0,0,W,H);
+  // tray
+  ctx.fillStyle='#f4efe6';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(60,50,40,.09)';ctx.lineWidth=0.025;
+  for(let x=1;x<W;x++){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=1;y<H;y++){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+  // zones
+  for(const z of p.zones){
+    if(z.type==='felt'){
+      ctx.fillStyle='#6aa877';rr(z.x0,z.y0,z.x1-z.x0,z.y1-z.y0,0.12);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.08)';
+      for(let x=z.x0+0.1;x<z.x1;x+=0.18)for(let y=z.y0+0.1;y<z.y1;y+=0.18){ctx.fillRect(x+((Math.round(y*10)%2)*0.09),y,0.04,0.04)}
+      ctx.fillStyle='rgba(255,255,255,.75)';ctx.font='600 0.26px Space Grotesk';ctx.fillText('FELT',z.x0+0.14,z.y0+0.34);
+    }else{
+      const g=ctx.createLinearGradient(z.x0,z.y0,z.x1,z.y1);g.addColorStop(0,'#d7f0fa');g.addColorStop(.5,'#b9e0f0');g.addColorStop(1,'#d7f0fa');
+      ctx.fillStyle=g;rr(z.x0,z.y0,z.x1-z.x0,z.y1-z.y0,0.12);ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=0.04;
+      for(let k=0;k<3;k++){ctx.beginPath();const sx=z.x0+0.3+k*0.5;ctx.moveTo(sx,z.y1-0.25);ctx.lineTo(sx+0.6,z.y0+0.35);ctx.stroke()}
+      ctx.fillStyle='rgba(40,110,140,.7)';ctx.font='600 0.26px Space Grotesk';ctx.fillText('ICE',z.x0+0.14,z.y0+0.34);
+    }
+  }
+  // walls
+  for(const w of p.walls){
+    ctx.fillStyle='rgba(0,0,0,.14)';rr(w.x0+0.07,w.y0+0.1,w.x1-w.x0,w.y1-w.y0,0.08);ctx.fill();
+    ctx.fillStyle='#8d8a93';rr(w.x0,w.y0,w.x1-w.x0,w.y1-w.y0,0.08);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.22)';rr(w.x0,w.y0,w.x1-w.x0,Math.min(0.12,w.y1-w.y0),0.06);ctx.fill();
+  }
+  // paths after reveal
+  const fr=p.sim.frames;
+  if(pathAlpha>0){
+    const upto=frame===undefined?fr.length-1:frame;
+    p.objs.forEach((o,i)=>{
+      ctx.strokeStyle=hexA(TYPES[o.t].color,0.35*pathAlpha);ctx.lineWidth=0.06;ctx.setLineDash([]);
+      ctx.beginPath();ctx.moveTo(fr[0][i][0],fr[0][i][1]);for(let k=1;k<=upto;k+=2)ctx.lineTo(fr[k][i][0],fr[k][i][1]);ctx.stroke();
+    });
+  }
+  // start ghosts when moved
+  const pos=frame===undefined?(result?fr[fr.length-1]:fr[0]):fr[frame];
+  if(frame!==undefined||result){
+    p.objs.forEach((o,i)=>{drawObj(o.t,fr[0][i][0],fr[0][i][1],i,0.18)});
+  }
+  // guess lines (object start -> marker) before reveal
+  let svg='';
+  if(!result){
+    guesses.forEach((g,i)=>{if(!g)return;const o=p.objs[i];
+      svg+=`<line x1="${o.x}" y1="${o.y}" x2="${g.x}" y2="${g.y}" stroke="${TYPES[o.t].color}" stroke-width="0.05" stroke-dasharray="0.12 0.14" stroke-linecap="round" opacity=".8"/>`});
+  }else if(frame===undefined){
+    const labels=[];
+    guesses.forEach((g,i)=>{const a=p.sim.final[i];
+      svg+=`<line x1="${g.x}" y1="${g.y}" x2="${a.x}" y2="${a.y}" stroke="#2b2a33" stroke-width="0.04" stroke-dasharray="0.08 0.1" opacity=".6"/>`;
+      // label sits on the guess→actual line, a bit toward the guess, nudged away from other labels/objects
+      let lx=g.x+(a.x-g.x)*0.4,ly=g.y+(a.y-g.y)*0.4-0.5;
+      if(Math.hypot(a.x-g.x,a.y-g.y)<1.2){lx=g.x;ly=g.y-0.75}
+      for(let k=0;k<8;k++){const hit=labels.find(L=>Math.abs(L[0]-lx)<0.95&&Math.abs(L[1]-ly)<0.5);if(!hit)break;ly+=ly>H/2?-0.55:0.55}
+      lx=Math.max(0.5,Math.min(W-0.5,lx));ly=Math.max(0.3,Math.min(H-0.3,ly));labels.push([lx,ly]);
+      const c=TYPES[p.objs[i].t].color;
+      svg+=`<g transform="translate(${lx} ${ly})"><rect x="-0.45" y="-0.21" width="0.9" height="0.42" rx="0.13" fill="#2b2a33" stroke="${c}" stroke-width="0.05"/><text x="0" y="0.1" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="0.27" fill="#fff">${result.scores[i]}</text></g>`;
+    });
+  }
+  ov.innerHTML=svg;
+  // objects
+  p.objs.forEach((o,i)=>drawObj(o.t,pos[i][0],pos[i][1],i,1));
+}
+function hexA(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${n>>8&255},${n&255},${a})`}
+function drawObj(t,x,y,i,alpha){
+  const T=TYPES[t];ctx.save();ctx.globalAlpha=alpha;
+  // shadow
+  ctx.fillStyle='rgba(40,30,20,.22)';
+  if(T.shape==='box'){rr(x-T.h+0.08,y-T.h+0.12,T.h*2,T.h*2,0.1);ctx.fill()}
+  else{ctx.beginPath();ctx.ellipse(x+0.07,y+0.12,T.r,T.r*0.9,0,0,Math.PI*2);ctx.fill()}
+  if(t==='ball'){
+    const g=ctx.createRadialGradient(x-T.r*0.35,y-T.r*0.4,T.r*0.1,x,y,T.r);g.addColorStop(0,'#f27a70');g.addColorStop(1,T.color);
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,T.r,0,Math.PI*2);ctx.fill();
+  }else if(t==='block'){
+    ctx.fillStyle=T.color;rr(x-T.h,y-T.h,T.h*2,T.h*2,0.1);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.18)';rr(x-T.h,y-T.h,T.h*2,T.h*0.5,0.1);ctx.fill();
+  }else{
+    ctx.fillStyle='#d99a1c';ctx.beginPath();ctx.arc(x,y+0.05,T.r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=T.color;ctx.beginPath();ctx.arc(x,y,T.r,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=0.04;ctx.beginPath();ctx.arc(x,y,T.r*0.7,0,Math.PI*2);ctx.stroke();
+  }
+  ctx.fillStyle='#fff';ctx.font='700 0.42px JetBrains Mono';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(String(i+1),x,y+0.02);ctx.restore();ctx.textAlign='left';ctx.textBaseline='alphabetic';
+}
+
+// ---------- run ----------
+function tiltCSS(st){if(!st)return '';const k=st.s==='steep'?11:6;return `rotateX(${(-st.d.v[1]*k).toFixed(2)}deg) rotateY(${(st.d.v[0]*k).toFixed(2)}deg)`}
+function score(g,a){const d=Math.hypot(g.x-a.x,g.y-a.y);return Math.round(100*Math.max(0,1-d/6))}
+function lockIn(){
+  if(locked||guesses.some(g=>!g))return;
+  locked=true;markers.forEach(m=>m.el.classList.add('locked'));
+  const scores=guesses.map((g,i)=>score(g,puzzle.sim.final[i]));
+  result={scores,total:Math.round(scores.reduce((a,b)=>a+b,0)/3)};
+  if(mode==='daily'){
+    store.set('ripple-day-'+dayNum,{seed,guesses,result});
+    const st=store.get('ripple-stats')||{played:0,sum:0,best:0,streak:0,last:0};
+    st.played++;st.sum+=result.total;st.best=Math.max(st.best,result.total);st.streak=(st.last===dayNum-1)?st.streak+1:1;st.last=dayNum;
+    store.set('ripple-stats',st);
+  }
+  $('goBtn').disabled=true;$('hint').textContent='Watch closely…';
+  play();
+}
+function play(){
+  const fr=puzzle.sim.frames;const p=puzzle;
+  const SLOW=0.5, FPS=60;
+  const step=(1/240*4)/(1/FPS)*SLOW; // sim frames per display frame
+  $('results').classList.remove('show');
+  ov.innerHTML='';pathAlpha=0.0;
+  const phase=$('phase');
+  // pre-roll: tilt board
+  board.style.transform=tiltCSS(p.stages[0]);
+  phase.textContent=p.stages[0].d.raised.replace(/^./,c=>c.toUpperCase())+' rises'+(p.stages.length>1?` · ${p.stages[0].dur}s`:'');phase.classList.add('show');
+  let f=0,started=null,switched=false;
+  anim={raf:0};
+  const startAt=performance.now()+750;
+  function tick(now){
+    if(now<startAt){draw(0);anim.raf=requestAnimationFrame(tick);return}
+    f+=step;const fi=Math.min(fr.length-1,Math.floor(f));
+    if(p.sim.stageSwitch!==null&&!switched&&fi>=p.sim.stageSwitch){switched=true;board.style.transform=tiltCSS(p.stages[1]);phase.textContent=p.stages[1].d.raised.replace(/^./,c=>c.toUpperCase())+' rises'}
+    pathAlpha=0.6;draw(fi);
+    if(fi>=fr.length-1){setTimeout(()=>{board.style.transform='';phase.classList.remove('show');pathAlpha=1;finish(false)},500);return}
+    anim.raf=requestAnimationFrame(tick);
+  }
+  anim.raf=requestAnimationFrame(tick);
+}
+function explain(i){
+  const p=puzzle,f=p.sim.flags[i],t=p.objs[i].t,mv=p.moved[i];
+  const bits=[];
+  if(mv<0.3)bits.push(t==='block'?'Never moved — the tilt wasn\'t steep enough to break its grip':'Never moved');
+  else{
+    if(f.zone){const z=zoneAt(p,p.sim.final[i].x,p.sim.final[i].y);bits.push(z&&z.type==='felt'?'Caught on the felt':'Crossed a patch')}
+    if(f.wall)bits.push('met a barrier');
+    if(f.hit)bits.push('collided with another object');
+    if(!bits.length)bits.push('Slid to the edge');
+  }
+  const s=bits.join(', ');return s.charAt(0).toUpperCase()+s.slice(1)+'.';
+}
+function finish(instant){
+  locked=true;pathAlpha=1;markers.forEach(m=>m.el.classList.add('locked'));
+  $('goBtn').style.display='none';dock.style.display='none';$('hint').textContent=mode==='daily'?'Come back tomorrow for a new tray — or try a practice tray.':'Practice tray · try another, or go back to the daily.';
+  draw();
+  const r=result;
+  $('bigScore').innerHTML=`${r.total}<small>/100</small>`;
+  $('verdict').textContent=r.total>=90?'Laboratory precision.':r.total>=75?'Sharp physical intuition.':r.total>=55?'Solid read — a few surprises.':r.total>=35?'The tray had other ideas.':'Chaos theory wins today.';
+  $('rows').innerHTML=puzzle.objs.map((o,i)=>`<div class="row"><span class="sw ${o.t}" style="width:22px;height:22px;font-size:12px">${i+1}</span><div class="bar"><i style="background:${TYPES[o.t].color}" data-w="${r.scores[i]}"></i></div><span class="n">${r.scores[i]}</span><div class="why">${TYPES[o.t].name}: ${explain(i)}</div></div>`).join('');
+  setTimeout(()=>document.querySelectorAll('.bar i').forEach(b=>b.style.width=b.dataset.w+'%'),instant?0:60);
+  const st=store.get('ripple-stats');
+  $('stats').innerHTML=(mode==='daily'&&st)?`<div><b>${st.played}</b>played</div><div><b>${Math.round(st.sum/st.played)}</b>average</div><div><b>${st.best}</b>best</div><div><b>${st.streak}</b>streak</div>`:'';
+  $('shareBtn').style.display=mode==='daily'?'':'none';
+  $('practiceBtn').textContent=mode==='daily'?'Practice tray':'Another practice tray';
+  $('results').classList.add('show');
+}
+function shareText(){
+  const sq=s=>s>=85?'🟢':s>=60?'🟡':s>=35?'🟠':'🔴';
+  const ev=puzzle.stages.map(s=>s.d.ico).join('');
+  return `Ripple #${dayNum} ${ev}  ${result.total}/100\n${result.scores.map((s,i)=>['🔴','🔵','🟡'][i]+' '+sq(s)+' '+s).join('\n')}`;
+}
+function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),1800)}
+
+// ---------- wire up ----------
+$('goBtn').onclick=lockIn;
+$('replayBtn').onclick=()=>{play()};
+$('practiceBtn').onclick=()=>load('practice',(Math.random()*1e9)|0);
+$('modeBtn').onclick=()=>mode==='daily'?load('practice',(Math.random()*1e9)|0):load('daily',hashStr('ripple-'+dayNum));
+$('shareBtn').onclick=async()=>{const t=shareText();try{await navigator.clipboard.writeText(t);toast('Copied to clipboard')}catch(e){toast('Copy failed — select the text below');$('stats').insertAdjacentHTML('afterend',`<pre style="white-space:pre-wrap;user-select:all;background:#fff;padding:10px;border-radius:8px">${t}</pre>`)}};
+$('helpBtn').onclick=()=>$('modal').classList.add('show');
+$('closeModal').onclick=()=>{$('modal').classList.remove('show');store.set('ripple-seen',1)};
+window.addEventListener('resize',resize);
+if(!store.get('ripple-seen'))$('modal').classList.add('show');
+load('daily',hashStr('ripple-'+dayNum));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>draw(result?undefined:undefined));
+window.__ripple={genPuzzle,simulate,hashStr,score};
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soundcheck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1f1b18; --panel:#2a2521; --panel2:#332d28; --line:#463e37;
+  --cream:#f3e9d2; --muted:#b8ab95; --dim:#7d7264;
+  --c1:#e9785c; --c2:#e9bb4c; --c3:#58b8a8; --c4:#a596e0;
+  --bad:#e05a4f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--cream);font-family:'DM Sans',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:radial-gradient(1200px 600px at 50% -200px,#2e2722 0%,var(--bg) 60%)}
+.wrap{max-width:500px;margin:0 auto;padding:18px 16px 60px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:disabled{cursor:default}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.rec{width:11px;height:11px;border-radius:50%;background:var(--c1);box-shadow:0 0 0 3px rgba(233,120,92,.18)}
+.playing .rec{animation:rec 1.6s ease-in-out infinite}
+@keyframes rec{50%{opacity:.35}}
+h1{font-family:'Fraunces',serif;font-weight:700;font-size:28px;letter-spacing:.02em}
+.meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+.score{font-family:'DM Mono',monospace;font-size:24px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 12px;min-width:84px;text-align:center;transition:color .3s}
+.score small{font-size:11px;color:var(--dim);display:block;font-family:'DM Sans';letter-spacing:.08em;margin-top:-2px}
+.score.hit{animation:hit .5s}
+@keyframes hit{30%{color:var(--bad);transform:scale(1.08)}}
+.tag{font-family:'Fraunces',serif;font-style:italic;color:var(--muted);font-size:16px;margin:14px 2px 16px}
+
+/* studio panel */
+.studio{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:22px;padding:16px 16px 18px;box-shadow:0 18px 40px -20px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.04)}
+.wave{position:relative;height:84px;border-radius:12px;background:#1c1916;overflow:hidden;border:1px solid #3a332d}
+.wave canvas{width:100%;height:100%;display:block}
+.focusbadge{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:12px;background:var(--cream);color:var(--bg);padding:3px 10px;border-radius:99px;font-weight:700;opacity:0;transition:opacity .3s;white-space:nowrap}
+.focusing .focusbadge{opacity:1}
+.transport{display:flex;align-items:center;gap:16px;margin-top:16px}
+.play{width:84px;height:84px;flex:none;border-radius:50%;background:var(--cream);color:var(--bg);display:grid;place-items:center;box-shadow:0 8px 22px -8px rgba(243,233,210,.45),inset 0 -4px 0 rgba(0,0,0,.12);transition:transform .12s}
+.play:active{transform:scale(.95)}
+.play svg{width:34px;height:34px}
+.tright{flex:1;min-width:0}
+.vol{display:flex;align-items:center;gap:10px}
+.vol svg{width:24px;height:24px;flex:none;color:var(--muted)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:8px;background:linear-gradient(90deg,var(--cream) var(--v,80%),#4a423b var(--v,80%))}
+input[type=range]::-moz-range-track{height:8px;border-radius:8px;background:#4a423b}
+input[type=range]::-moz-range-progress{height:8px;border-radius:8px;background:var(--cream)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--cream);margin-top:-9px;border:4px solid var(--panel2)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--cream);border:4px solid var(--panel2)}
+.master{display:flex;gap:3px;height:10px;margin-top:6px}
+.master i{flex:1;border-radius:2px;background:#3d3631;transition:background .08s}
+.hint{font-size:12px;color:var(--dim);margin-top:8px}
+
+/* slots */
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.slot{position:relative;border-radius:14px;border:1.5px dashed #4c443c;min-height:88px;padding:10px 12px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+.slot .ch{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em}
+.slot .name{font-weight:700;font-size:15px;line-height:1.2;color:var(--dim);position:relative;z-index:1}
+.slot .bars{display:flex;align-items:flex-end;gap:3px;height:22px;position:relative;z-index:1}
+.slot .bars i{width:5px;border-radius:2px;background:#433b34;height:15%}
+.slot .fill{position:absolute;inset:0;background:var(--col);transform:scaleX(0);transform-origin:left;opacity:.16}
+.slot.on{border:1.5px solid var(--col)}
+.slot.on .fill{animation:sweep .7s cubic-bezier(.2,.8,.2,1) forwards}
+.slot.on .name{color:var(--cream)}
+.slot.on .ch{color:var(--col)}
+.slot.on .bars i{background:var(--col)}
+.slot.on{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.slot.revealed{border:1.5px solid #5b5249}
+.slot.revealed .name{color:var(--muted);font-style:italic}
+.slot.revealed .fill{transform:scaleX(1);opacity:.05;background:var(--cream)}
+@keyframes sweep{to{transform:scaleX(1)}}
+@keyframes pop{0%{transform:scale(.94)}100%{transform:scale(1)}}
+.mute{position:absolute;bottom:8px;right:8px;z-index:2;min-width:58px;padding:0 8px;height:30px;border-radius:9px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);display:none;place-items:center;font-size:11px;font-weight:700;letter-spacing:.06em}
+.slot.on .mute,.slot.revealed .mute{display:grid}
+.mute.m{background:var(--cream);color:var(--bg)}
+.slot.muted .bars,.slot.muted .name{opacity:.4}
+
+/* actions */
+.actions{display:flex;gap:10px;margin-top:14px}
+.act{flex:1;border-radius:14px;padding:13px 10px;font-weight:700;font-size:15px;border:1.5px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:center;gap:8px}
+.act .cost{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);font-weight:500}
+.act.focus{border-color:#6b6055}
+.act.focus.live{background:var(--cream);color:var(--bg)}
+.act.focus.live .cost{color:var(--bg)}
+.act.warn{border-color:var(--bad);color:var(--bad)}
+.act:disabled{opacity:.4}
+
+/* search */
+.search{margin-top:20px}
+.search label{font-size:13px;color:var(--muted);display:block;margin:0 2px 8px}
+.field{position:relative}
+.field input{width:100%;font:inherit;font-size:17px;color:var(--cream);background:#191613;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px 14px 44px;outline:none}
+.field input:focus{border-color:var(--muted)}
+.field input::placeholder{color:#6e655a}
+.field svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--dim)}
+.field.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.lib{display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:330px;overflow:auto;padding:2px}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:12px 14px;border-radius:12px;background:var(--panel);border:1px solid #3b342e;font-size:15.5px}
+.opt:hover:not(:disabled){border-color:var(--muted)}
+.opt .via{font-size:12px;color:var(--dim)}
+.opt.wrong{opacity:.45;text-decoration:line-through}
+.opt.right{border-color:#4f6b5d;color:var(--c3)}
+.opt .tick{font-size:13px}
+.empty{color:var(--dim);font-size:14px;padding:10px 4px}
+.float{position:fixed;font-family:'DM Mono',monospace;font-weight:500;color:var(--bad);font-size:20px;pointer-events:none;animation:up 1s forwards;z-index:9}
+@keyframes up{to{transform:translateY(-40px);opacity:0}}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--cream);color:var(--bg);font-weight:700;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:10;font-size:14px;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* result */
+.result{display:none;margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;text-align:center}
+.done .result{display:block;animation:pop .5s}
+.done .search,.done .actions{display:none}
+.result h2{font-family:'Fraunces',serif;font-size:22px}
+.big{font-family:'DM Mono',monospace;font-size:52px;margin:6px 0 2px}
+.big span{font-size:20px;color:var(--dim)}
+.breakdown{color:var(--muted);font-size:14px}
+.grid{font-size:26px;letter-spacing:4px;margin:12px 0}
+.stats{display:flex;justify-content:center;gap:24px;margin:12px 0 16px}
+.stats b{font-family:'DM Mono',monospace;font-size:22px;display:block}
+.stats span{font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.btnrow{display:flex;gap:10px}
+.btn{flex:1;border-radius:14px;padding:14px;font-weight:700;background:var(--cream);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--cream);border:1.5px solid var(--line)}
+.next{font-size:13px;color:var(--dim);margin-top:12px}
+.sharebox{display:none;width:100%;margin-top:10px;background:#191613;color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:10px;font:13px 'DM Mono',monospace;height:96px}
+
+.foot{margin-top:28px;color:var(--dim);font-size:13px;line-height:1.55}
+.foot details{background:var(--panel);border:1px solid #3b342e;border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.foot summary{cursor:pointer;color:var(--muted);font-weight:700}
+.foot ul{margin:8px 0 0 18px}
+.foot a{color:var(--muted)}
+.practice-flag{display:none;font-size:11px;font-weight:700;letter-spacing:.1em;background:var(--c4);color:var(--bg);padding:2px 7px;border-radius:6px;margin-left:6px;vertical-align:2px}
+.practice .practice-flag{display:inline-block}
+.loading{opacity:.5;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <div>
+      <div class="brand"><span class="rec"></span><h1>Soundcheck</h1></div>
+      <div class="meta" id="meta">Daily #1</div>
+    </div>
+    <div class="score" id="score">100<small>POINTS</small></div>
+  </header>
+  <p class="tag">Four familiar sounds. One tangled recording.</p>
+
+  <section class="studio">
+    <div class="wave" id="wave"><canvas id="cv"></canvas><div class="focusbadge" id="fbadge">Focus · 8s</div></div>
+    <div class="transport">
+      <button class="play" id="play" aria-label="Play"><svg viewBox="0 0 24 24" id="playIcon"><path fill="currentColor" d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg></button>
+      <div class="tright">
+        <div class="vol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          <input type="range" id="vol" min="0" max="100" value="80" aria-label="Volume"></div>
+        <div class="master" id="master"></div>
+        <div class="hint">8-second loop · replays are free</div>
+      </div>
+    </div>
+    <div class="slots" id="slots"></div>
+    <div class="actions">
+      <button class="act focus" id="focus">Focus <span class="cost">−10</span></button>
+      <button class="act" id="reveal">Reveal answers</button>
+    </div>
+  </section>
+
+  <section class="search">
+    <label for="q">What do you hear? Search the sound library, then tap your answer. Wrong answers cost 5.</label>
+    <div class="field" id="field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Try “keys”, “ball”, “bell”…" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="lib" id="lib"></div>
+  </section>
+
+  <section class="result" id="result">
+    <h2 id="rtitle">Session wrapped</h2>
+    <div class="big" id="rscore">85<span>/100</span></div>
+    <div class="breakdown" id="rbreak"></div>
+    <div class="grid" id="rgrid"></div>
+    <div class="stats" id="rstats"></div>
+    <div class="btnrow">
+      <button class="btn" id="share">Copy result</button>
+      <button class="btn ghost" id="practice">Practice mix</button>
+    </div>
+    <textarea class="sharebox" id="sharebox" readonly></textarea>
+    <div class="next" id="next"></div>
+  </section>
+
+  <div class="foot">
+    <details>
+      <summary>How to play</summary>
+      <ul>
+        <li>Each day's recording layers four everyday sounds in an 8-second loop. Replay it as often as you like.</li>
+        <li>Search the library and tap the sound you think you hear. Right answers open a channel; wrong ones cost 5 points.</li>
+        <li>Mute solved channels (free) to hear what's left underneath.</li>
+        <li><b>Focus</b> (−10) brings one unsolved sound forward for a full loop.</li>
+        <li>You start with 100. The round ends when all four are solved or you reveal the answers — each sound still unsolved at reveal costs 25.</li>
+      </ul>
+    </details>
+    🎧 Headphones help, but a phone speaker works fine. On iPhone, flip off silent mode if you hear nothing.
+    <br><span id="foot2"></span>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== Soundcheck synth engine: every sound is generated from math, 8 s loop ===== */
+const SR = 44100, LOOP = 8, N = SR * LOOP;
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+
+// --- biquad (RBJ) ---
+function biquad(type, f, Q){
+  const w=2*Math.PI*Math.min(f,SR*0.45)/SR, c=Math.cos(w), s=Math.sin(w), al=s/(2*Q);
+  let b0,b1,b2,a0=1+al,a1=-2*c,a2=1-al;
+  if(type==='lp'){b0=(1-c)/2;b1=1-c;b2=(1-c)/2;}
+  else if(type==='hp'){b0=(1+c)/2;b1=-(1+c);b2=(1+c)/2;}
+  else {b0=al;b1=0;b2=-al;} // bandpass, 0 dB peak
+  return {b0:b0/a0,b1:b1/a0,b2:b2/a0,a1:a1/a0,a2:a2/a0};
+}
+function filt(buf, type, f, Q=0.707){
+  const k=biquad(type,f,Q); let x1=0,x2=0,y1=0,y2=0;
+  for(let i=0;i<buf.length;i++){const x=buf[i];const y=k.b0*x+k.b1*x1+k.b2*x2-k.a1*y1-k.a2*y2;x2=x1;x1=x;y2=y1;y1=y;buf[i]=y;}
+  return buf;
+}
+// add a short buffer into the loop at time t (wraps around so the loop is seamless)
+function put(out, t, buf, g=1){ let o=Math.round(t*SR); for(let i=0;i<buf.length;i++){out[((o+i)%N+N)%N]+=buf[i]*g;} }
+
+// --- building blocks (each returns a short Float32Array) ---
+function noiseBurst(rng, dur, type, f, Q, attack, decay, hold=0){
+  const L=Math.round(dur*SR), b=new Float32Array(L);
+  for(let i=0;i<L;i++) b[i]=rng()*2-1;
+  if(type) filt(b,type,f,Q);
+  if(type==='bp') filt(b,'bp',f,Q);
+  for(let i=0;i<L;i++){const t=i/SR; b[i]*=envAD(t,attack,decay,hold);}
+  return b;
+}
+function envAD(t,a,d,h=0){ if(t<a) return t/a; if(t<a+h) return 1; return Math.exp(-(t-a-h)/d); }
+// sum of decaying sine partials: parts = [[freqMult, amp, decay], ...]
+function partials(base, parts, dur, attack=0.002, rng=null){
+  const L=Math.round(dur*SR), b=new Float32Array(L);
+  for(const [m,a,d] of parts){ const f=base*m, ph=rng?rng()*6.28:0;
+    for(let i=0;i<L;i++){const t=i/SR; b[i]+=a*Math.sin(2*Math.PI*f*t+ph)*Math.exp(-t/d)*Math.min(1,t/attack);} }
+  return b;
+}
+// sine with pitch glide
+function glide(f0,f1,glideT,dur,decay,attack=0.002,harm=null){
+  const L=Math.round(dur*SR), b=new Float32Array(L); let ph=0;
+  for(let i=0;i<L;i++){const t=i/SR; const f=t<glideT? f0+(f1-f0)*(t/glideT) : f1; ph+=2*Math.PI*f/SR;
+    let v=Math.sin(ph); if(harm) for(const [n,a] of harm) v+=a*Math.sin(n*ph);
+    b[i]=v*Math.exp(-t/decay)*Math.min(1,t/attack);}
+  return b;
+}
+function mix(...bs){const L=Math.max(...bs.map(b=>b.length)),o=new Float32Array(L);for(const b of bs)for(let i=0;i<b.length;i++)o[i]+=b[i];return o;}
+function scale(b,g){for(let i=0;i<b.length;i++)b[i]*=g;return b;}
+function sawOsc(f,dur){const L=Math.round(dur*SR),b=new Float32Array(L);let p=0;for(let i=0;i<L;i++){p+=f/SR;p-=Math.floor(p);b[i]=2*p-1;}return b;}
+function sqOsc(f,dur){const L=Math.round(dur*SR),b=new Float32Array(L);for(let i=0;i<L;i++){b[i]=((i*f/SR)%1)<0.5?1:-1;}return b;}
+function gate(b,a,r){const L=b.length;for(let i=0;i<L;i++){const t=i/SR,T=L/SR;b[i]*=Math.min(1,t/a)*Math.min(1,(T-t)/r);}return b;}
+
+/* ===== sound definitions ===== */
+const S = {};
+
+S.ice = (o,r)=>{ // cubes clinking into a glass
+  const drop=(t0)=>{ let t=t0; const n=4+Math.floor(r()*2);
+    for(let k=0;k<n;k++){ const base=1900+r()*900, g=k===0?1:0.75-k*0.1;
+      put(o,t,partials(base,[[1,1,0.22],[1.59,0.6,0.14],[2.31,0.4,0.08],[3.7,0.15,0.05]],0.6,0.001,r),g);
+      put(o,t,noiseBurst(r,0.03,'hp',3000,0.7,0.0005,0.006),0.5*g);
+      t+=0.07+r()*0.13+k*0.03; }
+    put(o,t+0.35,partials(2200+r()*500,[[1,1,0.3],[1.59,0.5,0.15]],0.7,0.001,r),0.35); };
+  drop(0.8+r()*0.3); drop(4.3+r()*0.4);
+};
+S.zipper = (o,r)=>{
+  const zip=(t0,len)=>{ const n=Math.round(len*95);
+    for(let k=0;k<n;k++){ const p=k/n, t=t0+p*len+(r()-0.5)*0.003;
+      const env=Math.sin(Math.PI*Math.min(1,p*1.1))**0.6;
+      put(o,t,noiseBurst(r,0.012,'bp',1800+p*2200,2.2,0.0003,0.0025),env); } };
+  zip(1.5+r()*0.3,0.75); zip(5.3+r()*0.3,0.6);
+};
+S.basketball = (o,r)=>{
+  const bounce=(t)=>{ put(o,t,glide(170,75,0.05,0.25,0.07),0.9);
+    put(o,t,noiseBurst(r,0.06,'bp',900,0.9,0.0005,0.012),0.9);
+    put(o,t,partials(330,[[1,0.5,0.05],[1.7,0.25,0.03]],0.15),0.35); };
+  let a=0.2+r()*0.2; for(let t=a;t<3.2;t+=0.52) bounce(t);
+  for(let t=a+4.6;t<7.7;t+=0.52) bounce(t);
+};
+S.pingpong = (o,r)=>{
+  const tok=(t,f,g)=>{ put(o,t,partials(f,[[1,1,0.025],[2.4,0.3,0.012]],0.1),g); put(o,t,noiseBurst(r,0.01,'hp',2000,0.7,0.0003,0.002),g*0.5); };
+  const rally=(t0,n)=>{ let t=t0; for(let k=0;k<n;k++){ tok(t,1100,1); tok(t+0.32,1500,0.7); t+=0.62+r()*0.05; } };
+  rally(0.4+r()*0.3,4); rally(4.6+r()*0.3,4);
+};
+S.turnsignal = (o,r)=>{
+  const click=(t,f,g)=>{ put(o,t,noiseBurst(r,0.02,'bp',f,1.5,0.0003,0.003),g); put(o,t,partials(f*0.75,[[1,1,0.012],[2.1,0.4,0.006]],0.05),g*0.6); };
+  const off=r()*0.3; for(let k=0;k<10;k++){ click(off+k*0.8,2400,1); click(off+k*0.8+0.4,1500,0.85); }
+};
+S.clock = (o,r)=>{
+  const off=r()*0.5; for(let k=0;k<8;k++){ const f=k%2?2600:3300;
+    put(o,off+k,noiseBurst(r,0.015,'bp',f,3,0.0002,0.0018),1); put(o,off+k,partials(f*0.62,[[1,1,0.008]],0.04),0.4); }
+};
+S.keys = (o,r)=>{
+  const jingle=(t0,len)=>{ const n=Math.round(len*45);
+    for(let k=0;k<n;k++){ const t=t0+r()*len, env=Math.sin(Math.PI*(t-t0)/len);
+      put(o,t,partials(2100+r()*2600,[[1,1,0.06+r()*0.08],[1.47+r()*0.2,0.6,0.05],[2.6,0.3,0.03]],0.25,0.0005,r),0.35+0.65*env*r()); } };
+  jingle(1.0+r()*0.3,0.8); jingle(4.9+r()*0.4,0.9);
+};
+S.coins = (o,r)=>{
+  const t0=2.2+r()*1.5, coin=(t,g)=>put(o,t,partials(2650,[[1,1,0.25],[1.83,0.6,0.18],[2.92,0.4,0.1]],0.6,0.0005,r),g);
+  coin(t0,1); coin(t0+0.28,0.6); coin(t0+0.45,0.45); // bounces
+  let t=t0+0.6, dt=0.085, g=0.45; while(dt>0.009 && t<t0+2.2){ coin(t,g); t+=dt; dt*=0.9; g*=0.985; }
+  put(o,t,noiseBurst(r,0.05,'bp',2500,1,0.001,0.015),0.4);
+};
+S.typing = (o,r)=>{
+  const key=(t,g,space)=>{ put(o,t,noiseBurst(r,0.02,'bp',space?1800:2600+r()*800,1.3,0.0003,0.0025),g);
+    put(o,t,noiseBurst(r,0.04,'lp',space?350:500,0.9,0.001,0.012),g*0.8); };
+  const burst=(t0,len)=>{ let t=t0; while(t<t0+len){ const sp=r()<0.15; key(t,0.6+r()*0.4,sp); t+=0.09+r()*0.14; } };
+  burst(0.3,1.6); burst(3.2+r()*0.3,1.3); burst(5.9,1.5);
+};
+S.typewriter = (o,r)=>{
+  const strike=(t,g)=>{ put(o,t,noiseBurst(r,0.05,'bp',1300,1.2,0.0005,0.008),g); put(o,t,glide(240,160,0.02,0.08,0.025),g*0.6); put(o,t+0.035,noiseBurst(r,0.02,'bp',3000,2,0.0003,0.003),g*0.4); };
+  let t=0.4; for(let k=0;k<13;k++){ strike(t,0.7+r()*0.3); t+=0.17+r()*0.12; }
+  put(o,t+0.1,partials(2100,[[1,1,0.6],[2.76,0.4,0.3],[5.4,0.2,0.1]],1.5),0.6); // bell
+  const ret=noiseBurst(r,0.45,'bp',900,1.2,0.05,0.1,0.25); put(o,t+0.5,ret,0.7); put(o,t+0.98,noiseBurst(r,0.06,'lp',600,1,0.001,0.02),0.9);
+  t=t+1.6; for(let k=0;k<8;k++){ strike(t,0.7+r()*0.3); t+=0.17+r()*0.12; }
+};
+S.piano = (o,r)=>{
+  const note=(t,f,g)=>{ const parts=[]; for(let n=1;n<=8;n++) parts.push([n*(1+0.0004*n*n),1/Math.pow(n,1.3),1.4/Math.pow(n,0.7)]);
+    put(o,t,partials(f,parts,2.2,0.003),g); put(o,t,noiseBurst(r,0.02,'bp',f*3,1,0.0005,0.004),g*0.2); };
+  const tune=[[0,659],[0.45,587],[0.9,523]]; const a=0.9+r()*0.3;
+  for(const [dt,f] of tune) note(a+dt,f,1);
+  for(const [dt,f] of [[0,659],[0.45,587],[0.9,523],[1.6,784]]) note(a+4+dt,f,1);
+};
+S.guitar = (o,r)=>{
+  const pluck=(f,dur)=>{ const L=Math.round(dur*SR), P=Math.round(SR/f), b=new Float32Array(L), d=new Float32Array(P);
+    for(let i=0;i<P;i++) d[i]=r()*2-1; let idx=0;
+    for(let i=0;i<L;i++){ const nx=(idx+1)%P; const v=d[idx]; d[idx]=0.996*0.5*(d[idx]+d[nx]); b[i]=v; idx=nx; } return b; };
+  const chord=[196,247,294,392,494,784];
+  const strum=(t,down,g)=>{ const s=down?chord:[...chord].reverse(); s.forEach((f,i)=>put(o,t+i*0.018,pluck(f,1.8),g*(i<2&&down?0.8:1))); };
+  const a=0.5+r()*0.3; strum(a,true,0.7); strum(a+0.9,true,0.6); strum(a+1.35,false,0.5); strum(a+4.2,true,0.7); strum(a+5.1,false,0.55);
+};
+S.spray = (o,r)=>{
+  const rattle=(t0)=>{ for(let k=0;k<6;k++) put(o,t0+k*0.11,noiseBurst(r,0.02,'bp',2200,3,0.0003,0.004),0.5); };
+  const spray=(t,len)=>put(o,t,noiseBurst(r,len+0.1,'bp',4200,0.6,0.03,0.04,len),1);
+  rattle(1.3); spray(2.2+r()*0.2,0.9); spray(5.7+r()*0.3,0.7);
+};
+S.kettle = (o,r)=>{
+  const t0=1.5+r()*0.5, len=4.5, L=Math.round(len*SR), b=new Float32Array(L); let ph=0;
+  for(let i=0;i<L;i++){ const t=i/SR; const f=2050+40*Math.sin(2*Math.PI*5.5*t)+60*(t/len); ph+=2*Math.PI*f/SR;
+    const env=Math.min(1,(t/2.2)**2)*Math.min(1,(len-t)/0.3); b[i]=Math.sin(ph)*env*(0.8+0.2*Math.sin(2*Math.PI*0.7*t)); }
+  const breath=noiseBurst(r,len,'bp',2100,6,1.5,10,2.7); gate(breath,1.5,0.3);
+  put(o,t0,b,0.8); put(o,t0,breath,1.2);
+};
+S.doorbell = (o,r)=>{
+  const bell=(t,f)=>put(o,t,partials(f,[[1,1,1.6],[2,0.45,0.9],[3,0.25,0.6],[4.2,0.12,0.3]],3,0.002),1);
+  const t=1.8+r()*1.5; bell(t,659); bell(t+0.65,523);
+};
+S.bikebell = (o,r)=>{
+  const ring=(t0)=>{ for(let k=0;k<9;k++) put(o,t0+k*0.045,partials(2300,[[1,1,0.4],[1.12,0.7,0.4],[2.2,0.3,0.15]],0.8,0.0005,r),k?0.5:1); };
+  const a=0.8+r()*0.4; ring(a); ring(a+0.75); ring(a+4.6);
+};
+S.phone = (o,r)=>{
+  const burst=(t0,len)=>{ for(let k=0;k<len*20;k++){ const f=k%2?1050:1340; put(o,t0+k*0.05,partials(f,[[1,1,0.12],[2.7,0.3,0.05]],0.2,0.0005),0.8); } };
+  const a=0.4+r()*0.4; burst(a,1.6); burst(a+4,1.6);
+};
+S.alarm = (o,r)=>{
+  const beep=(t)=>{ const b=filt(sqOsc(1000,0.08),'lp',3000,0.7); gate(b,0.002,0.004); put(o,t,b,0.6); };
+  const a=r()*0.3; for(let s=0;s<6;s++){ for(let k=0;k<4;k++) beep(a+s+k*0.12); if(s===2) s+=1; }
+};
+S.microwave = (o,r)=>{
+  const beep=(t)=>{ const b=filt(sqOsc(1250,0.38),'lp',2500,0.7); gate(b,0.005,0.01); put(o,t,b,0.55); };
+  const a=1.5+r()*2; for(let k=0;k<3;k++) beep(a+k*0.65);
+};
+S.carhorn = (o,r)=>{
+  const honk=(t,len)=>{ const b=mix(sawOsc(415,len),sawOsc(523,len)); filt(b,'lp',1800,0.8); filt(b,'hp',250,0.7); gate(b,0.01,0.04); put(o,t,b,0.6); };
+  const a=1.0+r()*0.8; honk(a,0.3); honk(a+0.45,0.75); honk(a+4.3,0.5);
+};
+S.siren = (o,r)=>{
+  const t0=0.8+r()*0.6, len=4.2, L=Math.round(len*SR), b=new Float32Array(L); let ph=0;
+  for(let i=0;i<L;i++){ const t=i/SR; const f=950+330*Math.sin(2*Math.PI*0.45*t-1.5); ph+=2*Math.PI*f/SR;
+    b[i]=(Math.sin(ph)+0.35*Math.sin(2*ph)+0.15*Math.sin(3*ph))*Math.min(1,t/0.5)*Math.min(1,(len-t)/0.8); }
+  put(o,t0,b,0.6);
+};
+S.knock = (o,r)=>{
+  const k=(t,g)=>{ put(o,t,glide(230,150,0.03,0.12,0.035),g); put(o,t,noiseBurst(r,0.06,'bp',520,2,0.0005,0.012),g*1.4); put(o,t,noiseBurst(r,0.01,'bp',1600,1,0.0002,0.002),g*0.5); };
+  const a=1.6+r()*0.5; k(a,1); k(a+0.2,0.9); k(a+0.4,1);
+  const b=a+3.4; k(b,1); k(b+0.19,0.85); k(b+0.38,0.95);
+};
+S.footsteps = (o,r)=>{
+  const step=(t,g)=>{ put(o,t,noiseBurst(r,0.1,'lp',900,0.9,0.002,0.025),g); put(o,t,noiseBurst(r,0.02,'bp',2800,1.5,0.0003,0.004),g*0.35); put(o,t+0.05,noiseBurst(r,0.06,'bp',1500,1,0.002,0.015),g*0.45); };
+  const off=r()*0.2; for(let k=0;k<14;k++) step(off+k*0.57,k%2?0.8:1);
+};
+S.drip = (o,r)=>{
+  const plip=(t)=>{ put(o,t,glide(700,1500,0.035,0.15,0.04,0.001),1); put(o,t+0.004,glide(1500,1550,0.02,0.1,0.03),0.3); };
+  const off=0.2+r()*0.3; for(let k=0;k<8;k++) plip(off+k*1.0+(r()-0.5)*0.03);
+};
+S.bird = (o,r)=>{
+  const tweet=(t,f0,f1,len)=>{ const b=glide(f0,f1,len,len+0.02,1,0.004,[[2,0.15]]); gate(b,0.004,0.012); put(o,t,b,0.7); };
+  const song=(t0)=>{ let t=t0; for(let k=0;k<3;k++){ tweet(t,4200,2600,0.07); t+=0.11; } t+=0.08; for(let k=0;k<6;k++){ tweet(t,3000,3500,0.03); t+=0.045; } };
+  song(1.1+r()*0.3); song(3.8+r()*0.3); song(6.3+r()*0.2);
+};
+S.crickets = (o,r)=>{
+  const chirp=(t)=>{ for(let p=0;p<3;p++){ const b=partials(4300,[[1,1,10]],0.022); gate(b,0.004,0.006); put(o,t+p*0.04,b,0.6); } };
+  const off=r()*0.2; for(let k=0;k<16;k++) chirp(off+k*0.5);
+};
+S.popcorn = (o,r)=>{
+  const pop=(t,g)=>{ put(o,t,noiseBurst(r,0.03,'bp',1300+r()*1200,0.8,0.0002,0.004),g); put(o,t,glide(400,250,0.01,0.04,0.01),g*0.4); };
+  const times=[]; for(let k=0;k<26;k++) times.push(r()*8);
+  for(const t of times) pop(t,0.5+r()*0.5);
+  put(o,0,noiseBurst(r,8,'bp',3500,0.8,3,10,4),0.05);
+};
+S.clapping = (o,r)=>{
+  const clap=(t,g)=>{ for(let m=0;m<3;m++) put(o,t+m*0.008,noiseBurst(r,0.01,'bp',1100,1,0.0003,0.002),g*0.7); put(o,t+0.024,noiseBurst(r,0.12,'bp',1200,1,0.0005,0.025),g); };
+  const a=0.4+r()*0.3; for(let k=0;k<5;k++) clap(a+k*0.42,0.85+0.15*r()); for(let k=0;k<5;k++) clap(a+4.4+k*0.42,0.85+0.15*r());
+};
+S.rain = (o,r)=>{
+  put(o,0,noiseBurst(r,8,'lp',2500,0.6,0.001,1e9),0.25);
+  for(let k=0;k<320;k++) put(o,r()*8,noiseBurst(r,0.012,'bp',2000+r()*3000,2,0.0003,0.002),0.15+r()*0.25);
+};
+
+/* ===== library: labels, aliases, families. Two sounds from one family never share a puzzle ===== */
+const LIBRARY = [
+ {id:'ice',label:'Ice dropping into a glass',aka:['ice','ice cubes','glass clink','drink','clinking glass'],fam:'clink',lvl:1},
+ {id:'zipper',label:'Zipper',aka:['zip','zipping','zipper closing','unzip'],fam:'zip',lvl:1},
+ {id:'basketball',label:'Basketball bouncing',aka:['dribbling','dribble','ball bouncing','bounce'],fam:'bounce',lvl:1},
+ {id:'pingpong',label:'Ping-pong rally',aka:['table tennis','ping pong','paddle','ping pong ball'],fam:'bounce',lvl:1},
+ {id:'turnsignal',label:'Car turn signal',aka:['indicator','blinker','car blinker','hazard lights','hazards','turn indicator'],fam:'tick',lvl:0.75,dense:true},
+ {id:'clock',label:'Clock ticking',aka:['tick tock','ticking','watch','wall clock'],fam:'tick',lvl:0.9,dense:true},
+ {id:'keys',label:'Keys jingling',aka:['keychain','keyring','key ring','car keys','jingle'],fam:'jingle',lvl:1},
+ {id:'coins',label:'Coin spinning on a table',aka:['coin','coin drop','penny','quarter','change','spinning coin'],fam:'coin',lvl:1},
+ {id:'typing',label:'Keyboard typing',aka:['computer keyboard','typing','keys','computer keys','laptop'],fam:'type',lvl:1.1},
+ {id:'typewriter',label:'Typewriter',aka:['typewriter bell','carriage return','typing'],fam:'type',lvl:1},
+ {id:'piano',label:'Piano keys',aka:['piano','piano notes','keys','melody'],fam:'tonal',lvl:0.7},
+ {id:'guitar',label:'Guitar strumming',aka:['acoustic guitar','strum','strumming','guitar chord'],fam:'tonal',lvl:0.85},
+ {id:'spray',label:'Spray can',aka:['aerosol','spray paint','hairspray','deodorant','air freshener'],fam:'hiss',lvl:1},
+ {id:'rain',label:'Rain',aka:['rainfall','raining','rain on window','storm','shower'],fam:'hiss',lvl:0.6,dense:true},
+ {id:'kettle',label:'Kettle whistling',aka:['tea kettle','teapot','whistling kettle','boiling water','whistle'],fam:'whistle',lvl:0.7},
+ {id:'doorbell',label:'Doorbell',aka:['ding dong','door chime','chime'],fam:'bell',lvl:0.85},
+ {id:'bikebell',label:'Bicycle bell',aka:['bike bell','bike','bicycle','ring ring'],fam:'bell',lvl:1},
+ {id:'phone',label:'Old telephone ringing',aka:['phone','telephone','landline','ringing','rotary phone'],fam:'bell',lvl:0.8},
+ {id:'alarm',label:'Alarm clock beeping',aka:['alarm','digital alarm','beeping','alarm clock'],fam:'beep',lvl:0.85},
+ {id:'microwave',label:'Microwave beeping',aka:['microwave','microwave done','beeping','oven timer'],fam:'beep',lvl:0.85},
+ {id:'carhorn',label:'Car horn',aka:['honk','honking','horn','beep beep'],fam:'horn',lvl:0.9},
+ {id:'siren',label:'Siren',aka:['police siren','ambulance','fire truck','emergency siren'],fam:'horn',lvl:0.7},
+ {id:'knock',label:'Knocking on a door',aka:['knock','door knock','knocking','knock knock'],fam:'thud',lvl:1.1},
+ {id:'footsteps',label:'Footsteps',aka:['walking','steps','feet','shoes'],fam:'thud',lvl:0.8,dense:true},
+ {id:'drip',label:'Water dripping',aka:['drip','dripping','leaky faucet','tap dripping','water drop'],fam:'drip',lvl:0.9},
+ {id:'bird',label:'Bird chirping',aka:['birds','tweeting','birdsong','songbird','tweet'],fam:'chirp',lvl:0.9},
+ {id:'crickets',label:'Crickets',aka:['cricket','insects','bugs','chirping'],fam:'chirp',lvl:0.65,dense:true},
+ {id:'popcorn',label:'Popcorn popping',aka:['popcorn','popping','corn'],fam:'pop',lvl:1},
+ {id:'clapping',label:'Hands clapping',aka:['clap','clapping','applause','hand clap'],fam:'pop',lvl:1.05},
+];
+
+// render a sound into a normalized 8 s Float32Array
+function renderSound(id, seed){
+  const r=mulberry32(seed), o=new Float32Array(N); S[id](o,r);
+  // loudness match on the active part of the sound (50 ms frames)
+  const F=2205, frames=[]; let mx=0;
+  for(let i=0;i<N;i+=F){let s=0;for(let j=i;j<i+F;j++)s+=o[j]*o[j];s=Math.sqrt(s/F);frames.push(s);if(s>mx)mx=s;}
+  const act=frames.filter(f=>f>mx*0.2); const rms=Math.sqrt(act.reduce((a,f)=>a+f*f,0)/act.length)||1e-9;
+  const lib=LIBRARY.find(l=>l.id===id); let g=0.16*(lib?lib.lvl:1)/rms;
+  let pk=0; for(let i=0;i<N;i++) pk=Math.max(pk,Math.abs(o[i]));
+  if(pk*g>0.9) g=0.9/pk;
+  for(let i=0;i<N;i++) o[i]*=g;
+  return o;
+}
+
+// ===== daily puzzle =====
+const EPOCH = new Date(2026,10,5); // Puzzle #1 = Nov 5, 2026
+function puzzleNumber(d=new Date()){ const a=new Date(d.getFullYear(),d.getMonth(),d.getDate()); return Math.round((a-EPOCH)/864e5)+1; }
+function pickSounds(seed){
+  const r=mulberry32(seed*7919+13); const pool=[...LIBRARY]; const picked=[];
+  while(picked.length<4){ const c=pool.splice(Math.floor(r()*pool.length),1)[0];
+    if(picked.some(p=>p.fam===c.fam)) continue; if(c.dense && picked.some(p=>p.dense)) continue; picked.push(c); }
+  return picked.map(p=>p.id);
+}
+function puzzleFor(num){ if(num===1) return ['ice','zipper','basketball','turnsignal']; return pickSounds(num); }
+
+if(typeof module!=='undefined') module.exports={S,LIBRARY,renderSound,puzzleFor,puzzleNumber,SR,N};
+
+</script>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const COLORS=['--c1','--c2','--c3','--c4'], SQUARES=['🟧','🟨','🟩','🟪'];
+const APP=$('app');
+let store={}; try{store=JSON.parse(localStorage.getItem('soundcheck:v1')||'{}')}catch(e){}
+function save(){try{localStorage.setItem('soundcheck:v1',JSON.stringify(store))}catch(e){}}
+store.days=store.days||{}; store.stats=store.stats||{played:0,streak:0,max:0,last:0,total:0};
+
+const today=puzzleNumber();
+let mode='daily', num=today, ids=[], bufs=[], env=[];
+let st; // {solved:[ids in slot order], wrong:[ids], focus:n, revealed:bool, done:bool}
+
+/* ---------- audio ---------- */
+let ctx=null, master=null, comp=null, chans=[], playing=false, startAt=0, offset=0, focusUntil=0, focusIdx=-1, vol=0.8;
+function ensureCtx(){
+  if(ctx) return;
+  const AC=window.AudioContext||window.webkitAudioContext; ctx=new AC();
+  comp=ctx.createDynamicsCompressor(); comp.threshold.value=-10; comp.ratio.value=6; comp.attack.value=0.003; comp.release.value=0.15;
+  master=ctx.createGain(); master.gain.value=vol*0.75; master.connect(comp); comp.connect(ctx.destination);
+  masterAn=ctx.createAnalyser(); masterAn.fftSize=1024; comp.connect(masterAn);
+  buildChannels();
+}
+let masterAn=null;
+function buildChannels(){
+  chans.forEach(c=>{try{c.src&&c.src.stop()}catch(e){} c.gain.disconnect();});
+  chans=bufs.map((b,i)=>{
+    const ab=ctx.createBuffer(1,b.length,SR); ab.getChannelData(0).set(b);
+    const gain=ctx.createGain(), an=ctx.createAnalyser(); an.fftSize=1024;
+    let out=gain; if(ctx.createStereoPanner){const p=ctx.createStereoPanner(); p.pan.value=[-.35,.35,-.15,.15][i]; gain.connect(p); out=p;}
+    out.connect(an); an.connect(master);
+    return {ab,gain,an,src:null,data:new Float32Array(1024)};
+  });
+  applyGains(true);
+}
+function startSources(){
+  const t=ctx.currentTime+0.04; startAt=t;
+  chans.forEach(c=>{const s=ctx.createBufferSource(); s.buffer=c.ab; s.loop=true; s.connect(c.gain); s.start(t,offset%LOOP); c.src=s;});
+}
+function stopSources(){ chans.forEach(c=>{try{c.src&&c.src.stop()}catch(e){} c.src=null;}); }
+function pos(){ return playing? (offset+ctx.currentTime-startAt)%LOOP : offset%LOOP; }
+async function play(){
+  ensureCtx(); try{await ctx.resume()}catch(e){}
+  if(playing) return; startSources(); playing=true; APP.classList.add('playing'); setIcon();
+}
+function pause(){ if(!playing) return; offset=pos(); stopSources(); playing=false; APP.classList.remove('playing'); setIcon(); }
+function setIcon(){ $('playIcon').innerHTML=playing?'<rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/>':'<path fill="currentColor" d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/>'; $('play').setAttribute('aria-label',playing?'Pause':'Play'); }
+function chanMuted(i){ const s=slotOf(ids[i]); return s>=0 && muted[s]; }
+let muted=[false,false,false,false];
+function chanGain(i){
+  if(chanMuted(i)) return 0;
+  if(isFocusing()) return i===focusIdx?1.5:0.1;
+  return 1;
+}
+function isFocusing(){ return ctx && focusIdx>=0 && ctx.currentTime<focusUntil; }
+function applyGains(now){
+  if(!ctx) return; const t=ctx.currentTime;
+  chans.forEach((c,i)=>{ c.gain.gain.cancelScheduledValues(t); if(now) c.gain.gain.value=chanGain(i); else c.gain.gain.setTargetAtTime(chanGain(i),t,0.06); });
+}
+
+/* ---------- puzzle setup ---------- */
+function load(m, n){
+  mode=m; num=n; pause(); offset=0; focusIdx=-1; focusUntil=0; muted=[false,false,false,false];
+  APP.classList.toggle('practice',m==='practice');
+  ids = m==='daily'? puzzleFor(n) : pickSounds(n);
+  st = m==='daily' && store.days[n] ? store.days[n] : {solved:[],wrong:[],focus:0,revealed:false,done:false};
+  APP.classList.add('loading');
+  setTimeout(()=>{
+    bufs=ids.map((id,i)=>renderSound(id,(m==='daily'?n:n+99991)*100+i));
+    env=bufs.map(b=>{const B=120,step=Math.floor(b.length/B),e=new Float32Array(B);for(let k=0;k<B;k++){let s=0;for(let j=k*step;j<(k+1)*step;j+=4)s+=b[j]*b[j];e[k]=Math.sqrt(s/(step/4));}return e;});
+    if(ctx) buildChannels();
+    APP.classList.remove('loading');
+    render();
+  },30);
+  const d=new Date(EPOCH); d.setDate(d.getDate()+n-1);
+  $('meta').innerHTML = m==='daily' ? `Daily #${n} · ${d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}` : `Unlimited mix<span class="practice-flag">PRACTICE</span>`;
+  $('q').value='';
+}
+function score(){ const un=st.revealed?4-st.solved.length:0; return Math.max(0,100-5*st.wrong.length-10*st.focus-25*un); }
+function slotOf(id){ return st.solved.indexOf(id); }
+function persist(){ if(mode==='daily'){ store.days[num]=st; save(); } }
+
+/* ---------- rendering ---------- */
+function render(){
+  const sc=$('score'); sc.firstChild.nodeValue=score();
+  // slots
+  const box=$('slots'); box.innerHTML='';
+  const order=[...st.solved]; if(st.revealed) ids.forEach(id=>{ if(!order.includes(id)) order.push(id); });
+  for(let s=0;s<4;s++){
+    const id=order[s], lib=id&&LIBRARY.find(l=>l.id===id), el=document.createElement('div');
+    el.className='slot'+(id? (s<st.solved.length?' on':' revealed'):'')+(muted[s]?' muted':'');
+    el.style.setProperty('--col',`var(${COLORS[s]})`);
+    el.innerHTML=`<div class="fill"></div><div class="ch">CH ${s+1}</div><div class="name">${lib?lib.label:'· · ·'}</div><div class="bars">${'<i></i>'.repeat(7)}</div>${id?`<button class="mute ${muted[s]?'m':''}" data-s="${s}">${muted[s]?'MUTED':'MUTE'}</button>`:''}`;
+    if(s>=st.solved.length && !st.revealed) el.style.animation='none';
+    if(lastSolved!==null && s===lastSolved) {} else if(s<st.solved.length) el.style.animation='none', el.querySelector('.fill').style.animation='none', el.querySelector('.fill').style.transform='scaleX(1)';
+    box.appendChild(el);
+  }
+  lastSolved=null;
+  box.querySelectorAll('.mute').forEach(b=>b.onclick=()=>{ const s=+b.dataset.s; muted[s]=!muted[s]; applyGains(); render(); });
+  $('focus').disabled = st.done || st.solved.length>=4;
+  $('focus').classList.toggle('live',isFocusing());
+  APP.classList.toggle('done',st.done);
+  renderLib(); if(st.done) renderResult();
+}
+let lastSolved=null;
+
+const norm=s=>s.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+function matches(q){
+  const toks=norm(q).split(' ').filter(Boolean);
+  if(!toks.length) return LIBRARY.map(l=>({l,via:null})).sort((a,b)=>a.l.label.localeCompare(b.l.label));
+  const out=[];
+  for(const l of LIBRARY){
+    const names=[l.label,...l.aka];
+    let hit=null, rank=9;
+    names.forEach((n,ni)=>{ const words=norm(n).split(' ');
+      const ok=toks.every(t=>words.some(w=>w.startsWith(t)) || (t.length>3 && norm(n).includes(t)));
+      if(ok){ const r=(ni===0?0:1)+(words.some(w=>w===toks[0])?0:0.5); if(r<rank){rank=r; hit=ni===0?null:n;} } });
+    if(rank<9) out.push({l,via:hit,rank});
+  }
+  return out.sort((a,b)=>a.rank-b.rank||a.l.label.localeCompare(b.l.label));
+}
+function renderLib(){
+  const lib=$('lib'), res=matches($('q').value);
+  lib.innerHTML = res.length? '' : '<div class="empty">Nothing by that name in the library — try a broader word like “ball”, “bell” or “water”.</div>';
+  for(const {l,via} of res){
+    const b=document.createElement('button'); const w=st.wrong.includes(l.id), r=st.solved.includes(l.id);
+    b.className='opt'+(w?' wrong':'')+(r?' right':''); b.disabled=w||r||st.done;
+    b.innerHTML=`<span>${l.label}${via?` <span class="via">· “${via}”</span>`:''}</span><span class="tick">${r?'✓ CH '+(slotOf(l.id)+1):w?'−5':''}</span>`;
+    b.onclick=()=>guess(l.id,b);
+    lib.appendChild(b);
+  }
+}
+function guess(id,btn){
+  if(st.done||st.solved.includes(id)||st.wrong.includes(id)) return;
+  if(ids.includes(id)){
+    st.solved.push(id); lastSolved=st.solved.length-1;
+    if(focusIdx===ids.indexOf(id)){ focusUntil=0; focusIdx=-1; applyGains(); }
+    try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}
+    toast(['Channel open!','Nice ear.','Locked in.','Clean take.'][st.solved.length-1]);
+    $('q').value='';
+    if(st.solved.length===4) finish(false);
+  } else {
+    st.wrong.push(id); floatText('−5',btn); $('field').classList.remove('shake'); void $('field').offsetWidth; $('field').classList.add('shake');
+    hitScore();
+  }
+  persist(); render();
+}
+function hitScore(){const s=$('score'); s.classList.remove('hit'); void s.offsetWidth; s.classList.add('hit');}
+function floatText(t,el){ const r=el.getBoundingClientRect(), f=document.createElement('div'); f.className='float'; f.textContent=t; f.style.left=(r.right-50)+'px'; f.style.top=(r.top)+'px'; document.body.appendChild(f); setTimeout(()=>f.remove(),1000); }
+let tt; function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('show'),1500); }
+
+/* ---------- focus & reveal ---------- */
+let focusCycle=0;
+$('focus').onclick=async()=>{
+  if(st.done||isFocusing()) return;
+  const uns=ids.map((id,i)=>i).filter(i=>!st.solved.includes(ids[i])); if(!uns.length) return;
+  await play();
+  focusIdx=uns[focusCycle++ % uns.length]; focusUntil=ctx.currentTime+LOOP;
+  st.focus++; persist(); hitScore(); floatText('−10',$('focus')); applyGains(); render();
+};
+let revealArm=0;
+$('reveal').onclick=()=>{
+  if(st.done) return;
+  const b=$('reveal');
+  if(Date.now()-revealArm>3000){ revealArm=Date.now(); b.textContent='Tap again to reveal'; b.classList.add('warn'); setTimeout(()=>{ if(Date.now()-revealArm>=3000){ b.textContent='Reveal answers'; b.classList.remove('warn'); } },3050); return; }
+  b.textContent='Reveal answers'; b.classList.remove('warn'); finish(true);
+};
+function finish(revealed){
+  st.revealed=revealed||st.solved.length<4; st.done=true; focusIdx=-1; focusUntil=0; applyGains();
+  if(mode==='daily'){ const S=store.stats; if(S.last!==num){ S.played++; S.streak = (S.last===num-1? S.streak+1 : 1); S.max=Math.max(S.max,S.streak); S.total+=score(); S.last=num; } save(); }
+  persist(); render();
+}
+function shareText(){
+  const g=[0,1,2,3].map(s=>s<st.solved.length?SQUARES[s]:'⬛').join('');
+  const head = mode==='daily'? `Soundcheck #${num}` : 'Soundcheck practice';
+  return `${head} 🎚️ ${score()}/100\n${g}\n❌ ${st.wrong.length} · 🎧 ${st.focus} focus`;
+}
+function renderResult(){
+  const n=st.solved.length;
+  $('rtitle').textContent = n===4 ? (score()===100?'Perfect pitch.':score()>=80?'Studio-grade ears.':'All four channels open.') : `${n} of 4 identified`;
+  $('rscore').innerHTML=`${score()}<span>/100</span>`;
+  const un=st.revealed?4-n:0, parts=[];
+  if(st.wrong.length) parts.push(`${st.wrong.length} wrong (−${st.wrong.length*5})`);
+  if(st.focus) parts.push(`${st.focus} focus (−${st.focus*10})`);
+  if(un) parts.push(`${un} revealed (−${un*25})`);
+  $('rbreak').textContent=parts.length?parts.join(' · '):'No wrong answers, no focus. Clean.';
+  $('rgrid').textContent=[0,1,2,3].map(s=>s<n?SQUARES[s]:'⬛').join('');
+  const S=store.stats;
+  $('rstats').innerHTML = mode==='daily' ? `<div><b>${S.played}</b><span>Played</span></div><div><b>${S.streak}</b><span>Streak</span></div><div><b>${S.played?Math.round(S.total/S.played):0}</b><span>Avg</span></div>` : '';
+  $('practice').textContent = mode==='daily'?'Practice mix':'New practice mix';
+  updateNext();
+}
+function updateNext(){
+  const now=new Date(), mid=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1), ms=mid-now;
+  const h=Math.floor(ms/36e5), m=Math.floor(ms/6e4)%60;
+  $('next').innerHTML = mode==='daily' ? `Next recording in ${h}h ${m}m` : `<a href="#" id="backDaily" style="color:var(--muted)">Back to today's daily</a>`;
+  const bd=$('backDaily'); if(bd) bd.onclick=e=>{e.preventDefault(); load('daily',today);};
+}
+$('share').onclick=async()=>{
+  const t=shareText();
+  try{ await navigator.clipboard.writeText(t); toast('Result copied'); }
+  catch(e){ const sb=$('sharebox'); sb.style.display='block'; sb.value=t; sb.select(); toast('Copy the text below'); }
+};
+$('practice').onclick=()=>{ load('practice', Math.floor(Math.random()*1e6)+1000); window.scrollTo({top:0,behavior:'smooth'}); };
+
+/* ---------- controls ---------- */
+$('play').onclick=()=> playing? pause() : play();
+const volEl=$('vol');
+volEl.oninput=()=>{ vol=volEl.value/100; volEl.style.setProperty('--v',volEl.value+'%'); if(master) master.gain.setTargetAtTime(vol*0.75,ctx.currentTime,0.03); };
+volEl.style.setProperty('--v','80%');
+$('q').oninput=renderLib;
+$('q').onkeydown=e=>{ if(e.key==='Enter'){ const first=$('lib').querySelector('.opt:not(:disabled)'); if(first && $('q').value.trim()) first.click(); } };
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) pause(); });
+
+/* ---------- meters + waveform loop ---------- */
+const mEl=$('master'); for(let i=0;i<16;i++) mEl.appendChild(document.createElement('i'));
+const mBars=[...mEl.children];
+const cv=$('cv'), g2=cv.getContext('2d');
+let mLevel=0, chLevels=[0,0,0,0], wasFocus=false;
+function rms(an,data){ an.getFloatTimeDomainData(data); let s=0; for(let i=0;i<data.length;i++) s+=data[i]*data[i]; return Math.sqrt(s/data.length); }
+function frame(){
+  // waveform
+  const W=cv.clientWidth, H=cv.clientHeight, dpr=window.devicePixelRatio||1;
+  if(cv.width!==W*dpr){ cv.width=W*dpr; cv.height=H*dpr; }
+  g2.setTransform(dpr,0,0,dpr,0,0); g2.clearRect(0,0,W,H);
+  if(env.length){
+    const B=env[0].length, bw=W/B, p=pos()/LOOP, foc=isFocusing();
+    for(let k=0;k<B;k++){
+      let s=0; for(let i=0;i<env.length;i++){ const gg=chanGain(i); s+=(env[i][k]*gg)**2; }
+      const a=Math.min(1,Math.sqrt(s)*3.2), h=Math.max(2,a*(H-14));
+      const passed=k/B<p;
+      g2.fillStyle = passed ? (foc?'#f3e9d2':'#d9c9a8') : '#4e453d';
+      g2.fillRect(k*bw+1,(H-h)/2,Math.max(1,bw-2),h);
+    }
+    g2.fillStyle='rgba(233,120,92,.95)'; g2.fillRect(p*W-1,0,2,H);
+  }
+  // focus state
+  const foc=isFocusing();
+  $('wave').classList.toggle('focusing',foc);
+  if(foc){ $('fbadge').textContent=`Focus · ${Math.ceil(focusUntil-ctx.currentTime)}s`; }
+  if(wasFocus && !foc){ focusIdx=-1; applyGains(); render(); }
+  wasFocus=foc;
+  // meters
+  let lv=0; if(playing&&masterAn){ lv=Math.min(1,rms(masterAn,new Float32Array(1024))*4); }
+  mLevel = lv>mLevel? lv : mLevel*0.9;
+  mBars.forEach((b,i)=>{ const on=i/16<mLevel; b.style.background= on? (i>12?'var(--c1)':i>9?'var(--c2)':'var(--cream)') : '#3d3631'; });
+  const slotEls=$('slots').children;
+  for(let s=0;s<4;s++){
+    const id=(st.solved[s]) || (st.revealed? null:null);
+    const el=slotEls[s]; if(!el) continue;
+    let orderId = el.classList.contains('on')||el.classList.contains('revealed') ? slotId(s) : null;
+    let L=0; if(orderId && playing && chans.length){ const ci=ids.indexOf(orderId); if(ci>=0) L=Math.min(1,rms(chans[ci].an,chans[ci].data)*5); }
+    chLevels[s] = L>chLevels[s]? L : chLevels[s]*0.88;
+    const bars=el.querySelectorAll('.bars i'); const t=performance.now()/1000;
+    bars.forEach((b,i)=>{ const wob=0.55+0.45*Math.sin(t*9+i*1.7+s); b.style.height = (12+88*Math.min(1,chLevels[s]*wob*(1-Math.abs(i-3)/6)))+'%'; });
+  }
+  requestAnimationFrame(frame);
+}
+function slotId(s){ const order=[...st.solved]; if(st.revealed) ids.forEach(id=>{ if(!order.includes(id)) order.push(id); }); return order[s]; }
+requestAnimationFrame(frame);
+setInterval(()=>{ if(st&&st.done) updateNext(); },30000);
+
+/* ---------- go ---------- */
+$('foot2').textContent='';
+load('daily',today);
+// test hooks
+window.__sc={get ids(){return ids}, get st(){return st}, score, guess:(id)=>guess(id,$('q')), load, matches};
+})();
+</script>
+</body>
+</html>

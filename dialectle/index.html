@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dialectle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Layout: one centered column, a dictionary entry per word; each country is a numbered sense. Airmail stripe frames the page. */
+  --paper: #eef1f5;
+  --card: #ffffff;
+  --ink: #15203a;
+  --muted: #5d6781;
+  --line: #d5dae5;
+  --accent: #1f4e9c;
+  --accent-ink: #ffffff;
+  --mail-red: #c8102e;
+  --ok: #217a4b;
+  --ok-bg: #e2f3ea;
+  --bad: #b3261e;
+  --bad-bg: #fbe5e3;
+  --chip: #e6eaf2;
+  --display: "Young Serif", Georgia, "Times New Roman", serif;
+  --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1524; --card: #171f33; --ink: #e8ecf5; --muted: #9aa4bd; --line: #2b3550;
+    --accent: #7fa6ef; --accent-ink: #0f1524; --mail-red: #ef5a6f;
+    --ok: #6fd39c; --ok-bg: #173527; --bad: #ff8a80; --bad-bg: #3a1c1f; --chip: #222c45;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1524; --card: #171f33; --ink: #e8ecf5; --muted: #9aa4bd; --line: #2b3550;
+  --accent: #7fa6ef; --accent-ink: #0f1524; --mail-red: #ef5a6f;
+  --ok: #6fd39c; --ok-bg: #173527; --bad: #ff8a80; --bad-bg: #3a1c1f; --chip: #222c45;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.45;
+  min-height: 100%;
+}
+.airmail {
+  height: 8px;
+  background: repeating-linear-gradient(-45deg, var(--mail-red) 0 14px, transparent 14px 22px, var(--accent) 22px 36px, transparent 36px 44px);
+}
+.wrap { max-width: 680px; margin: 0 auto; padding: 20px 16px 48px; display: flex; flex-direction: column; gap: 18px; }
+header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand h1 { font-family: var(--display); font-weight: 400; font-size: 2.2rem; margin: 0; letter-spacing: -0.01em; line-height: 1; }
+.brand h1 .dot { color: var(--mail-red); }
+.brand p { margin: 4px 0 0; color: var(--muted); font-size: 0.92rem; }
+.brand .ipa { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+.controls { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.seg { display: inline-flex; background: var(--chip); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; color: var(--muted); font: 600 0.82rem var(--mono); padding: 6px 11px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.seg button:focus-visible, .btn:focus-visible, .sense:focus-visible, .linkbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.progress { display: flex; gap: 6px; align-items: center; }
+.progress .pip { flex: 1; height: 5px; border-radius: 3px; background: var(--line); }
+.progress .pip.done { background: var(--accent); }
+.progress .pip.cur { background: var(--mail-red); }
+.progress .lbl { font: 500 0.78rem var(--mono); color: var(--muted); margin-left: 6px; white-space: nowrap; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px 20px; display: flex; flex-direction: column; gap: 16px; }
+.entry-head { display: flex; flex-direction: column; gap: 4px; }
+.headword { font-family: var(--display); font-size: clamp(2.2rem, 7vw, 3.3rem); line-height: 1.05; margin: 0; text-wrap: balance; }
+.meta { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+.ctx { font-style: italic; color: var(--muted); margin: 2px 0 0; }
+.ask { margin: 0; font-size: 0.95rem; color: var(--muted); }
+
+.senses { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; counter-reset: sense; }
+.row { display: grid; grid-template-columns: 2.1rem 1fr; gap: 10px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.row:first-child { border-top: 0; padding-top: 0; }
+.num { font-family: var(--display); font-size: 1.3rem; color: var(--mail-red); line-height: 1.3; }
+.who { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.cc { font: 600 0.75rem var(--mono); background: var(--ink); color: var(--card); padding: 2px 6px; border-radius: 4px; letter-spacing: 0.04em; }
+.cname { font-weight: 700; }
+.opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.sense { font: 400 0.92rem var(--body); text-align: left; background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; padding: 7px 11px; cursor: pointer; transition: border-color .12s, background .12s; }
+.sense:hover:not(:disabled) { border-color: var(--accent); }
+.sense[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.sense:disabled { cursor: default; }
+.sense.right { background: var(--ok-bg); border-color: var(--ok); color: var(--ink); }
+.sense.wrong { background: var(--bad-bg); border-color: var(--bad); color: var(--ink); text-decoration: line-through; }
+.sense.dim { opacity: .45; }
+.verdict { font: 600 0.75rem var(--mono); margin-left: auto; }
+.verdict.ok { color: var(--ok); }
+.verdict.no { color: var(--bad); }
+
+.note { background: var(--paper); border-left: 3px solid var(--mail-red); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 0.95rem; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn { font: 700 1rem var(--body); border: 0; border-radius: 10px; padding: 11px 20px; cursor: pointer; background: var(--accent); color: var(--accent-ink); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+.hint { color: var(--muted); font-size: 0.85rem; }
+
+.result .big { font-family: var(--display); font-size: 3rem; line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
+.grid { font-size: 1.25rem; line-height: 1.35; letter-spacing: 2px; margin: 0; white-space: pre; font-family: var(--mono); }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { background: var(--paper); border-radius: 10px; padding: 10px 6px; text-align: center; }
+.stat b { display: block; font-family: var(--display); font-size: 1.5rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 0.74rem; color: var(--muted); }
+.recap { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.recap li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+.recap .rw { font-family: var(--display); }
+.recap .rs { font: 500 0.85rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.sharebox { width: 100%; font: 0.85rem var(--mono); min-height: 7rem; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 8px; }
+.howto summary { cursor: pointer; font-weight: 700; }
+.howto { color: var(--muted); font-size: 0.92rem; }
+.howto ol { padding-left: 1.2rem; margin: 8px 0 0; }
+footer { color: var(--muted); font-size: 0.8rem; text-align: center; }
+.linkbtn { background: none; border: 0; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; padding: 0; }
+@media (max-width: 420px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .controls { align-items: flex-start; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card.enter { animation: slip .28s ease-out; }
+  @keyframes slip { from { transform: translateY(6px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+</style>
+</head>
+<body>
+<div class="airmail" aria-hidden="true"></div>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>Dialectle<span class="dot">.</span></h1>
+      <p><span class="ipa">/daɪ.əˈlɛk.təl/</span> One word, many countries. Pick what it means in each.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Language" id="langSeg"></div>
+      <div class="seg" role="group" aria-label="Mode" id="modeSeg">
+        <button id="modeDaily" data-mode="daily">Daily</button>
+        <button id="modePractice" data-mode="practice">Practice</button>
+      </div>
+    </div>
+  </header>
+  <div class="progress" id="progress" aria-label="Progress"></div>
+  <main id="main"></main>
+  <details class="howto">
+    <summary>How to play</summary>
+    <ol>
+      <li>Each day there are five words per language, the same for everyone.</li>
+      <li>For every country listed, pick what a local would mean by the word. Some meanings are decoys that no country uses.</li>
+      <li>Many words share a meaning everywhere (monkey, footwear). Pick the meaning that is specific to that country.</li>
+      <li>You get a point for each country you get right. Share your grid when you're done.</li>
+    </ol>
+  </details>
+  <footer>New puzzle every day at midnight your time · <span id="wordcount"></span></footer>
+</div>
+
+<script>
+// Dialectle word data.
+// Each entry: { w: word, s: {key: sense}, a: {COUNTRY: senseKey}, n: note, c?: context line }
+// Senses not used in `a` are decoys.
+const COUNTRIES = {
+  US: "United States", UK: "United Kingdom", CA: "Canada", AU: "Australia",
+  ES: "Spain", MX: "Mexico", AR: "Argentina", CO: "Colombia", CL: "Chile",
+  CU: "Cuba", VE: "Venezuela", PE: "Peru", EC: "Ecuador", GT: "Guatemala",
+  PT: "Portugal", BR: "Brazil",
+  FR: "France", QC: "Québec", BE: "Belgium", CH: "Switzerland"
+};
+
+const LANGS = {
+  en: { name: "English", words: [
+    { w: "pants", s: { tr: "Trousers", un: "Underwear", sh: "Shorts" }, a: { US: "tr", UK: "un", CA: "tr", AU: "tr" }, n: "Ask a Brit to admire your new pants and you're showing them your underwear. Trousers are trousers." },
+    { w: "jumper", s: { sw: "Pullover sweater", dr: "Sleeveless pinafore dress", pa: "Parachutist" }, a: { US: "dr", UK: "sw", CA: "dr", AU: "sw" }, n: "In North America a jumper is a sleeveless dress worn over a blouse. In the UK and Australia it's a sweater." },
+    { w: "thongs", s: { fl: "Flip-flops", gs: "G-string underwear", st: "Leather straps" }, a: { US: "gs", UK: "gs", CA: "gs", AU: "fl" }, n: "Australians wear thongs to the beach on their feet." },
+    { w: "chips", s: { cr: "Thin bagged potato snacks", fr: "French fries", po: "Poker tokens" }, a: { US: "cr", UK: "fr", CA: "cr" }, n: "Fish and chips comes with fries. The bagged snack is called crisps in the UK." },
+    { w: "biscuit", s: { co: "Sweet cookie", br: "Soft savory bread roll", cr: "Dry cracker" }, a: { US: "br", UK: "co", AU: "co" }, n: "Biscuits and gravy only makes sense in the US. In Britain a biscuit goes with tea." },
+    { w: "rubber", s: { er: "Pencil eraser", co: "Condom", bo: "Rain boots" }, a: { US: "co", UK: "er", AU: "er" }, n: "A schoolkid in London asking to borrow a rubber gets a very different reaction in Ohio." },
+    { w: "football", s: { am: "American football", so: "Soccer", au: "Australian rules football", ca: "Canadian football" }, a: { US: "am", UK: "so", CA: "ca", AU: "au" }, n: "Four countries, four sports. In New South Wales and Queensland, footy often means rugby league instead." },
+    { w: "entrée", s: { ma: "Main course", st: "Starter or appetizer", si: "Side dish" }, a: { US: "ma", UK: "st", CA: "ma", AU: "st" }, n: "The French meaning is the course that 'enters' the meal first, which Australia and the UK kept. North America moved it to the main dish." },
+    { w: "first floor", s: { gr: "Ground level", up: "One level above the ground", ba: "Basement" }, a: { US: "gr", UK: "up", CA: "gr", AU: "up" }, n: "British and Australian buildings start at the ground floor, so the first floor is one flight up." },
+    { w: "public school", s: { st: "Free, government-run school", pr: "Elite fee-paying private school", un: "Public university" }, a: { US: "st", UK: "pr", CA: "st", AU: "st" }, n: "In England, 'public schools' like Eton charge tens of thousands a year. The name dates back to when they were open to the paying public." },
+    { w: "hockey", s: { ic: "Ice hockey", fi: "Field hockey", ai: "Air hockey" }, a: { US: "ic", UK: "fi", CA: "ic", AU: "fi" }, n: "Outside North America, hockey is played on grass." },
+    { w: "quite good", s: { ve: "Very good", ok: "Fairly good, nothing special", ba: "Not good at all" }, a: { US: "ve", UK: "ok" }, n: "An American hears praise. A Brit hears mild disappointment." },
+    { w: "table (a motion)", s: { po: "Postpone it indefinitely", pr: "Put it forward for discussion", vo: "Vote it down" }, a: { US: "po", UK: "pr", CA: "pr", AU: "pr" }, n: "Famously confused Allied planners in WWII: the Americans wanted to shelve the item, the British wanted to discuss it now." },
+    { w: "homely", s: { pl: "Plain-looking, unattractive", co: "Cozy and welcoming", ho: "Homesick" }, a: { US: "pl", UK: "co", AU: "co" }, n: "Calling a host's house homely is a compliment in Britain and an insult in America." },
+    { w: "dummy", s: { pa: "Baby's pacifier", fo: "Foolish person", ma: "Shop mannequin" }, a: { US: "fo", UK: "pa", CA: "fo", AU: "pa" }, n: "British and Australian babies suck on a dummy. Canadians usually call it a soother." },
+    { w: "suspenders", s: { br: "Straps that hold up trousers", ga: "Garters that hold up stockings", ca: "Bridge cables" }, a: { US: "br", UK: "ga", CA: "br", AU: "ga" }, n: "The trouser straps are braces in the UK and Australia." },
+    { w: "caravan", s: { tr: "Towed camping trailer", co: "Convoy of travelers", va: "Delivery van" }, a: { US: "co", UK: "tr", AU: "tr" }, n: "Americans tow an RV or a camper. Brits and Aussies tow a caravan." },
+    { w: "pavement", s: { si: "Sidewalk", ro: "Road surface", pa: "Patio" }, a: { US: "ro", UK: "si" }, n: "Telling an American kid to stay on the pavement puts them in the street." },
+    { w: "trolley", s: { sh: "Shopping cart", st: "Streetcar or tram", ho: "Hospital stretcher" }, a: { US: "st", UK: "sh", AU: "sh" }, n: "San Francisco's trolleys run on rails. A British trolley gets pushed around the supermarket." },
+    { w: "jelly", s: { ja: "Fruit jam", ge: "Wobbly gelatin dessert", ca: "Gummy candy" }, a: { US: "ja", UK: "ge", AU: "ge" }, n: "A peanut butter and jelly sandwich sounds alarming in the UK, where jelly is Jell-O." },
+    { w: "torch", s: { fl: "Flashlight", fi: "Flaming stick", bl: "Blowtorch" }, a: { US: "fi", UK: "fl", CA: "fi", AU: "fl" }, n: "The battery-powered kind is a torch in the UK and Australia." },
+    { w: "bonnet", s: { ho: "Car hood", ha: "Old-fashioned tie-on hat", te: "Tea cozy" }, a: { US: "ha", UK: "ho", CA: "ha", AU: "ho" }, n: "Pop the bonnet in London to check the engine. In the US that's the hood." },
+    { w: "vest", s: { wa: "Waistcoat worn under a suit jacket", un: "Sleeveless undershirt", li: "Life jacket" }, a: { US: "wa", UK: "un", CA: "wa" }, n: "A British vest is worn under your shirt. The suit piece is a waistcoat." },
+    { w: "runners", s: { sn: "Sneakers", pe: "People who run", ru: "Long hallway rug" }, a: { US: "pe", UK: "pe", CA: "sn", AU: "sn" }, n: "Canadians and Australians lace up their runners. Irish speakers do too." },
+    { w: "pot plant", s: { ho: "Houseplant", ma: "Marijuana plant", ve: "Vegetable patch" }, a: { US: "ma", UK: "ho", AU: "ho" }, n: "In Britain and Australia it's a plant in a pot, nothing more." },
+    { w: "cot", s: { ba: "Baby's crib", ca: "Folding camp bed", gu: "Hospital gurney" }, a: { US: "ca", UK: "ba", CA: "ca", AU: "ba" }, n: "A British baby sleeps in a cot. An American cot is a folding bed for camping or the army." },
+    { w: "chemist", s: { ph: "Pharmacy", sc: "Lab scientist", te: "Chemistry teacher" }, a: { US: "sc", UK: "ph", CA: "sc", AU: "ph" }, n: "You pick up a prescription at the chemist in the UK and Australia." },
+    { w: "rocket", s: { ar: "Arugula (salad leaf)", sp: "Space rocket", fi: "Firework" }, a: { US: "sp", UK: "ar", CA: "sp", AU: "ar" }, n: "A rocket salad in London is arugula." },
+    { w: "mince", s: { gr: "Ground beef", ch: "To chop very finely", wa: "To walk daintily" }, a: { US: "ch", UK: "gr", CA: "ch", AU: "gr" }, n: "In the UK and Australia you buy a pound of mince for spaghetti bolognese." },
+    { w: "tank top", s: { sl: "Sleeveless knitted sweater", sh: "Sleeveless T-shirt", wa: "Water tank lid" }, a: { US: "sh", UK: "sl", CA: "sh" }, n: "The British tank top is the knitted vest your grandad wears over a shirt." },
+    { w: "purse", s: { ha: "Handbag", wa: "Small wallet for coins and cards", pr: "Prize money" }, a: { US: "ha", UK: "wa", CA: "ha", AU: "wa" }, n: "A British purse fits inside a handbag." },
+    { w: "squash", s: { ve: "A gourd vegetable", dr: "Fruit drink concentrate", sp: "A racket sport" }, a: { US: "ve", UK: "dr", CA: "ve", AU: "ve" }, n: "Kids in Britain drink orange squash, diluted with water. Australians call it cordial." },
+    { w: "interstate", s: { hi: "Major highway", ot: "Another state", bo: "A state border" }, a: { US: "hi", AU: "ot" }, c: "“My sister moved ___ last year.”", n: "Australians move interstate. Americans drive on one." },
+    { w: "my shout", s: { tr: "I'm paying for this round", tu: "My turn to yell", id: "My idea" }, a: { US: "tu", UK: "tr", AU: "tr" }, n: "At a pub in Sydney or Manchester, 'my shout' means the drinks are on you." },
+    { w: "sherbet", s: { fr: "Fruity frozen dessert", fi: "Fizzy powdered candy", dr: "Sweet syrup drink" }, a: { US: "fr", UK: "fi", AU: "fi" }, n: "British sherbet comes in a packet and fizzes on your tongue." },
+    { w: "toque", s: { wi: "Knitted winter hat", ch: "Chef's tall white hat", ro: "Ceremonial robe" }, a: { US: "ch", UK: "ch", CA: "wi", AU: "ch" }, n: "Every Canadian owns a toque (also spelled tuque). Everyone else would call it a beanie." },
+    { w: "mickey", s: { bo: "Small bottle of liquor", dr: "A drugged drink", te: "Teasing (as in 'taking the ___')" }, a: { US: "dr", CA: "bo", UK: "te" }, n: "A Canadian mickey is a 375 ml bottle. In the US, 'slipping someone a mickey' means spiking their drink." },
+    { w: "college", s: { un: "University", vo: "Non-degree school after high school", si: "School for ages 16–18" }, a: { US: "un", CA: "vo", UK: "si" }, n: "Americans go to college for a bachelor's degree. In Canada, college means a diploma school, and in the UK it often means sixth-form college." },
+    { w: "pissed", s: { an: "Angry", dr: "Drunk", ti: "Exhausted" }, a: { US: "an", UK: "dr", CA: "an", AU: "dr" }, n: "A Brit who is pissed has had a few too many. An American who is pissed is about to yell." },
+    { w: "scheme", s: { pl: "Sneaky plot", pr: "Official program or plan", co: "Color palette" }, a: { US: "pl", UK: "pr", AU: "pr" }, n: "A government pension scheme sounds shady to Americans and perfectly normal to Brits." },
+    { w: "gas", s: { fu: "Car fuel", na: "Natural gas for heating and cooking", fu2: "A great time ('it was a gas')" }, a: { US: "fu", CA: "fu", UK: "na", AU: "na" }, n: "British and Australian cars run on petrol. Gas is what the stove burns." },
+    { w: "muffin", s: { cu: "Sweet cupcake-like bake", fl: "Flat bread roll you toast" }, a: { US: "cu", CA: "cu", UK: "fl", AU: "cu" }, n: "The traditional British muffin is what Americans call an English muffin." },
+    { w: "pudding", s: { cu: "Creamy custard-style dessert", de: "Any dessert course", br: "Bread roll" }, a: { US: "cu", CA: "cu", UK: "de", AU: "de" }, n: "'What's for pudding?' in Britain just means 'what's for dessert?'" },
+    { w: "holiday", s: { va: "Vacation", pu: "A single public holiday" }, a: { US: "pu", CA: "pu", UK: "va", AU: "va" }, n: "Brits and Aussies go on holiday for two weeks. Americans take vacation." },
+    { w: "athletics", s: { tr: "Track and field", al: "Sports in general" }, a: { US: "al", UK: "tr", AU: "tr" }, n: "A US athletics department runs every sport at a school." },
+    { w: "flannel", s: { wa: "Washcloth", fa: "Soft cotton fabric or shirt", ba: "Bath towel" }, a: { US: "fa", CA: "fa", UK: "wa" }, n: "In Britain you wash your face with a flannel." },
+    { w: "geezer", s: { ol: "Old man", gu: "Any guy, a bloke", ki: "Young child" }, a: { US: "ol", UK: "gu" }, n: "In London a geezer can be any age, often said with approval." },
+    { w: "swimmers", s: { sw: "Swimsuit", pe: "People who swim", go: "Swim goggles" }, a: { US: "pe", UK: "pe", AU: "sw" }, n: "Australians have many words for a swimsuit: swimmers, bathers, cossie and togs, depending on the state." },
+    { w: "chesterfield", s: { so: "Any sofa or couch", le: "Deep-buttoned leather sofa", co: "Overcoat" }, a: { CA: "so", UK: "le" }, n: "Older Canadians call any couch a chesterfield. In Britain it's one specific style." },
+    { w: "lollies", s: { ca: "Any sweets or candy", ic: "Ice pops", ch: "Potato chips" }, a: { AU: "ca", UK: "ic" }, n: "An Australian lolly is any candy. In the UK, ice lollies are popsicles." },
+  ]},
+
+  es: { name: "Español", words: [
+    { w: "carro", s: { ca: "Car", cr: "Cart or wagon", su: "Shopping cart" }, a: { ES: "cr", MX: "ca", CO: "ca", AR: "cr" }, n: "Mexicans and Colombians drive a carro. Spaniards drive a coche and Argentines an auto." },
+    { w: "guagua", s: { bu: "Bus", be: "Baby", tr: "Something free" }, a: { CU: "bu", CL: "be", PE: "be" }, n: "In Cuba and the Canary Islands you ride the guagua. In the Andes a guagua is a baby, from Quechua." },
+    { w: "camión", s: { bu: "City bus", tr: "Truck", tm: "Tram" }, a: { MX: "bu", ES: "tr", AR: "tr", CO: "tr" }, n: "In Mexico you take the camión to work. Everywhere else it hauls freight." },
+    { w: "torta", s: { sa: "Sandwich on a crusty roll", ca: "Cake", om: "Omelette" }, a: { MX: "sa", AR: "ca", CL: "ca", CO: "ca" }, n: "A Mexican torta is a loaded sandwich. Ask for one in Buenos Aires and you get cake." },
+    { w: "tortilla", s: { om: "Potato omelette", fl: "Corn or flour flatbread", cr: "Crepe" }, a: { ES: "om", MX: "fl" }, n: "Spain's tortilla española is a thick egg-and-potato omelette." },
+    { w: "tinto", s: { co: "Small black coffee", wi: "Red wine", in: "Ink" }, a: { CO: "co", ES: "wi", AR: "wi", MX: "wi" }, n: "Offer someone a tinto in Bogotá and they expect coffee." },
+    { w: "bocadillo", s: { ba: "Baguette sandwich", sw: "Guava paste sweet", sn: "Small appetizer" }, a: { ES: "ba", CO: "sw", MX: "sn" }, n: "Colombian bocadillo is a firm guava sweet, often eaten with cheese." },
+    { w: "vereda", s: { si: "Sidewalk", ru: "Rural district", pa: "Footpath or trail" }, a: { AR: "si", CL: "si", PE: "si", CO: "ru", ES: "pa" }, n: "Colombian veredas are rural subdivisions of a municipality." },
+    { w: "banqueta", s: { si: "Sidewalk", st: "Low stool or bench", ba: "Banquet" }, a: { MX: "si", ES: "st" }, n: "In Mexico you walk on the banqueta. In Spain you sit on it." },
+    { w: "alberca", s: { po: "Swimming pool", re: "Irrigation reservoir", ba: "Bathtub" }, a: { MX: "po", ES: "re" }, n: "The word comes from Arabic al-birka, a pool or pond. Spain kept the farm meaning." },
+    { w: "pileta", s: { po: "Swimming pool", si: "Sink or washbasin", ba: "Battery" }, a: { AR: "po", MX: "si" }, n: "Argentines swim in the pileta. Elsewhere it's for washing up." },
+    { w: "saco", s: { bl: "Suit jacket or blazer", sw: "Sweater or cardigan", sa: "Sack or bag" }, a: { MX: "bl", AR: "bl", CO: "sw", ES: "sa" }, n: "Bring a saco to Bogotá and you're bringing a sweater." },
+    { w: "polera", s: { ts: "T-shirt", tu: "Turtleneck sweater", sw: "Sweatshirt or hoodie" }, a: { CL: "ts", AR: "tu", PE: "sw" }, n: "Same word, three neighboring countries, three different garments." },
+    { w: "playera", s: { ts: "T-shirt", sh: "Canvas sneaker", be: "Beach towel" }, a: { MX: "ts", ES: "sh" }, n: "In Spain, playeras are light sports shoes." },
+    { w: "buzo", s: { sw: "Sweatshirt", tr: "Tracksuit", di: "Scuba diver" }, a: { AR: "sw", CL: "tr", ES: "di" }, n: "Chilean schoolkids wear a buzo for gym class." },
+    { w: "mono", s: { cu: "Cute", bl: "Blond", ov: "Overalls" }, a: { ES: "cu", CO: "bl" }, c: "“Tu hermano es muy ___.”", n: "Everywhere it also means monkey, but a Spaniard calling you mono means you're cute." },
+    { w: "pana", s: { bu: "Buddy or pal", co: "Corduroy", br: "Bread" }, a: { VE: "bu", ES: "co" }, n: "Venezuelans call their friends pana. In Spain, pantalones de pana are corduroys." },
+    { w: "plata", s: { mo: "Money", si: "Silver" }, a: { AR: "mo", CO: "mo", CL: "mo", ES: "si" }, n: "Across much of Latin America, plata is everyday slang for money." },
+    { w: "lana", s: { mo: "Money", wo: "Wool" }, a: { MX: "mo", ES: "wo", AR: "wo" }, n: "In Mexico, 'no tengo lana' means you're broke." },
+    { w: "piola", s: { co: "Cool or clever", lo: "Low-key, discreet", ro: "Thin cord" }, a: { AR: "co", CL: "lo", ES: "ro" }, n: "An Argentine who is piola is smart and easygoing. A Chilean who stays piola keeps quiet." },
+    { w: "cachar", s: { un: "To get it, understand", ca: "To catch a ball", br: "To break" }, a: { CL: "un", MX: "ca" }, n: "Chileans constantly ask '¿cachai?', meaning 'you get it?'" },
+    { w: "colectivo", s: { bu: "City bus", sh: "Shared taxi or minivan", gr: "A collective group" }, a: { AR: "bu", CL: "sh", CO: "sh", ES: "gr" }, n: "In Buenos Aires the colectivo is the regular city bus." },
+    { w: "piso", s: { ap: "Apartment", fl: "Floor" }, a: { ES: "ap", MX: "fl", AR: "fl" }, n: "Spaniards rent a piso. Latin Americans rent a departamento or apartamento." },
+    { w: "recámara", s: { be: "Bedroom", ch: "Gun chamber", cl: "Closet" }, a: { MX: "be", ES: "ch" }, n: "A Mexican house listing counts its recámaras." },
+    { w: "vaina", s: { th: "Thing, stuff, situation", po: "Pea pod or sheath", tr: "Trouble" }, a: { CO: "th", VE: "th", ES: "po" }, n: "'¿Qué es esa vaina?' is Colombian and Venezuelan for 'what's that thing?'" },
+    { w: "cuadra", s: { bl: "City block", st: "Horse stable", sq: "Square" }, a: { AR: "bl", MX: "bl", CO: "bl", ES: "st" }, n: "Latin Americans give directions in cuadras. Spaniards say manzanas." },
+    { w: "damasco", s: { ap: "Apricot", fa: "Damask fabric", pl: "Plum" }, a: { AR: "ap", CL: "ap", ES: "fa" }, n: "Spain and Mexico call the fruit albaricoque and chabacano." },
+    { w: "plátano", s: { ba: "Banana", pl: "Plantain (cooking banana)", pa: "Plane tree" }, a: { ES: "ba", MX: "ba", CO: "pl" }, n: "In Colombia a banana is a banano. The plátano gets fried." },
+    { w: "bombilla", s: { li: "Light bulb", ma: "Metal straw for yerba mate", st: "Drinking straw" }, a: { ES: "li", AR: "ma", CL: "st" }, n: "An Argentine bombilla is the filtered metal straw for mate." },
+    { w: "pitillo", s: { st: "Drinking straw", ci: "Cigarette", wh: "Whistle" }, a: { CO: "st", ES: "ci" }, n: "Ask for a pitillo with your juice in Colombia." },
+    { w: "sorbete", s: { st: "Drinking straw", so: "Sorbet" }, a: { AR: "st", ES: "so", MX: "so" }, n: "Argentines drink soda with a sorbete. Mexicans say popote, Spaniards pajita." },
+    { w: "coche", s: { ca: "Car", pi: "Pig", tr: "Train carriage" }, a: { ES: "ca", GT: "pi" }, n: "In Guatemala a coche is a pig, and carne de coche is pork." },
+    { w: "fresa", s: { st: "Strawberry", sn: "Snobby, posh" }, a: { ES: "st", MX: "sn" }, c: "“Esa chica es muy ___.”", n: "Mexicans call preppy, upper-class kids fresas. The fruit is still a fresa too." },
+    { w: "morocho", s: { da: "Dark-haired person", co: "Sweet corn drink", pa: "Bread loaf" }, a: { AR: "da", EC: "co" }, n: "In Argentina, morocho describes someone with dark hair. In Ecuador it's a cinnamon corn drink." },
+  ]},
+
+  pt: { name: "Português", words: [
+    { w: "propina", s: { tu: "University tuition fee", br: "Bribe", ti: "Tip" }, a: { PT: "tu", BR: "br" }, n: "Portuguese students pay propinas each year. In Brazil a propina is a kickback." },
+    { w: "camisola", s: { sw: "Sweater or sports jersey", ni: "Nightgown", sh: "Shirt" }, a: { PT: "sw", BR: "ni" }, n: "A football shirt is a camisola in Portugal and a camisa in Brazil." },
+    { w: "fato", s: { su: "Suit (clothing)", fa: "Fact", fe: "Party" }, a: { PT: "su", BR: "fa" }, n: "In Portugal you wear a fato to a wedding. Brazilians wear a terno." },
+    { w: "sítio", s: { pl: "Place", fa: "Small farm or country house", ma: "Market" }, a: { PT: "pl", BR: "fa" }, n: "Both use it for website. Otherwise, a Brazilian goes to the sítio for the weekend." },
+    { w: "apelido", s: { su: "Surname", ni: "Nickname", ap: "Appetite" }, a: { PT: "su", BR: "ni" }, n: "A Portuguese form asks for your apelido, meaning your last name." },
+    { w: "cachorro", s: { pu: "Puppy", do: "Dog", ho: "Hot dog" }, a: { PT: "pu", BR: "do" }, n: "Brazilians call any dog cachorro. In Portugal it's a cão, and a cachorro is a young one." },
+    { w: "peão", s: { pe: "Pedestrian", fa: "Farmhand or rodeo cowboy", pi: "Peacock" }, a: { PT: "pe", BR: "fa" }, n: "Portuguese road signs warn about peões crossing." },
+    { w: "miúdos", s: { ki: "Kids", gi: "Giblets", co: "Coins" }, a: { PT: "ki", BR: "gi" }, n: "Os miúdos are the kids in Portugal, and chicken innards in a Brazilian recipe." },
+    { w: "comboio", s: { tr: "Train", co: "Convoy", cr: "Cruise" }, a: { PT: "tr", BR: "co" }, n: "Portugal takes the comboio. Brazil takes the trem." },
+    { w: "bica", s: { es: "Espresso coffee", sp: "Spout or tap", br: "Bread roll" }, a: { PT: "es", BR: "sp" }, n: "In Lisbon, 'uma bica' is how you order an espresso." },
+  ]},
+
+  fr: { name: "Français", words: [
+    { w: "dîner", s: { lu: "Lunch", di: "Evening meal", br: "Breakfast" }, a: { FR: "di", QC: "lu", BE: "lu", CH: "lu" }, n: "Québec, Belgium and Switzerland kept the older meal order: déjeuner, dîner, souper." },
+    { w: "déjeuner", s: { br: "Breakfast", lu: "Lunch", sn: "Afternoon snack" }, a: { FR: "lu", QC: "br", BE: "br", CH: "br" }, n: "In France breakfast is the petit-déjeuner." },
+    { w: "souper", s: { di: "Evening meal", la: "Late-night supper after a show", sn: "Snack" }, a: { QC: "di", BE: "di", CH: "di", FR: "la" }, n: "A Parisian souper comes after the theatre, if at all." },
+    { w: "char", s: { ca: "Car", ta: "Army tank or parade float", ch: "Shopping cart" }, a: { QC: "ca", FR: "ta" }, n: "Québécois drive a char. A French char d'assaut is a battle tank." },
+    { w: "liqueur", s: { so: "Soft drink, soda", li: "Sweet alcoholic liqueur", ju: "Fruit juice" }, a: { QC: "so", FR: "li" }, n: "Short for liqueur douce, Québec slang for soda." },
+    { w: "dépanneur", s: { co: "Corner store", to: "Repairman or tow-truck driver", ph: "Pharmacy" }, a: { QC: "co", FR: "to" }, n: "Montrealers grab milk at the dép. In France the dépanneur fixes your car." },
+    { w: "bas", s: { so: "Socks", st: "Stockings", sh: "Shorts" }, a: { QC: "so", FR: "st" }, n: "French speakers in France say chaussettes for socks." },
+    { w: "barrer", s: { lo: "To lock a door", cr: "To cross out or block", sw: "To sweep" }, a: { QC: "lo", FR: "cr" }, n: "'As-tu barré la porte?' asks whether you locked the door in Québec." },
+    { w: "cartable", s: { bi: "Ring binder", sa: "School bag or satchel", ma: "Map" }, a: { QC: "bi", FR: "sa" }, n: "French kids carry a cartable on their backs. Québec kids put papers in one." },
+    { w: "jaser", s: { ch: "To chat", go: "To gossip", ar: "To argue" }, a: { QC: "ch", FR: "go" }, n: "Jaser is friendly chatting in Québec and gossip in France." },
+    { w: "bienvenue", s: { yo: "You're welcome", we: "Welcome!", go: "Goodbye" }, a: { QC: "yo", FR: "we" }, c: "Reply to “Merci !”", n: "A calque of English 'you're welcome', used everywhere in Québec." },
+    { w: "blonde", s: { gi: "Girlfriend", bl: "Blonde woman or light beer", ca: "Caramel" }, a: { QC: "gi", FR: "bl" }, c: "“Je te présente ma ___.”", n: "In Québec, your blonde is your girlfriend, whatever her hair color. Your boyfriend is your chum." },
+    { w: "s'il vous plaît", s: { he: "Here you go", pl: "Please", ex: "Excuse me" }, a: { BE: "he", FR: "pl" }, c: "Said while handing something over", n: "Belgians say it when giving you something, where the French say voilà." },
+    { w: "cornet", s: { ba: "Plastic shopping bag", ic: "Ice cream cone", tr: "Trumpet" }, a: { CH: "ba", FR: "ic" }, n: "A Swiss shop asks if you want a cornet for your groceries." },
+    { w: "foehn", s: { ha: "Hair dryer", wi: "Warm mountain wind", st: "Heater" }, a: { CH: "ha", FR: "wi" }, n: "From the German Föhn, the brand name that became the Swiss word for a hair dryer." },
+    { w: "linge", s: { to: "Towel", la: "Laundry or linens", sh: "Shirt" }, a: { CH: "to", FR: "la" }, n: "In Switzerland, un linge is a towel." },
+  ]},
+};
+
+</script>
+<script>
+(function () {
+  const EPOCH = new Date(2026, 10, 5); // puzzle #1
+  const PER_DAY = 5;
+  const STORE_KEY = "dialectle:v1";
+
+  // ---------- storage (best effort) ----------
+  function load() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; } }
+  function save(db) { try { localStorage.setItem(STORE_KEY, JSON.stringify(db)); } catch (e) {} }
+  let db = load();
+  db.daily = db.daily || {};
+  db.stats = db.stats || {};
+
+  // ---------- helpers ----------
+  function dayIndex(d) {
+    d = d || new Date();
+    const mid = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    return Math.round((mid - EPOCH) / 864e5);
+  }
+  function rng(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function hash(str) { let h = 2166136261; for (const ch of str) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function shuffle(arr, r) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function el(tag, attrs, ...kids) {
+    const n = document.createElement(tag);
+    for (const k in (attrs || {})) {
+      if (k === "class") n.className = attrs[k];
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), attrs[k]);
+      else if (attrs[k] !== false && attrs[k] != null) n.setAttribute(k, attrs[k] === true ? "" : attrs[k]);
+    }
+    for (const kid of kids.flat()) if (kid != null) n.append(kid.nodeType ? kid : document.createTextNode(kid));
+    return n;
+  }
+
+  // Daily word picks: a fixed permutation per language, walked five at a time.
+  function dailyWordIdx(lang, day) {
+    const n = LANGS[lang].words.length;
+    const perm = shuffle([...Array(n).keys()], rng(hash("perm-" + lang)));
+    const cycle = Math.floor((day * PER_DAY) / n);
+    const p = cycle === 0 ? perm : shuffle(perm, rng(hash("perm-" + lang + "-" + cycle)));
+    const out = [];
+    for (let k = 0; k < Math.min(PER_DAY, n); k++) out.push(p[(day * PER_DAY + k) % n]);
+    return out;
+  }
+  function buildQuestion(lang, wi, r) {
+    const w = LANGS[lang].words[wi];
+    return { wi, order: shuffle(Object.keys(w.s), r), countries: shuffle(Object.keys(w.a), r), picks: {}, checked: false };
+  }
+  function newGame(lang, mode) {
+    const day = dayIndex();
+    if (mode === "daily") {
+      const saved = db.daily[lang];
+      if (saved && saved.day === day) return saved;
+      const r = rng(hash("q-" + lang + "-" + day));
+      const g = { lang, mode, day, cur: 0, done: false, qs: dailyWordIdx(lang, day).map(wi => buildQuestion(lang, wi, r)) };
+      db.daily[lang] = g; save(db);
+      return g;
+    }
+    const n = LANGS[lang].words.length;
+    const r = Math.random;
+    const idx = shuffle([...Array(n).keys()], r).slice(0, PER_DAY);
+    return { lang, mode, day, cur: 0, done: false, qs: idx.map(wi => buildQuestion(lang, wi, r)) };
+  }
+  function scoreOf(q) {
+    const w = LANGS[game.lang].words[q.wi];
+    let right = 0;
+    for (const c of q.countries) if (q.picks[c] === w.a[c]) right++;
+    return { right, total: q.countries.length };
+  }
+  function totals(g) {
+    let right = 0, total = 0;
+    for (const q of g.qs) { const s = scoreOf(q); right += s.right; total += s.total; }
+    return { right, total };
+  }
+
+  // ---------- state ----------
+  let lang = "en", mode = "daily", game;
+  function persist() { if (game.mode === "daily") { db.daily[game.lang] = game; save(db); } }
+
+  // ---------- rendering ----------
+  const main = document.getElementById("main");
+  function renderControls() {
+    const seg = document.getElementById("langSeg");
+    seg.replaceChildren(...Object.keys(LANGS).map(k => el("button", {
+      "aria-pressed": String(k === lang), title: LANGS[k].name,
+      onclick: () => { lang = k; start(); }
+    }, k.toUpperCase())));
+    for (const b of document.querySelectorAll("#modeSeg button")) b.setAttribute("aria-pressed", String(b.dataset.mode === mode));
+    const total = Object.values(LANGS).reduce((a, l) => a + l.words.length, 0);
+    document.getElementById("wordcount").textContent = total + " words in " + Object.keys(LANGS).length + " languages";
+  }
+  function renderProgress() {
+    const p = document.getElementById("progress");
+    const pips = game.qs.map((q, i) => el("div", { class: "pip" + (game.done || i < game.cur || (i === game.cur && q.checked) ? " done" : i === game.cur ? " cur" : "") }));
+    const label = game.mode === "daily" ? LANGS[game.lang].name + " #" + (game.day + 1) : "Practice";
+    p.replaceChildren(...pips, el("span", { class: "lbl" }, label));
+  }
+
+  function renderQuestion(animate, focusId) {
+    const q = game.qs[game.cur];
+    const w = LANGS[game.lang].words[q.wi];
+    const rows = q.countries.map((c, i) => {
+      const correct = w.a[c];
+      const opts = q.order.map(k => {
+        let cls = "sense";
+        if (q.checked) {
+          if (k === correct) cls += " right";
+          else if (k === q.picks[c]) cls += " wrong";
+          else cls += " dim";
+        }
+        return el("button", {
+          class: cls, id: "s-" + c + "-" + k, "aria-pressed": String(q.picks[c] === k), disabled: q.checked,
+          onclick: () => { q.picks[c] = k; persist(); renderQuestion(false, "s-" + c + "-" + k); }
+        }, w.s[k]);
+      });
+      const verdict = q.checked ? (q.picks[c] === correct ? el("span", { class: "verdict ok" }, "Correct") : el("span", { class: "verdict no" }, "Missed")) : null;
+      return el("li", { class: "row" },
+        el("div", { class: "num", "aria-hidden": "true" }, (i + 1) + "."),
+        el("div", {},
+          el("div", { class: "who" }, el("span", { class: "cc" }, c), el("span", { class: "cname" }, COUNTRIES[c]), verdict),
+          el("div", { class: "opts", role: "group", "aria-label": "Meaning in " + COUNTRIES[c] }, opts)));
+    });
+    const allPicked = q.countries.every(c => q.picks[c]);
+    const isLast = game.cur === game.qs.length - 1;
+    const s = scoreOf(q);
+    const card = el("section", { class: animate === false ? "card" : "card enter" },
+      el("div", { class: "entry-head" },
+        el("span", { class: "meta" }, "Word " + (game.cur + 1) + " of " + game.qs.length + " · " + LANGS[game.lang].name),
+        el("h2", { class: "headword" }, w.w),
+        w.c ? el("p", { class: "ctx" }, w.c) : null),
+      el("p", { class: "ask" }, q.checked ? "You got " + s.right + " of " + s.total + "." : "What does a local mean by it?"),
+      el("ol", { class: "senses" }, rows),
+      q.checked ? el("div", { class: "note" }, w.n) : null,
+      el("div", { class: "actions" },
+        q.checked
+          ? el("button", { class: "btn", id: "nextBtn", onclick: next }, isLast ? "See results" : "Next word")
+          : el("button", { class: "btn", id: "checkBtn", disabled: !allPicked, onclick: check }, "Check answers"),
+        !q.checked && !allPicked ? el("span", { class: "hint" }, "Pick a meaning for every country.") : null));
+    main.replaceChildren(card);
+    renderProgress();
+    if (focusId) { const f = document.getElementById(focusId); if (f) f.focus(); }
+  }
+
+  function check() {
+    const q = game.qs[game.cur];
+    q.checked = true; persist(); renderQuestion(false);
+    const b = document.getElementById("nextBtn"); if (b) b.focus();
+  }
+  function next() {
+    if (game.cur < game.qs.length - 1) { game.cur++; persist(); renderQuestion(); window.scrollTo({ top: 0 }); return; }
+    finish();
+  }
+  function finish() {
+    if (!game.done && game.mode === "daily") {
+      const st = db.stats[game.lang] || { played: 0, streak: 0, best: 0, last: null, right: 0, total: 0 };
+      st.played++;
+      st.streak = st.last === game.day - 1 ? st.streak + 1 : 1;
+      st.best = Math.max(st.best, st.streak);
+      st.last = game.day;
+      const t = totals(game); st.right += t.right; st.total += t.total;
+      db.stats[game.lang] = st;
+    }
+    game.done = true; persist(); save(db);
+    renderResult();
+  }
+
+  function shareText() {
+    const t = totals(game);
+    const head = "Dialectle " + game.lang.toUpperCase() + (game.mode === "daily" ? " #" + (game.day + 1) : " practice") + "  " + t.right + "/" + t.total;
+    const lines = game.qs.map(q => {
+      const w = LANGS[game.lang].words[q.wi];
+      return q.countries.map(c => q.picks[c] === w.a[c] ? "🟩" : "🟥").join("");
+    });
+    return head + "\n" + lines.join("\n");
+  }
+  function countdown() {
+    const now = new Date();
+    const tm = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const s = Math.max(0, Math.floor((tm - now) / 1000));
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+    return h + "h " + String(m).padStart(2, "0") + "m";
+  }
+  function renderResult() {
+    const t = totals(game);
+    const st = db.stats[game.lang];
+    const text = shareText();
+    const box = el("textarea", { class: "sharebox", id: "shareBox", readonly: true, "aria-label": "Your result to share" });
+    box.value = text;
+    const copyBtn = el("button", { class: "btn", id: "copyBtn", onclick: async () => {
+      try { await navigator.clipboard.writeText(text); copyBtn.textContent = "Copied"; }
+      catch (e) { box.hidden = false; box.focus(); box.select(); copyBtn.textContent = "Select and copy below"; }
+    } }, "Copy result");
+    box.hidden = true;
+    const recap = el("ul", { class: "recap" }, game.qs.map(q => {
+      const s = scoreOf(q); const w = LANGS[game.lang].words[q.wi];
+      return el("li", {}, el("span", { class: "rw" }, w.w), el("span", { class: "rs" }, s.right + "/" + s.total));
+    }));
+    const pct = t.total ? Math.round((t.right / t.total) * 100) : 0;
+    const card = el("section", { class: "card result enter" },
+      el("span", { class: "meta" }, game.mode === "daily" ? LANGS[game.lang].name + " · puzzle #" + (game.day + 1) : LANGS[game.lang].name + " · practice round"),
+      el("p", { class: "big" }, t.right + "/" + t.total),
+      el("p", { class: "ask" }, pct >= 90 ? "Fluent in every accent." : pct >= 70 ? "Well traveled." : pct >= 50 ? "You'd get by with a phrasebook." : "Lost in translation, for now."),
+      el("pre", { class: "grid", "aria-label": "Result grid" }, text.split("\n").slice(1).join("\n")),
+      game.mode === "daily" && st ? el("div", { class: "stats" },
+        el("div", { class: "stat" }, el("b", {}, String(st.played)), el("span", {}, "Played")),
+        el("div", { class: "stat" }, el("b", {}, String(st.streak)), el("span", {}, "Streak")),
+        el("div", { class: "stat" }, el("b", {}, String(st.best)), el("span", {}, "Best streak")),
+        el("div", { class: "stat" }, el("b", {}, (st.total ? Math.round(st.right / st.total * 100) : 0) + "%"), el("span", {}, "Accuracy"))) : null,
+      recap,
+      el("div", { class: "actions" }, copyBtn,
+        el("button", { class: "btn ghost", onclick: () => { mode = "practice"; start(); } }, game.mode === "daily" ? "Practice more" : "Another round")),
+      box,
+      game.mode === "daily" ? el("p", { class: "hint" }, "Next " + LANGS[game.lang].name + " puzzle in " + countdown() + ". Other languages have their own daily puzzle.") : null);
+    main.replaceChildren(card);
+    renderProgress();
+  }
+
+  function start(data) {
+    if (data && data.lang && LANGS[data.lang]) { lang = data.lang; mode = data.mode === "practice" ? "practice" : "daily"; }
+    game = (data && data.game && data.game.lang === lang && data.game.mode === mode) ? data.game : newGame(lang, mode);
+    renderControls();
+    if (game.done) renderResult(); else renderQuestion();
+  }
+  document.getElementById("modeSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    mode = b.dataset.mode; start();
+  });
+
+  window.claude?.hot?.snapshot?.(() => ({ lang, mode, game }));
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+</body>
+</html>

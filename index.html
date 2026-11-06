@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Today’s Daily Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3eee4; --paper-2:#ebe4d6; --card:#fbf8f2; --ink:#1e1c19; --ink-2:#5b554c; --ink-3:#8d867a;
+    --line:#d9d0bf; --accent:#2f5d50; --accent-2:#e2ece6; --warm:#c6512f;
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:"Inter Tight",system-ui,sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  button{font:inherit;color:inherit;cursor:pointer}
+
+  /* header */
+  header.top{display:flex;align-items:center;justify-content:space-between;padding:22px 0 8px}
+  .logo{display:flex;align-items:center;gap:10px;font-family:Fraunces,serif;font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
+  .logo .mark{width:30px;height:30px}
+  .meta{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink-2)}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);white-space:nowrap}
+  .pill b{color:var(--ink)}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:start;padding:36px 0 40px}
+  .eyebrow{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  h1{font-family:Fraunces,serif;font-weight:600;font-size:clamp(40px,6vw,66px);line-height:1;letter-spacing:-.03em;margin:12px 0 16px}
+  h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .lede{font-size:18px;color:var(--ink-2);max-width:30em;margin:0}
+
+  /* planner */
+  .planner{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 1px 0 rgba(0,0,0,.03),0 12px 30px -18px rgba(60,40,10,.25)}
+  .planner h2{font-family:Fraunces,serif;font-weight:600;font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+  .planner .sub{font-size:14px;color:var(--ink-3);margin:0 0 14px}
+  .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+  .chip{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 0;font-weight:600;font-size:15px;transition:.15s}
+  .chip small{display:block;font-weight:500;font-size:11px;color:var(--ink-3);letter-spacing:.04em}
+  .chip:hover{border-color:var(--ink-3)}
+  .chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .chip[aria-pressed="true"] small{color:#cfc7b8}
+  .set{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .set li a{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--paper);text-decoration:none;border:1px solid transparent;transition:.15s}
+  .set li a:hover{border-color:var(--line);background:#f7f2e8}
+  .set .ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center}
+  .set .ico svg{width:22px;height:22px}
+  .set .nm{font-weight:600}
+  .set .why{font-size:12.5px;color:var(--ink-3)}
+  .set .t{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+  .set li.done a{opacity:.55}
+  .set li.done .nm{text-decoration:line-through;text-decoration-thickness:1.5px}
+  .set li.done .t{color:var(--accent);font-weight:600}
+  .total{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);font-size:14px;color:var(--ink-2)}
+  .bar{height:6px;border-radius:9px;background:var(--paper-2);overflow:hidden;margin-top:8px}
+  .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+  .note{font-size:13.5px;color:var(--ink-2);background:var(--accent-2);border-radius:12px;padding:10px 12px;margin-top:12px}
+  .finish{text-align:center;padding:10px 4px 4px}
+  .finish .big{font-family:Fraunces,serif;font-size:26px;font-weight:600;margin:6px 0 4px}
+  .finish p{margin:0;color:var(--ink-2);font-size:14.5px}
+  .linkbtn{background:none;border:0;padding:0;text-decoration:underline;color:var(--ink-2);font-size:13px}
+
+  /* sections */
+  section.block{padding:26px 0 18px;border-top:1px solid var(--line)}
+  .sechead{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  .sechead h2{font-family:Fraunces,serif;font-weight:600;font-size:30px;letter-spacing:-.02em;margin:0}
+  .sechead p{margin:4px 0 0;color:var(--ink-3);font-size:14.5px}
+  .filters{display:flex;gap:6px;flex-wrap:wrap}
+  .filters button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:500;color:var(--ink-2)}
+  .filters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:transform .15s, box-shadow .15s}
+  .card:hover{transform:translateY(-2px);box-shadow:0 14px 30px -20px rgba(60,40,10,.4)}
+  .art{height:150px;position:relative;display:grid;place-items:center;overflow:hidden}
+  .art svg.scene{width:100%;height:100%;display:block}
+  .body{padding:16px 16px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .card h3{font-family:Fraunces,serif;font-weight:600;font-size:23px;margin:0;letter-spacing:-.015em}
+  .card p{margin:0;color:var(--ink-2);font-size:14.5px}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:10px;font-size:12px;color:var(--ink-3)}
+  .tags span{border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+  .cta{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line);font-weight:600;font-size:14.5px;text-decoration:none}
+  .cta:hover{background:var(--paper)}
+  .cta .arrow{transition:transform .15s}
+  .cta:hover .arrow{transform:translateX(3px)}
+  .status{font-size:12px;font-weight:600;color:var(--accent);display:inline-flex;gap:5px;align-items:center}
+  .status.played::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  .fav{border:0;background:rgba(255,255,255,.85);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;position:absolute;top:10px;right:10px;backdrop-filter:blur(4px);transition:transform .15s}
+  .fav:hover{transform:scale(1.08)}
+  .fav svg{width:19px;height:19px}
+  .fav[aria-pressed="true"] svg path{fill:#e0a526;stroke:#b07d10}
+
+
+  footer{padding:30px 0 50px;border-top:1px solid var(--line);margin-top:20px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--ink-3);font-size:13.5px}
+  footer .pledge{font-family:Fraunces,serif;font-size:19px;color:var(--ink);max-width:30em}
+
+  @media (max-width:880px){
+    .hero{grid-template-columns:1fr;gap:26px;padding-top:22px}
+    .grid{grid-template-columns:1fr 1fr}
+    }
+  @media (max-width:560px){
+    .grid{grid-template-columns:1fr}
+    .meta .hide-sm{display:none}
+    .chips{grid-template-columns:repeat(4,1fr)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="#top" aria-label="Today’s Daily Game home">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="2" y="2" width="28" height="28" rx="8" fill="#2f5d50"/>
+        <rect x="8" y="8" width="7" height="7" rx="2" fill="#f3eee4"/>
+        <rect x="17" y="8" width="7" height="7" rx="2" fill="#e0a526"/>
+        <rect x="8" y="17" width="7" height="7" rx="2" fill="#c6512f"/>
+        <rect x="17" y="17" width="7" height="7" rx="2" fill="#f3eee4" opacity=".45"/>
+      </svg>
+      Today’s Daily Game
+    </a>
+    <div class="meta">
+      <span class="pill hide-sm" id="today"></span>
+      <span class="pill" title="Days in a row you've played at least one game">🔥 <b id="streak">0</b> day streak</span>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">New puzzles every midnight</div>
+        <h1>A few good games.<br><em>Then get on with your day.</em></h1>
+        <p class="lede">Eleven small daily games you can actually finish. Same puzzles for everyone, a few minutes each, no endless feed. Pick your favorites, or tell us how long you've got and we'll set up today's games.</p>
+      </div>
+
+      <aside class="planner" aria-labelledby="plan-h">
+        <h2 id="plan-h">How much time do you have?</h2>
+        <p class="sub" id="plan-sub">Your favorites go first.</p>
+        <div class="chips" role="group" aria-label="Time available">
+          <button class="chip" data-min="5">5<small>MIN</small></button>
+          <button class="chip" data-min="10">10<small>MIN</small></button>
+          <button class="chip" data-min="15">15<small>MIN</small></button>
+          <button class="chip" data-min="30">30<small>MIN</small></button>
+        </div>
+        <div id="plan"></div>
+      </aside>
+    </div>
+
+    <section class="block" aria-labelledby="games-h">
+      <div class="sechead">
+        <div>
+          <h2 id="games-h">Today's games</h2>
+          <p>Tap the star to add a game to your favorites.</p>
+        </div>
+        <div class="filters" role="group" aria-label="Filter games" id="filters">
+          <button data-f="all" aria-pressed="true">All</button>
+          <button data-f="fav" aria-pressed="false">★ Favorites</button>
+          <button data-f="knowledge" aria-pressed="false">Knowledge</button>
+          <button data-f="puzzle" aria-pressed="false">Puzzle</button>
+          <button data-f="senses" aria-pressed="false">Memory &amp; senses</button>
+          <button data-f="skill" aria-pressed="false">Skill</button>
+        </div>
+      </div>
+      <div class="grid" id="live"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="pledge">No feed, no autoplay, no infinite scroll. When you've played today's games, you're done.</div>
+    <div>todaysdailygame.com · Scores and streaks stay in this browser.</div>
+  </footer>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const ICONS = {
+  dialectle:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h11v8H9l-4 3v-3H4z"/><path d="M13 13v2h5l3 3v-3h-1V9h-4"/></svg>',
+  topshelf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l6 13"/><path d="M12 16h5a1.5 1.5 0 010 3h-6"/><ellipse cx="7" cy="19.5" rx="3" ry="1.2"/></svg>',
+  breakaway:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19V8h18v11"/><path d="M3 8l3 3h12l3-3"/><path d="M6 11v8M18 11v8M9 11v8M12 11v8M15 11v8" opacity=".45"/></svg>',
+  secondguess:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 9a4 4 0 117 2.6c-1.2 1-2 1.6-2 3.4"/><circle cx="13" cy="19" r=".6" fill="currentColor"/><path d="M4 6l2 2M4 10h2" /></svg>',
+  equalfooting:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="8" height="8"/><path d="M14 17l3.5-12L21 17z"/><path d="M11 9h3" stroke-dasharray="1 2"/></svg>',
+  outofplace:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="12" r="2"/><rect x="10" y="10" width="4" height="4"/><circle cx="18" cy="12" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>',
+  ripple:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M7.5 7.5a6.4 6.4 0 000 9M16.5 7.5a6.4 6.4 0 010 9"/><path d="M4.5 4.5a10.6 10.6 0 000 15M19.5 4.5a10.6 10.6 0 010 15" opacity=".5"/></svg>',
+  missing:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 4h6v2a2 2 0 104 0V4h6v16H4z"/><path d="M10 20v-3a2 2 0 114 0v3" stroke-dasharray="2 2"/></svg>',
+  dryrun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 20v-6"/><path d="M9 20h6"/><path d="M12 13c-3-1-5-4-6-7M12 13c3-1 5-4 6-7M12 13V5" stroke-dasharray="1.5 2.2"/></svg>',
+  soundcheck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg>',
+  eyewitness:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
+};
+
+const LIVE = [
+  { id:'dialectle', name:'Dialectle', mins:4, cat:'knowledge', color:'#b8322a', tint:'#f4e3df',
+    url:'/dialectle/',
+    blurb:'Same word, different country. Pick what “boot” or “pants” means in the US, UK, Canada and Australia.',
+    tags:['5 words','4 languages'] },
+  { id:'secondguess', name:'Second Guess', mins:3, cat:'knowledge', color:'#1d2b4f', tint:'#e4e7f0',
+    url:'/second-guess/',
+    blurb:'Three trivia questions and ten confidence chips. Knowing the answer helps. Knowing how sure you are wins.',
+    tags:['3 questions','Trivia'] },
+  { id:'outofplace', name:'Out of Place', mins:3, cat:'knowledge', color:'#8a6a12', tint:'#f1ead0',
+    url:'/out-of-place/',
+    blurb:'An ordinary kitchen, 1978. Three things in the picture don’t belong in that year. Find them.',
+    tags:['3 picks','History'] },
+  { id:'missing', name:'Missing Piece', mins:4, cat:'puzzle', color:'#2e4a62', tint:'#efece4',
+    url:'/missing-piece/',
+    blurb:'You know the object. Do you know what makes it work? Fit the missing part and press Test it.',
+    tags:['3 mechanisms','How things work'] },
+  { id:'dryrun', name:'Dry Run', mins:4, cat:'puzzle', color:'#2f7a3a', tint:'#e1efd9',
+    url:'/dry-run/',
+    blurb:'Water the lawn. Spare everything else. Set up the sprinklers, then get one run to soak the grass and miss the laundry.',
+    tags:['1 yard','Spatial'] },
+  { id:'ripple', name:'Ripple', mins:3, cat:'puzzle', color:'#4a3fa0', tint:'#eae8f5',
+    url:'/ripple/',
+    blurb:'One event. Predict the aftermath. The tray tilts and you mark where the ball, block and puck end up.',
+    tags:['3 objects','Physics'] },
+  { id:'eyewitness', name:'Eyewitness', mins:3, cat:'senses', color:'#b3261e', tint:'#f5e6e3',
+    url:'/eyewitness/',
+    blurb:'You saw it for five seconds. What do you remember? Put the scene back together from memory.',
+    tags:['3 scenes','Memory'] },
+  { id:'soundcheck', name:'Soundcheck', mins:4, cat:'senses', color:'#b5651d', tint:'#2a2522',
+    url:'/soundcheck/',
+    blurb:'Four familiar sounds, one tangled recording. Name them all. Focus helps, but it costs points.',
+    tags:['4 sounds','🎧 Sound on'] },
+  { id:'equalfooting', name:'Equal Footing', mins:3, cat:'senses', color:'#d0602b', tint:'#f6f1e6',
+    url:'/equal-footing/',
+    blurb:'Different shapes, same amount of space. Resize one until its area matches the other.',
+    tags:['5 shapes','Visual'] },
+  { id:'topshelf', name:'Top Shelf', mins:5, cat:'skill', color:'#1f5f8b', tint:'#e1edf5',
+    url:'/top-shelf/',
+    blurb:'Nine hockey shooting drills over three periods. Time your shot around the goalie and defenders and finish under par.',
+    tags:['9 drills','Hockey'] },
+  { id:'breakaway', name:'Breakaway', mins:2, cat:'skill', color:'#c6512f', tint:'#f7e6dc',
+    url:'/breakaway/',
+    blurb:'Five 3D shots on one goalie. Read the daily scouting report and find the corner he can’t reach.',
+    tags:['5 shots','3D hockey'] }
+];
+const CATNAME = {knowledge:'Knowledge', puzzle:'Puzzle', senses:'Memory & senses', skill:'Skill'};
+
+/* ---------- storage (safe) ---------- */
+const KEY = 'dailygames.v1';
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const S = Object.assign({ favs:[], played:{}, days:[], minutes:10 }, load());
+if(![5,10,15,30].includes(S.minutes)) S.minutes=10;
+
+const dayKey = d => { const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
+const TODAY = dayKey(Date.now());
+const playedToday = id => (S.played[TODAY]||[]).includes(id);
+// keep only the last 2 days of per-game play data
+Object.keys(S.played).forEach(k => { if(k < dayKey(Date.now()-2*864e5)) delete S.played[k]; });
+
+function markPlayed(id){
+  S.played[TODAY] = S.played[TODAY] || [];
+  if(!S.played[TODAY].includes(id)) S.played[TODAY].push(id);
+  if(!S.days.includes(TODAY)) S.days.push(TODAY);
+  S.days = S.days.slice(-400);
+  save(); renderAll();
+}
+function streak(){
+  const set = new Set(S.days); let n=0; let d=new Date();
+  if(!set.has(dayKey(d))) d.setDate(d.getDate()-1); // streak still alive if you haven't played yet today
+  while(set.has(dayKey(d))){ n++; d.setDate(d.getDate()-1); }
+  return n;
+}
+
+/* ---------- planner ---------- */
+function buildSet(limit){
+  const favs = LIVE.filter(g => S.favs.includes(g.id));
+  // the rest rotate daily so the set changes, mixing categories
+  let seed=[...TODAY].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7);
+  const rnd=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
+  const pool=LIVE.filter(g => !S.favs.includes(g.id)).map(g=>({g,k:rnd()})).sort((a,b)=>a.k-b.k).map(x=>x.g);
+  const rest=[]; const used=new Set(favs.map(g=>g.cat));
+  pool.filter(g=>!used.has(g.cat)&&(used.add(g.cat),true)).forEach(g=>rest.push(g));
+  pool.forEach(g=>{ if(!rest.includes(g)) rest.push(g); });
+  const out=[]; let t=0;
+  for(const g of [...favs, ...rest]){ if(t + g.mins <= limit){ out.push(g); t+=g.mins; } }
+  if(!out.length){ const g=[...LIVE].sort((a,b)=>a.mins-b.mins)[0]; out.push(g); t=g.mins; }
+  return {list:out, total:t};
+}
+
+function renderPlanner(){
+  document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(+c.dataset.min===S.minutes)));
+  const {list,total} = buildSet(S.minutes);
+  const done = list.filter(g=>playedToday(g.id)).length;
+  const allLive = LIVE.reduce((a,g)=>a+g.mins,0);
+  document.getElementById('plan-sub').textContent = S.favs.length ? 'Your favorites go first.' : 'Star a few games below and they’ll go first.';
+  const el = document.getElementById('plan');
+
+  if(done === list.length){
+    el.innerHTML = `<div class="finish"><div style="font-size:34px">🌤️</div>
+      <div class="big">That’s it for today.</div>
+      <p>You played ${list.length} game${list.length>1?'s':''} in about ${total} minutes. New puzzles at midnight.</p>
+      <p style="margin-top:10px"><button class="linkbtn" id="more">Show the list again</button></p></div>`;
+    document.getElementById('more').onclick = () => { el.dataset.force='1'; renderList(); };
+    if(!el.dataset.force) return;
+  }
+  renderList();
+
+  function renderList(){
+    const items = list.map((g,i)=>`<li class="${playedToday(g.id)?'done':''}">
+      <a href="${g.url}" data-play="${g.id}">
+        <span class="ico" style="background:${g.tint};color:${g.color}">${ICONS[g.id]}</span>
+        <span><span class="nm">${i+1}. ${g.name}</span><br><span class="why">${S.favs.includes(g.id)?'★ Favorite':CATNAME[g.cat]}</span></span>
+        <span class="t">${playedToday(g.id)?'✓ Played':'~'+g.mins+' min'}</span>
+      </a></li>`).join('');
+    const note = S.minutes > allLive
+      ? `<div class="note">That’s all ${LIVE.length} games (~${allLive} min). More are on the way.</div>` : '';
+    el.innerHTML = `<ul class="set">${items}</ul>
+      <div class="total"><span>${done} of ${list.length} played</span><span>~${total} of ${S.minutes} min</span></div>
+      <div class="bar"><i style="width:${list.length?done/list.length*100:0}%"></i></div>${note}`;
+    bindPlays(el);
+    delete el.dataset.force;
+  }
+}
+
+/* ---------- cards ---------- */
+let FILTER='all';
+function scene(g){
+  // simple abstract illustration per game
+  if(g.id==='dialectle') return `<svg class="scene" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
+    <rect width="300" height="150" fill="#f4e3df"/>
+    <g opacity=".9">${Array.from({length:16},(_,i)=>`<rect x="${-20+i*22}" y="-10" width="11" height="14" fill="${i%2?'#1f4e8c':'#b8322a'}" transform="skewX(-35)"/><rect x="${70+i*22}" y="146" width="11" height="14" fill="${i%2?'#1f4e8c':'#b8322a'}" transform="skewX(-35)"/>`).join('')}</g>
+    <text x="150" y="70" text-anchor="middle" font-family="Fraunces,serif" font-size="40" font-weight="600" fill="#1e1c19">boot</text>
+    <text x="150" y="96" text-anchor="middle" font-family="Inter Tight,sans-serif" font-size="12" fill="#5b554c" letter-spacing="1">/buːt/ · noun</text>
+    <g font-family="Inter Tight,sans-serif" font-size="11" font-weight="600">
+      <rect x="62" y="108" width="52" height="20" rx="10" fill="#fff" stroke="#b8322a"/><text x="88" y="122" text-anchor="middle" fill="#b8322a">🇬🇧 trunk</text>
+      <rect x="186" y="108" width="52" height="20" rx="10" fill="#fff" stroke="#1f4e8c"/><text x="212" y="122" text-anchor="middle" fill="#1f4e8c">🇺🇸 shoe</text>
+    </g></svg>`;
+  if(g.id==='topshelf') return `<svg class="scene" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
+    <rect width="300" height="150" fill="#e8f1f7"/>
+    <path d="M0 40h300" stroke="#c43b3b" stroke-width="3"/>
+    <path d="M0 110h300" stroke="#2c62a8" stroke-width="4" opacity=".75"/>
+    <circle cx="150" cy="40" r="26" fill="none" stroke="#c43b3b" stroke-width="2" opacity=".5"/>
+    <rect x="128" y="18" width="44" height="18" rx="3" fill="none" stroke="#c43b3b" stroke-width="2.5"/>
+    <path d="M60 130 Q120 70 146 32" fill="none" stroke="#1e1c19" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <ellipse cx="60" cy="131" rx="7" ry="3" fill="#1e1c19"/>
+    <rect x="200" y="78" width="10" height="16" rx="5" fill="#1f5f8b"/><path d="M190 86h30" stroke="#1f5f8b" stroke-width="1.5" stroke-dasharray="2 3"/>
+    <text x="284" y="138" text-anchor="end" font-family="Inter Tight,sans-serif" font-size="12" font-weight="700" fill="#1f5f8b">PAR 3</text></svg>`;
+  if(g.id==='breakaway') return `<svg class="scene" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
+    <defs><linearGradient id="ice" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe8ee"/><stop offset="1" stop-color="#f6f9fb"/></linearGradient></defs>
+    <rect width="300" height="150" fill="url(#ice)"/>
+    <path d="M70 128 L90 40 H210 L230 128" fill="none" stroke="#c6512f" stroke-width="5" stroke-linejoin="round"/>
+    <g stroke="#9aa9b4" stroke-width=".7" opacity=".7">${Array.from({length:12},(_,i)=>`<path d="M${96+i*10} 44 L${90+i*11.6} 126"/>`).join('')}${Array.from({length:7},(_,i)=>`<path d="M${88-i*2.6} ${52+i*12} H${212+i*2.6}"/>`).join('')}</g>
+    <circle cx="150" cy="62" r="14" fill="#2b3a46"/>
+    <path d="M128 78 h44 l10 48 h-64z" fill="#2b3a46"/>
+    <rect x="104" y="72" width="20" height="26" rx="4" fill="#c6512f"/>
+    <circle cx="186" cy="82" r="12" fill="#c6512f"/>
+    <circle cx="203" cy="50" r="5" fill="#1e1c19"/><circle cx="203" cy="50" r="12" fill="none" stroke="#e0a526" stroke-width="2" stroke-dasharray="3 3"/></svg>`;
+  const V='<svg class="scene" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">';
+  if(g.id==='secondguess') return V+`<rect width="300" height="150" fill="#1d2b4f"/>
+    ${[40,120,200].map((x,i)=>`<rect x="${x}" y="28" width="62" height="78" rx="6" fill="#f6efdc"/>
+      <rect x="${x+8}" y="38" width="46" height="5" rx="2" fill="#1d2b4f" opacity=".7"/><rect x="${x+8}" y="47" width="34" height="5" rx="2" fill="#1d2b4f" opacity=".4"/>
+      ${[0,1,2,3].map(k=>`<rect x="${x+8}" y="${60+k*10}" width="46" height="7" rx="3" fill="${k===(i+1)%4?'#d4a62a':'#e3dac3'}"/>`).join('')}
+      ${Array.from({length:[2,6,2][i]},(_,c)=>`<ellipse cx="${x+31}" cy="${128-c*4}" rx="12" ry="4" fill="#d4a62a" stroke="#9c7614"/>`).join('')}`).join('')}`+'</svg>';
+  if(g.id==='equalfooting') return V+`<rect width="300" height="150" fill="#f6f1e6"/>
+    <path d="M70 30 a46 46 0 1 0 0 92 a34 40 0 1 1 0-92z" fill="#e0662d"/>
+    <circle cx="215" cy="76" r="36" fill="#2c6fb7"/>
+    <text x="150" y="84" text-anchor="middle" font-family="Fraunces,serif" font-size="28" fill="#1e1c19">=?</text>`+'</svg>';
+  if(g.id==='soundcheck') return V+`<rect width="300" height="150" fill="#2a2522"/>
+    ${['#e07a3a','#e2bf3c','#5fb36a','#9a6fd1'].map((c,i)=>`<path d="M20 ${30+i*30} ${Array.from({length:52},(_,k)=>`L${20+k*5.2} ${30+i*30+Math.sin(k*(0.6+i*0.35))*(5+((k*7+i*3)%9))}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round"/>`).join('')}`+'</svg>';
+  if(g.id==='outofplace') return V+`<rect width="300" height="150" fill="#f1ead0"/>
+    <g opacity=".35">${Array.from({length:8},(_,i)=>`<circle cx="${20+i*38}" cy="22" r="12" fill="none" stroke="#c07a1c" stroke-width="5"/>`).join('')}</g>
+    <rect x="0" y="92" width="300" height="58" fill="#7b8a3a"/><rect x="0" y="88" width="300" height="8" fill="#d9b36a"/>
+    <rect x="40" y="56" width="34" height="32" rx="4" fill="#e7a43b"/><circle cx="57" cy="72" r="9" fill="#f6efdc" stroke="#7a4c12" stroke-width="2"/>
+    <rect x="200" y="46" width="44" height="42" rx="5" fill="#ece6d2" stroke="#9b8f6f"/><rect x="206" y="52" width="26" height="30" fill="#4b4a43"/>
+    <rect x="128" y="58" width="16" height="30" rx="8" fill="#2c2c2c"/>
+    <circle cx="136" cy="72" r="24" fill="none" stroke="#b8322a" stroke-width="2.5" stroke-dasharray="5 4"/>
+    <text x="284" y="138" text-anchor="end" font-family="Fraunces,serif" font-size="22" font-weight="600" fill="#f1ead0">1978</text>`+'</svg>';
+  if(g.id==='eyewitness') return V+`<rect width="300" height="150" fill="#f5e6e3"/>
+    <rect x="0" y="100" width="300" height="50" fill="#d9d2c8"/><path d="M0 100h300" stroke="#b9ab98" stroke-width="2"/>
+    ${[50,130,210].map(x=>`<circle cx="${x}" cy="60" r="16" fill="#fff" stroke="#c9b9ae"/><path d="M${x-22} 40 h44 l-6-14 h-32z" fill="${x===130?'#2f7a3a':'#e2bf3c'}"/>`).join('')}
+    <circle cx="250" cy="122" r="9" fill="#2c6fb7"/><path d="M226 122h12" stroke="#2c6fb7" stroke-width="2" stroke-dasharray="3 3"/>
+    <rect x="70" y="114" width="26" height="12" rx="4" fill="#b3261e"/>
+    <rect x="16" y="140" width="268" height="4" rx="2" fill="#e8d6d2"/><rect x="16" y="140" width="170" height="4" rx="2" fill="#b3261e"/>
+    <text x="16" y="22" font-family="Inter Tight,sans-serif" font-size="12" font-weight="700" fill="#b3261e">0:05</text>`+'</svg>';
+  if(g.id==='missing'){ const gear=(cx,cy,r,n,fill,dash)=>{let d='';for(let i=0;i<n*2;i++){const a=i*Math.PI/n,rr=i%2?r:r+5;d+=(i?'L':'M')+(cx+rr*Math.cos(a)).toFixed(1)+' '+(cy+rr*Math.sin(a)).toFixed(1);}return `<path d="${d}z" fill="${fill}" stroke="#2e4a62" stroke-width="1.6" ${dash?'stroke-dasharray="4 3"':''}/><circle cx="${cx}" cy="${cy}" r="4" fill="#efece4" stroke="#2e4a62"/>`;};
+    return V+`<rect width="300" height="150" fill="#efece4"/>
+    <g stroke="#c9c2b2" stroke-width=".6">${Array.from({length:16},(_,i)=>`<path d="M${i*20} 0V150"/>`).join('')}${Array.from({length:8},(_,i)=>`<path d="M0 ${i*20}H300"/>`).join('')}</g>
+    ${gear(80,75,30,12,'#d9cfb8')}${gear(150,75,18,8,'none',true)}${gear(220,75,30,12,'#e0a526')}
+    <text x="150" y="80" text-anchor="middle" font-family="Fraunces,serif" font-size="18" fill="#2e4a62">?</text>`+'</svg>'; }
+  if(g.id==='dryrun') return V+`<rect width="300" height="150" fill="#a9c98a"/>
+    <rect x="200" y="0" width="100" height="70" fill="#ddd6c6"/><path d="M200 0v70h100" fill="none" stroke="#b9ae97" stroke-width="2"/>
+    <path d="M0 6h300" stroke="#8b6f4e" stroke-width="5"/>
+    <path d="M30 18h120" stroke="#777" stroke-width="1"/>${[44,70,96,122].map((x,i)=>`<rect x="${x}" y="18" width="16" height="20" fill="${['#e07a7a','#ffffff','#7aa6e0','#f2d16b'][i]}" stroke="#999" stroke-width=".5"/>`).join('')}
+    ${[[40,130,-90,0],[150,140,-170,-10],[270,130,180,270]].map(([x,y,a1,a2])=>{const r=58,p=(a)=>[x+r*Math.cos(a*Math.PI/180),y+r*Math.sin(a*Math.PI/180)];const [x1,y1]=p(a1),[x2,y2]=p(a2);return `<path d="M${x} ${y} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}z" fill="#3a8fd6" opacity=".28" stroke="#2f78b8" stroke-dasharray="3 3"/><circle cx="${x}" cy="${y}" r="4" fill="#1f5f8b"/>`;}).join('')}
+    <ellipse cx="250" cy="40" rx="18" ry="11" fill="#c9a06b"/><circle cx="264" cy="34" r="6" fill="#c9a06b"/>`+'</svg>';
+  if(g.id==='ripple') return V+`<rect width="300" height="150" fill="#eae8f5"/>
+    <g transform="translate(150 80) skewX(-12) rotate(-4)"><rect x="-110" y="-55" width="220" height="110" rx="6" fill="#f7f6fb" stroke="#4a3fa0" stroke-width="2"/>
+    <g stroke="#d6d2ea" stroke-width=".7">${Array.from({length:11},(_,i)=>`<path d="M${-110+i*20} -55V55"/>`).join('')}${Array.from({length:5},(_,i)=>`<path d="M-110 ${-55+i*22}H110"/>`).join('')}</g>
+    <rect x="-20" y="-50" width="12" height="50" fill="#a9a6b8"/><rect x="40" y="10" width="50" height="30" rx="4" fill="#cfe6f5" opacity=".9"/>
+    <circle cx="-70" cy="-20" r="9" fill="#d94a3a"/><text x="-70" y="-16" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter Tight">1</text>
+    <rect x="-40" y="20" width="16" height="16" rx="2" fill="#2c6fb7"/><text x="-32" y="32" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter Tight">2</text>
+    <circle cx="20" cy="30" r="8" fill="#e2bf3c"/><text x="20" y="34" text-anchor="middle" font-size="10" font-weight="700" fill="#1e1c19" font-family="Inter Tight">3</text>
+    <path d="M-70 -20 Q10 -30 70 -30" fill="none" stroke="#4a3fa0" stroke-dasharray="3 3"/><circle cx="70" cy="-30" r="7" fill="none" stroke="#d94a3a" stroke-width="2" stroke-dasharray="2 2"/></g>
+    <text x="16" y="22" font-family="Inter Tight,sans-serif" font-size="11" font-weight="600" fill="#4a3fa0">← left side rises</text>`+'</svg>';
+  return '';
+}
+const cap = s => s[0].toUpperCase()+s.slice(1);
+const STAR = '<svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8z" fill="none" stroke="#5b554c" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+
+function renderLive(){
+  const list = LIVE.filter(g => FILTER==='all' || (FILTER==='fav' ? S.favs.includes(g.id) : g.cat===FILTER));
+  const el = document.getElementById('live');
+  if(!list.length){ el.innerHTML = `<p style="color:var(--ink-3);grid-column:1/-1">No favorites yet. Tap ☆ on a game to add it.</p>`; return; }
+  el.innerHTML = list.map(g => `<article class="card">
+    <div class="art">${scene(g)}
+      <button class="fav" data-fav="${g.id}" aria-pressed="${S.favs.includes(g.id)}" aria-label="${S.favs.includes(g.id)?'Remove from':'Add to'} favorites">${STAR}</button></div>
+    <div class="body">
+      <div class="row"><h3>${g.name}</h3>
+        <span class="status ${playedToday(g.id)?'played':''}" style="${playedToday(g.id)?'':'color:var(--ink-3)'}">${playedToday(g.id)?'Played today':'~'+g.mins+' min'}</span></div>
+      <p>${g.blurb}</p>
+      <div class="tags">${g.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+    </div>
+    <a class="cta" href="${g.url}" data-play="${g.id}" style="color:${g.color}">
+      <span>${playedToday(g.id)?'Play again':'Play today’s game'}</span><span class="arrow">→</span></a>
+  </article>`).join('');
+  el.querySelectorAll('[data-fav]').forEach(b => b.onclick = () => {
+    const id=b.dataset.fav; S.favs = S.favs.includes(id) ? S.favs.filter(x=>x!==id) : [...S.favs,id]; save(); renderAll();
+  });
+  bindPlays(el);
+}
+
+function bindPlays(root){
+  // let the link open normally, then record the play
+  root.querySelectorAll('[data-play]').forEach(a => a.addEventListener('click', () => setTimeout(()=>markPlayed(a.dataset.play), 50)));
+}
+
+function renderAll(){
+  document.getElementById('streak').textContent = streak();
+  renderPlanner(); renderLive();
+}
+
+/* ---------- init ---------- */
+document.getElementById('today').textContent = new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+document.querySelectorAll('.chip').forEach(c => c.onclick = () => { S.minutes=+c.dataset.min; save(); renderPlanner(); });
+document.querySelectorAll('#filters button').forEach(b => b.onclick = () => {
+  FILTER=b.dataset.f; document.querySelectorAll('#filters button').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); renderLive();
+});
+renderAll();
+</script>
+</body>
+</html>
