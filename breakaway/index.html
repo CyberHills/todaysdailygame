@@ -23,64 +23,98 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
-body { background: var(--arena); color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.4; }
+body { background: radial-gradient(120% 60% at 50% 0%, #131d33 0%, var(--arena) 60%) fixed, var(--arena); color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
 .wrap { max-width: 640px; margin: 0 auto; padding: 16px 16px 40px; display: flex; flex-direction: column; gap: 12px; }
 header { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
-h1 { font-family: var(--display); font-weight: 900; font-size: 2.6rem; margin: 0; line-height: .9; text-transform: uppercase; letter-spacing: .02em; }
-h1 span { color: var(--goal-red); }
+h1 { font-family: var(--display); font-weight: 900; font-size: 2.6rem; margin: 0; line-height: .9; text-transform: uppercase; letter-spacing: .02em; text-wrap: balance; }
+h1 span { color: var(--goal-red); text-shadow: 0 0 18px rgba(227,36,43,.35); }
 .sub { color: var(--muted); margin: 4px 0 0; font-size: .95rem; }
-.chips { display: flex; gap: 6px; }
-.chip { font: 700 .85rem var(--body); text-transform: uppercase; letter-spacing: .05em; background: var(--panel); color: var(--muted); border: 1px solid #26324f; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
-.chip[aria-pressed="true"] { color: var(--text); border-color: var(--led); }
-.chip:focus-visible, .shoot:focus-visible, .btn:focus-visible { outline: 3px solid var(--led); outline-offset: 2px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font: 700 .85rem var(--body); text-transform: uppercase; letter-spacing: .05em; background: var(--panel); color: var(--muted); border: 1px solid #26324f; min-height: 40px; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: color .15s, border-color .15s, background-color .15s; }
+.chip:hover { color: var(--text); }
+.chip[aria-pressed="true"] { color: var(--text); border-color: var(--led); background: #1d2944; }
+#soundBtn[aria-pressed="false"] { text-decoration: line-through; text-decoration-thickness: 2px; }
+.chip:focus-visible, .shoot:focus-visible, .btn:focus-visible, details summary:focus-visible { outline: 3px solid var(--led); outline-offset: 2px; }
 
-.tally { display: flex; gap: 8px; align-items: center; justify-content: space-between; background: #05080f; border: 2px solid #26324f; border-radius: 10px; padding: 8px 12px; }
+.tally { display: flex; gap: 8px; align-items: center; justify-content: space-between; background: linear-gradient(#070b14, #03060c); border: 2px solid #26324f; border-radius: 10px; padding: 8px 12px; box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
 .tally .lbl { font: 700 .7rem var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-.pucks { display: flex; gap: 8px; }
-.pk { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #33405f; display: grid; place-items: center; font: 800 .9rem var(--display); color: #05080f; }
+.pucks { display: flex; gap: 8px; margin-top: 3px; }
+.pk { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #33405f; display: grid; place-items: center; font: 800 .9rem var(--display); color: #05080f; background: radial-gradient(circle at 50% 35%, #1a2236, #0b101b); transition: background-color .2s, border-color .2s, box-shadow .2s; }
 .pk.cur { border-color: var(--led); box-shadow: 0 0 10px rgba(255,176,32,.5); }
-.pk.goal { background: var(--goal-red); border-color: var(--goal-red); color: #fff; }
-.pk.save { background: var(--save); border-color: var(--save); }
-.pk.miss { background: #3a4561; border-color: #3a4561; color: var(--text); }
+.pk.goal { background: var(--goal-red); border-color: #ff5a5f; color: #fff; box-shadow: 0 0 8px rgba(227,36,43,.55); }
+.pk.save { background: var(--save); border-color: #b7d3ff; }
+.pk.miss { background: #3a4561; border-color: #4a5677; color: var(--text); }
+.pk.pop { animation: pkpop .45s cubic-bezier(.3,1.6,.5,1); }
+@keyframes pkpop { 0% { transform: scale(.4); } 100% { transform: scale(1); } }
 .score { font-family: var(--display); font-weight: 800; font-size: 1.9rem; color: var(--led); line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 10px rgba(255,176,32,.35); }
+.score.bump { animation: bump .5s ease-out; }
+@keyframes bump { 30% { transform: scale(1.35); text-shadow: 0 0 22px rgba(255,176,32,.9); } }
 
-.stage { position: relative; border-radius: 14px; overflow: hidden; background: #0e1626; aspect-ratio: 4 / 3; box-shadow: 0 10px 30px rgba(0,0,0,.45); touch-action: manipulation; cursor: crosshair; }
+.stage { position: relative; border-radius: 14px; overflow: hidden; background: #0e1626; aspect-ratio: 4 / 3; box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 0 1px #26324f; touch-action: manipulation; cursor: crosshair; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(5,8,15,.55) 100%); }
 .stage canvas { display: block; width: 100% !important; height: 100% !important; }
-.flash { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: 0; }
-.flash.on { opacity: 1; }
+.flash { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: 0; z-index: 2; transition: opacity .25s ease-out; }
+.flash.on { opacity: 1; transition: none; }
 .flash.goal { background: radial-gradient(circle at 50% 30%, rgba(227,36,43,.5), rgba(227,36,43,0) 70%); }
-.flash .word { font-family: var(--display); font-weight: 900; font-size: clamp(3rem, 14vw, 5.5rem); color: #fff; letter-spacing: .04em; text-shadow: 0 0 24px var(--goal-red), 0 4px 0 #8a0f14; }
+.flash.save { background: radial-gradient(circle at 50% 40%, rgba(60,110,220,.28), rgba(60,110,220,0) 65%); }
+.flash .word { font-family: var(--display); font-weight: 900; font-size: clamp(2.6rem, 13vw, 5.5rem); line-height: 1; text-align: center; padding: 0 12px; color: #fff; letter-spacing: .04em; text-shadow: 0 0 24px var(--goal-red), 0 4px 0 #8a0f14; }
 .flash.save .word { text-shadow: 0 0 24px #2457c5, 0 4px 0 #13306e; }
-.flash.miss .word { text-shadow: 0 0 18px #000, 0 4px 0 #222; }
+.flash.miss .word { text-shadow: 0 0 18px #000, 0 4px 0 #222; color: #dfe5f0; }
+.shotlabel { position: absolute; left: 12px; top: 10px; z-index: 1; pointer-events: none; font: 800 .8rem var(--body); letter-spacing: .14em; text-transform: uppercase; color: #fff; background: rgba(5,8,15,.6); border: 1px solid rgba(255,255,255,.12); padding: 4px 10px; border-radius: 999px; }
+.shotlabel:empty { display: none; }
 @media (prefers-reduced-motion: no-preference) {
   .flash.goal.on { animation: lamp .5s steps(2, end) 3; }
   @keyframes lamp { 50% { opacity: .5; } }
+  .flash.on .word { animation: slam .32s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes slam { 0% { transform: scale(1.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 }
+@media (prefers-reduced-motion: reduce) { .pk.pop, .score.bump { animation: none; } .chip, .pk, .flash { transition: none; } }
 .fallback { position: absolute; inset: 0; display: none; place-items: center; text-align: center; padding: 20px; color: var(--muted); }
 
-.scout { background: var(--panel); border: 1px solid #26324f; border-left: 4px solid var(--led); border-radius: 10px; padding: 10px 14px; font-size: .95rem; }
-.scout b { font-family: var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--led); margin-right: 6px; }
-.shoot { width: 100%; font: 900 1.5rem var(--display); letter-spacing: .08em; text-transform: uppercase; padding: 12px; border-radius: 12px; border: 0; cursor: pointer; background: var(--goal-red); color: #fff; box-shadow: 0 4px 0 #8a0f14; }
+.scout { display: flex; gap: 12px; align-items: center; background: linear-gradient(90deg, #1b2847, var(--panel) 60%); border: 1px solid #26324f; border-left: 4px solid var(--led); border-radius: 10px; padding: 10px 14px; font-size: .95rem; }
+.scout .badge { flex: none; width: 54px; height: 54px; border-radius: 10px; background: #7a1f2b; border: 2px solid #f3f1ea; display: grid; place-items: center; font: 900 1.6rem/1 var(--display); color: #fff; box-shadow: inset 0 -8px 0 rgba(0,0,0,.18); }
+.scout .txt { flex: 1; min-width: 0; }
+.scout b { display: block; font-family: var(--display); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--led); font-size: .95rem; }
+.scout .tend { color: var(--muted); }
+.scout svg { flex: none; width: 66px; height: 46px; }
+.shoot { width: 100%; font: 900 1.5rem var(--display); letter-spacing: .08em; text-transform: uppercase; min-height: 56px; padding: 12px; border-radius: 12px; border: 0; cursor: pointer; background: linear-gradient(#ef3a40, var(--goal-red)); color: #fff; box-shadow: 0 4px 0 #8a0f14, 0 8px 18px rgba(227,36,43,.25); transition: transform .06s, box-shadow .06s, background-color .2s; }
 .shoot:active { transform: translateY(2px); box-shadow: 0 2px 0 #8a0f14; }
-.shoot:disabled { background: #3a4561; box-shadow: 0 4px 0 #242c40; cursor: default; }
+.shoot.armed { background: linear-gradient(#ffbf45, var(--led)); color: #1b1300; box-shadow: 0 4px 0 #9a6400, 0 8px 18px rgba(255,176,32,.25); }
+.shoot.armed:active { box-shadow: 0 2px 0 #9a6400; }
+.shoot:disabled { background: #3a4561; color: #c3cbe0; box-shadow: 0 4px 0 #242c40; cursor: default; transform: none; }
 .hint { color: var(--muted); font-size: .92rem; margin: 0; min-height: 1.3em; }
 
-.card { background: var(--panel); border: 1px solid #26324f; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-.card h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin: 0; font-size: 1.15rem; }
-.big { font-family: var(--display); font-weight: 900; font-size: 3.4rem; line-height: 1; margin: 0; color: var(--led); }
+.card { background: var(--panel); border: 1px solid #26324f; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 10px 24px rgba(0,0,0,.3); }
+.card h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin: 0; font-size: 1.15rem; color: var(--muted); }
+.big { font-family: var(--display); font-weight: 900; font-size: 3.4rem; line-height: 1; margin: 0; color: var(--led); font-variant-numeric: tabular-nums; text-shadow: 0 0 18px rgba(255,176,32,.3); }
+.verdict { color: var(--text); font-size: 1.05rem; font-weight: 500; margin: 0; }
 .grid { font-size: 1.5rem; letter-spacing: 4px; margin: 0; }
+.chart { display: flex; gap: 14px; align-items: center; }
+.chart svg { flex: none; width: 132px; height: 92px; }
+.verdict.small { font-size: .95rem; color: var(--muted); }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.stat { background: #05080f; border-radius: 8px; padding: 8px 4px; text-align: center; }
+.stat { background: #05080f; border: 1px solid #1c2640; border-radius: 8px; padding: 8px 4px; text-align: center; }
 .stat b { display: block; font-family: var(--display); font-size: 1.5rem; color: var(--led); font-variant-numeric: tabular-nums; }
-.stat span { font-size: .75rem; color: var(--muted); }
+.stat span { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; }
-.btn { font: 700 1rem var(--body); border-radius: 10px; padding: 10px 16px; border: 1px solid #33405f; background: transparent; color: var(--text); cursor: pointer; }
+.btn { font: 700 1rem var(--body); border-radius: 10px; min-height: 44px; padding: 10px 16px; border: 1px solid #33405f; background: transparent; color: var(--text); cursor: pointer; transition: background-color .15s, border-color .15s; }
+.btn:hover { border-color: #4a5a82; background: rgba(255,255,255,.03); }
 .btn.primary { background: var(--led); color: #1b1300; border-color: var(--led); }
+.btn.primary:hover { background: #ffbf45; }
 .sharebox { width: 100%; min-height: 4rem; background: #05080f; color: var(--text); border: 1px solid #26324f; border-radius: 8px; font: .9rem ui-monospace, Menlo, Consolas, monospace; padding: 8px; }
 details { color: var(--muted); font-size: .95rem; }
-details summary { cursor: pointer; color: var(--text); font-weight: 700; }
-details ul { padding-left: 1.2rem; margin: 8px 0 0; }
-@media (max-width: 420px) { .stats { grid-template-columns: repeat(2, 1fr); } .pk { width: 22px; height: 22px; } }
+details summary { cursor: pointer; color: var(--text); font-weight: 700; padding: 6px 0; border-radius: 4px; }
+details ul { padding-left: 1.2rem; margin: 8px 0 0; display: grid; gap: 4px; }
+@media (max-width: 420px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .pk { width: 24px; height: 24px; } .pucks { gap: 6px; }
+  h1 { font-size: 2.3rem; }
+  .row .btn { flex: 1 1 auto; }
+  .scout { gap: 10px; padding: 10px 12px; }
+  .scout .badge { display: none; }
+  .scout svg { width: 60px; height: 42px; }
+  .chart svg { width: 110px; height: 77px; }
+}
 </style>
 </head>
 <body>
@@ -103,11 +137,12 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   </div>
 
   <div class="stage" id="stage" aria-label="Your view of the net. Press Space or Shoot to lock left-right, then again to lock height and shoot.">
-    <div class="flash" id="flash"><div class="word">GOAL</div></div>
+    <div class="shotlabel" id="shotLabel" aria-hidden="true"></div>
+    <div class="flash" id="flash" aria-live="polite"><div class="word">GOAL</div></div>
     <div class="fallback" id="fallback">This game needs WebGL, which this browser has turned off.</div>
   </div>
 
-  <div class="scout" id="scout"></div>
+  <div class="scout" id="scout" aria-label="Scouting report"></div>
   <button class="shoot" id="shootBtn">Lock left–right</button>
   <p class="hint" id="hint">The red line sweeps across the net. Tap to lock it, then tap again to pick the height and shoot.</p>
   <section id="resultBox"></section>
@@ -118,9 +153,10 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
       <li>You get five shots on the same goalie. Score as many as you can.</li>
       <li>First tap locks where across the net you'll shoot. Second tap locks the height and releases the shot.</li>
       <li>The goalie shuffles, drops into the butterfly and moves his glove and blocker while you line up. Shoot where he isn't.</li>
-      <li>He reacts once you shoot. Corners far from his glove and blocker are hardest for him to reach.</li>
+      <li>He reacts once you shoot, but only a little. Watch him and release when your spot is open.</li>
       <li>Shots outside the posts or over the bar miss. Hitting the post rings, but it doesn't count.</li>
-      <li>Read the scouting report: every goalie has a weak spot.</li>
+      <li>Read the scouting report: every goalie has a weak spot, lit up in amber on the little net. There are ten kinds, and the goalie changes every day.</li>
+      <li>Once the puck leaves your stick the shot counts, even if you reload.</li>
     </ul>
   </details>
 </div>
@@ -128,43 +164,172 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function () {
+/*CORE-BEGIN*/
+  // ---------- game core (no DOM, no 3D): goalie generation, movement, saves, shot outcome ----------
   // Units: feet. Goal mouth: x in [-3, 3], y in [0, 4], goal line at z = 0. Shooter looks toward -z.
+  // Shooter's view: +x is the goalie's glove side, -x his blocker side.
   const NET_HW = 3, NET_H = 4, PUCK_R = 0.12, GZ = 1.0; // goalie plane in front of the line
   const START = { x: 0, y: 0.1, z: 11 };
-  const EPOCH = new Date(2026, 10, 5), STORE = "breakaway:v1", SHOTS = 5;
-
-  function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
-  function save() { try { localStorage.setItem(STORE, JSON.stringify(db)); } catch (e) {} }
-  const db = load(); db.stats = db.stats || { played: 0, streak: 0, best: 0, last: null, bestGoals: 0, goals: 0 };
+  const SHOTS = 5, SIM_DT = 1 / 120, FLIGHT = 0.5;
   function rng(seed) { return function () { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-  function dayIndex() { const d = new Date(); return Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - EPOCH) / 864e5); }
-
-  // ---------- daily goalie ----------
+  // Every weak spot is a set of changes to a baseline goalie. The baseline covers all four corners about equally.
+  // m: movement/coverage changes; zones: highlighted on the scouting mini-net (60x42 box, shooter's view).
+  const BASE = { gloveY: 0, blockY: 0, gloveUp: 6, gloveDown: 6, blockUp: 6, blockDown: 6, gap: 0.16, stick: true, dropMul: 1, dropSpd: 5, shufMul: 1, latSpd: 2.2, center: 0, crouch: 0, react: 0 };
   const WEAK = [
-    { key: "gloveHigh", text: "Slow getting the glove up. Try high on his glove side." },
-    { key: "blockerHigh", text: "Blocker hand is heavy. Look high on his blocker side." },
-    { key: "fiveHole", text: "Leaves the five-hole open when he's standing." },
-    { key: "lowCorners", text: "Slow to drop. Low corners beat him." },
-    { key: "lateral", text: "Struggles moving side to side. Pick a post and shoot early in his shuffle." },
+    { key: "gloveHigh", m: { gloveY: -0.45, gloveUp: 2.2 }, zones: [[36, 4, 20, 13]],
+      text: ["Slow getting the glove up. Try high on his glove side.", "Glove hand is a beat late. Go top corner, glove side.", "Catches low and lazy. Pick the high corner on his glove side.", "Glove drops when he's tired. Shoot over it, glove side."] },
+    { key: "blockerHigh", m: { blockY: -0.45, blockUp: 2.2 }, zones: [[4, 4, 20, 13]],
+      text: ["Blocker hand is heavy. Look high on his blocker side.", "Blocker sits low. Go high on his blocker side.", "Slow to lift the blocker. Aim upstairs, blocker side.", "Blocker stays at his hip. Go over it, top corner blocker side."] },
+    { key: "gloveLow", m: { gloveY: 0.45, gloveDown: 1.8, padGlove: 0.55 }, zones: [[38, 25, 18, 13]],
+      text: ["Carries his glove high. Low on the glove side.", "Glove never gets down in time. Keep it on the ice, glove side.", "Slow kick on his glove-side pad. Low corner, glove side.", "Glove-side pad is late to the post. Low and hard, glove side."] },
+    { key: "blockerLow", m: { blockY: 0.45, blockDown: 1.8, padBlock: 0.55 }, zones: [[4, 25, 18, 13]],
+      text: ["Blocker rides high. Low on the blocker side.", "Lazy blocker-side pad. Go low, blocker side.", "Can't get the blocker down to the ice. Low corner, blocker side.", "Blocker-side pad is slow to seal. Low corner, blocker side."] },
+    { key: "fiveHole", m: { gap: 0.42, stick: false, dropMul: 0.35, dropSpd: 1.5, shufMul: 0.55 }, zones: [[24, 23, 12, 15]],
+      text: ["Leaves the five-hole open when he's standing.", "Pads don't seal when he's upright. Go between the legs.", "Wide stance on his feet. Shoot five-hole before he drops.", "No stick between the pads. Right through the legs."] },
+    { key: "lowCorners", m: { dropSpd: 0.9, dropMul: 0.3, padBlock: 0.35, padGlove: 0.35, gloveDown: 2.5, blockDown: 2.5 }, zones: [[4, 27, 15, 11], [41, 27, 15, 11]],
+      text: ["Slow to drop. Low corners beat him.", "Late into the butterfly. Keep it on the ice in the corners.", "Pads are slow to the posts. Low and tight to either post.", "Stays tall too long. Either low corner, on the ice."] },
+    { key: "lateral", m: { shufMul: 1.55, shufSlow: 1.6, latSpd: 0.6 }, zones: [[4, 4, 10, 34], [46, 4, 10, 34]],
+      text: ["Struggles moving side to side. Shoot to the side he's drifting away from.", "Heavy feet post to post. Wait until he drifts, then go far side.", "Overcommits on his shuffle. Go far side, away from where he's moving.", "Drifts way out of position. Catch him at one post, shoot at the other."] },
+    { key: "dropsEarly", m: { dropMul: 2.4, crouchDown: 0.35, gloveUp: 2.5, blockUp: 2.5 }, zones: [[4, 4, 52, 10]],
+      text: ["Drops into the butterfly too early. Go high when he's down.", "Lives on his knees. Wait for him to drop, then go top shelf.", "Flops early. When the pads go down, shoot high.", "Slow to get his hands up from the butterfly. Top shelf once he's down."] },
+    { key: "cheatsGlove", m: { center: 0.95, shufMul: 0.8, latSpd: 1.2 }, zones: [[4, 4, 16, 34]],
+      text: ["Cheats toward his glove side. The blocker side is open.", "Leans to the glove side all night. Shoot blocker side.", "Overplays the glove. Go anywhere on his blocker side.", "Sits on his glove-side post. Blocker side, any height."] },
+    { key: "cheatsBlocker", m: { center: -0.95, shufMul: 0.8, latSpd: 1.2 }, zones: [[40, 4, 16, 34]],
+      text: ["Cheats toward his blocker side. The glove side is open.", "Leans to the blocker side. Shoot glove side.", "Overplays the blocker. Go anywhere on his glove side.", "Sits on his blocker-side post. Glove side, any height."] },
   ];
+  const WEAK_BY_KEY = {}; for (const w of WEAK) WEAK_BY_KEY[w.key] = w;
   const NUMBERS = [1, 29, 30, 31, 33, 35, 39, 40, 41, 70, 72, 88];
-  function makeGoalie(seed) {
+  const EPOCH = new Date(2026, 10, 5);
+  function daySeed(day) { return ((day + 1) * 2246822519) >>> 0; }
+  // Daily weak spot: every block of 10 days uses each weak spot once (shuffled per block), and the same weak spot
+  // never comes back within 4 days across a block boundary. Blocks are built in order from launch, so it's the same for everyone.
+  const BLOCKS = [];
+  function blockOrder(b) {
+    if (b < 0) b = -b;
+    while (BLOCKS.length <= b) {
+      const k = BLOCKS.length, prev = k ? BLOCKS[k - 1].slice(-3) : [], r = rng((k * 2654435761 + 97) >>> 0);
+      let a;
+      for (let tries = 0; tries < 50; tries++) {
+        a = WEAK.map((_, i) => i);
+        for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; }
+        if (!a.slice(0, 3).some(x => prev.includes(x))) break;
+      }
+      BLOCKS.push(a);
+    }
+    return BLOCKS[b];
+  }
+  function weakForDay(day) { const n = WEAK.length; return WEAK[blockOrder(Math.floor(day / n))[((day % n) + n) % n]]; }
+  function makeGoalie(seed, weak) {
     const r = rng(seed);
-    const weak = WEAK[Math.floor(r() * WEAK.length)];
+    const w0 = WEAK[Math.floor(r() * WEAK.length)]; // keeps the random stream the same length as v1
+    weak = weak || w0;
     const shots = [];
     for (let i = 0; i < SHOTS; i++) {
       shots.push({
-        shufAmp: 0.7 + r() * 0.6 + i * 0.08, shufPer: 3.2 - i * 0.15 + r() * 0.6, shufPh: r() * 6.28,
+        shufAmp: 0.75 + r() * 0.5 + i * 0.06, shufPer: 3.2 - i * 0.15 + r() * 0.6, shufPh: r() * 6.28,
         glovePer: 2.2 + r() * 1.4, glovePh: r() * 6.28,
-        dropPer: 5 + r() * 3, dropPh: r() * 6.28, dropDuty: 0.25 + r() * 0.15,
-        react: 0.36 - i * 0.02,
+        dropPer: 5 + r() * 3, dropPh: r() * 6.28, dropDuty: 0.18 + r() * 0.12,
+        react: 0.34 - i * 0.015,
         sweepX: 0.75 + i * 0.04, sweepY: 0.95 + i * 0.05,
       });
     }
-    return { weak, number: NUMBERS[Math.floor(r() * NUMBERS.length)], shots };
+    const m = Object.assign({}, BASE, weak.m);
+    return { weak, m, number: NUMBERS[Math.floor(r() * NUMBERS.length)], shots };
   }
+  function dailyGoalie(day) { return makeGoalie(daySeed(day), weakForDay(day)); }
+  function newPose() { return { gx: 0, drop: 0, gloveX: 1.35, gloveY: 2.6, blockX: -1.35, blockY: 2.2 }; }
+  function idlePose(g, s, t) {
+    const m = g.m;
+    const gx = m.center + s.shufAmp * m.shufMul * Math.sin((2 * Math.PI * t) / (s.shufPer * (m.shufSlow || 1)) + s.shufPh);
+    const duty = Math.min(0.8, s.dropDuty * m.dropMul);
+    const dc = (Math.sin((2 * Math.PI * t) / s.dropPer + s.dropPh) + 1) / 2; // 0..1
+    const drop = dc > 1 - duty ? 1 : 0;
+    const gl = Math.sin((2 * Math.PI * t) / s.glovePer + s.glovePh);
+    return {
+      gx, drop,
+      gloveX: 1.35, gloveY: m.gloveY + (drop ? 1.75 + 0.4 * gl : 2.45 + 0.45 * gl),
+      blockX: -1.35, blockY: m.blockY + (drop ? 1.5 : 2.3 + 0.3 * Math.sin((2 * Math.PI * t) / (s.glovePer * 1.3) + 1)),
+    };
+  }
+  function approach(v, target, maxStep) { return Math.abs(target - v) <= maxStep ? target : v + Math.sign(target - v) * maxStep; }
+  // where the shot crosses the goalie's plane
+  function crossing(tx, ty) { const k = (START.z - GZ) / START.z; return { px: START.x + (tx - START.x) * k, py: START.y + (ty - START.y) * k }; }
+  function updateGoalie(g, s, pose, clock, shot, dt) {
+    const m = g.m;
+    let tgt = idlePose(g, s, clock), sp = { gx: 2.5, drop: 4, gloveX: 6, gloveY: 6, blockX: 6, blockY: 6 };
+    if (shot && clock >= shot.reactAt) {
+      const c = crossing(shot.tx, shot.ty), px = c.px, py = c.py, rel = px - pose.gx;
+      tgt = Object.assign({}, tgt);
+      tgt.gx = pose.gx + Math.max(-0.8, Math.min(0.8, rel * 0.5)); sp.gx = m.latSpd;
+      if (py < 1.1) { tgt.drop = 1; sp.drop = m.dropSpd; }
+      if (rel > 0.3) { tgt.gloveX = Math.min(2.2, Math.max(0.9, rel)); tgt.gloveY = Math.max(0.5, Math.min(3.7, py)); sp.gloveX = 5.5; sp.gloveY = tgt.gloveY > pose.gloveY ? m.gloveUp : m.gloveDown; }
+      if (rel < -0.3) { tgt.blockX = Math.max(-2.2, Math.min(-0.9, rel)); tgt.blockY = Math.max(0.55, Math.min(3.6, py)); sp.blockX = 5; sp.blockY = tgt.blockY > pose.blockY ? m.blockUp : m.blockDown; }
+    }
+    pose.gx = approach(pose.gx, tgt.gx, sp.gx * dt);
+    pose.drop = approach(pose.drop, tgt.drop, sp.drop * dt);
+    pose.gloveX = approach(pose.gloveX, tgt.gloveX, sp.gloveX * dt);
+    pose.gloveY = approach(pose.gloveY, tgt.gloveY, sp.gloveY * dt);
+    pose.blockX = approach(pose.blockX, tgt.blockX, sp.blockX * dt);
+    pose.blockY = approach(pose.blockY, tgt.blockY, sp.blockY * dt);
+  }
+  // body layout shared by the hit test and the 3D model
+  function bodyLayout(g, pose) {
+    const d = pose.drop, m = g.m;
+    const crouch = (m.crouchDown || 0) * d;
+    const torsoY = 2.75 - 1.05 * d - crouch;
+    const standW = 0.4, gap = m.gap;
+    const padH = 2.0 * (1 - d) + 0.85 * d;
+    const padSpread = (gap + standW) * (1 - d) + 1.28 * d;
+    const padHW = standW * (1 - d) + 0.78 * d;
+    // a lazy pad on one side doesn't flare as far in the butterfly
+    const padOutB = padSpread - (m.padBlock || 0) * d * 0.5, padOutG = padSpread - (m.padGlove || 0) * d * 0.5;
+    const hwB = padHW - (m.padBlock || 0) * d * 0.3, hwG = padHW - (m.padGlove || 0) * d * 0.3;
+    return { d, torsoY, gap, padH, padOutB, padOutG, hwB, hwG, padSpread, standW };
+  }
+  // Hit test in goalie-plane coordinates; returns the part that stopped it, or null.
+  function goalieHit(g, pose, px, py) {
+    const L = bodyLayout(g, pose), r = PUCK_R, gx = pose.gx;
+    const inRect = (cx, cy, hw, hh) => Math.abs(px - cx) < hw + r && Math.abs(py - cy) < hh + r;
+    const inCirc = (cx, cy, rad) => Math.hypot(px - cx, py - cy) < rad + r;
+    if (inCirc(gx + pose.gloveX, pose.gloveY, 0.5)) return "glove";
+    if (inRect(gx + pose.blockX, pose.blockY, 0.38, 0.55)) return "blocker";
+    if (inCirc(gx, L.torsoY + 1.15, 0.38)) return "mask";
+    if (inRect(gx, L.torsoY, 0.85, 0.75)) return "chest";
+    if (inRect(gx - L.padOutB, L.padH / 2, L.hwB, L.padH / 2)) return "pad";
+    if (inRect(gx + L.padOutG, L.padH / 2, L.hwG, L.padH / 2)) return "pad";
+    if (L.d > 0.5 && inRect(gx, 0.35, 0.5, 0.35)) return "pad";
+    if (L.d < 0.5 && g.m.stick && inRect(gx, 0.12, L.gap + 0.15, 0.12)) return "stick";
+    return null;
+  }
+  const sweepX = (s, t) => (NET_HW + 0.7) * Math.sin(s.sweepX * 1.4 * t);
+  const sweepY = (s, t) => 2.1 + 2.25 * Math.sin(s.sweepY * 1.4 * t - Math.PI / 2);
+  function puckAt(tx, ty, u) { return { x: START.x + (tx - START.x) * u, y: START.y + (ty - START.y) * u + Math.sin(Math.PI * u) * 0.25 * (ty > 1 ? 1 : 0), z: START.z - START.z * u }; }
+  // Decide the shot the moment it's taken: fixed-step simulation from the goalie's current pose.
+  // Returns the result plus the goalie's poses so the animation can replay exactly what was decided.
+  function simulateShot(g, i, pose0, clock0, tx, ty) {
+    const s = g.shots[Math.min(i, SHOTS - 1)], pose = Object.assign({}, pose0), frames = [];
+    const shot = { tx, ty, reactAt: clock0 + s.react };
+    let t = 0;
+    for (;;) {
+      t += SIM_DT; updateGoalie(g, s, pose, clock0 + t, shot, SIM_DT); frames.push(Object.assign({}, pose));
+      const u = Math.min(1, t / FLIGHT), p = puckAt(tx, ty, u);
+      if (p.z <= GZ) { const part = goalieHit(g, pose, p.x, p.y); if (part) return { k: "save", p: part, t, frames }; break; }
+    }
+    const ax = Math.abs(tx);
+    if (ax > NET_HW + 0.11 + PUCK_R || ty > NET_H + 0.11 + PUCK_R) return { k: "miss", p: "wide", t: FLIGHT, frames };
+    if (ax > NET_HW - 0.11 - PUCK_R) return { k: "miss", p: "post", t: FLIGHT, frames };
+    if (ty > NET_H - 0.11 - PUCK_R) return { k: "miss", p: "bar", t: FLIGHT, frames };
+    return { k: "goal", p: null, t: FLIGHT, frames };
+  }
+/*CORE-END*/
+  const STORE = "breakaway:v1";
+  function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(db)); } catch (e) {} }
+  const db = load(); db.stats = Object.assign({ played: 0, streak: 0, best: 0, last: null, bestGoals: 0, goals: 0 }, db.stats || {});
+  function dayIndex() { const d = new Date(); return Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - EPOCH) / 864e5); }
 
   // ---------- state ----------
+  const RM = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
   let mode = "daily", day, seed, goalie, G;
   let phase = "aimX"; // aimX | aimY | flying | result | done
   let clock = 0, phaseT0 = 0, aimX = 0, aimY = 2, shot = null;
@@ -174,25 +339,73 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
 
   let gen = 0;
   function startMode(m) {
-    gen++; shot = null; document.getElementById("flash").classList.remove("on");
+    gen++; shot = null; shownResults = -1; document.getElementById("flash").classList.remove("on");
     mode = m; day = dayIndex();
-    seed = m === "daily" ? ((day + 1) * 2246822519) >>> 0 : (Math.random() * 4294967296) >>> 0;
-    goalie = makeGoalie(seed);
-    if (m === "daily" && db.daily && db.daily.day === day) G = db.daily.G;
+    seed = m === "daily" ? daySeed(day) : (Math.random() * 4294967296) >>> 0;
+    // practice goalies get a random weak spot, never today's daily one
+    const others = WEAK.filter(w => w !== weakForDay(day));
+    goalie = m === "daily" ? dailyGoalie(day) : makeGoalie(seed, others[Math.floor(rng(seed ^ 0x5bd1e995)() * others.length)]);
+    if (m === "daily" && db.daily && db.daily.day === day && db.daily.G && Array.isArray(db.daily.G.results)) G = db.daily.G;
     else G = { i: 0, results: [], done: false };
+    G.results = G.results.slice(0, SHOTS); G.i = G.results.length; G.done = G.i >= SHOTS;
+    if (G.done && m === "daily") recordStats();
+    shownN = G.results.length;
     persist();
     document.getElementById("modeDaily").setAttribute("aria-pressed", String(m === "daily"));
     document.getElementById("modePractice").setAttribute("aria-pressed", String(m === "practice"));
-    document.getElementById("scout").innerHTML = "";
-    const b = document.createElement("b"); b.textContent = "Scouting #" + goalie.number;
-    document.getElementById("scout").append(b, document.createTextNode(goalie.weak.text));
+    renderScout();
+    setJersey(goalie.number);
     document.getElementById("resultBox").replaceChildren();
     renderTally();
     if (G.done) { phase = "done"; setBtn("Shootout over", true); hint(""); showResult(true); return; }
     beginAim();
   }
+  const SVGNS = "http://www.w3.org/2000/svg";
+  // Scouting wording: daily rotates through each weak spot's three lines so no report repeats within 30 days; practice picks by seed.
+  function scoutLine() {
+    const t = goalie.weak.text, n = mode === "daily" ? Math.floor(day / WEAK.length) + WEAK.indexOf(goalie.weak) : seed;
+    return t[((n % t.length) + t.length) % t.length];
+  }
+  function tendencyLine() {
+    // Describes this goalie's own generated movement (averaged over his five shots); skips traits his weak spot already changes.
+    const sh = goalie.shots, avg = f => sh.reduce((a, x) => a + f(x), 0) / sh.length, w = goalie.weak.key;
+    const traits = [];
+    if (!/lowCorners|fiveHole|dropsEarly/.test(w)) traits.push({ z: (avg(x => x.dropDuty) / avg(x => x.dropPer) - 0.0371) / 0.0032, hi: "Goes down early and often.", lo: "Likes to stay on his feet." });
+    if (!/lateral|fiveHole|cheats/.test(w)) traits.push({ z: (avg(x => x.shufAmp) - 1.1215) / 0.0628, hi: "Wanders wide in his crease.", lo: "Stays square and doesn't drift much." });
+    if (!/glove/.test(w)) traits.push({ z: (2.898 - avg(x => x.glovePer)) / 0.1796, hi: "His glove hand never stops moving.", lo: "Holds his glove still." });
+    let best = traits[0]; for (const t of traits) if (Math.abs(t.z) > Math.abs(best.z)) best = t;
+    return best.z >= 0 ? best.hi : best.lo;
+  }
+  // mini net drawing used by the scouting report and the final shot chart (60x42, shooter's view)
+  function miniNet(zones, shots) {
+    const svg = document.createElementNS(SVGNS, "svg"); svg.setAttribute("viewBox", "0 0 60 42"); svg.setAttribute("aria-hidden", "true");
+    const add = (tag, attrs) => { const n = document.createElementNS(SVGNS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); svg.append(n); return n; };
+    add("rect", { x: 2, y: 2, width: 56, height: 38, fill: "#0b1220", stroke: "none" });
+    for (let gx = 9; gx < 58; gx += 7) add("line", { x1: gx, y1: 2, x2: gx, y2: 40, stroke: "rgba(255,255,255,.08)", "stroke-width": 1 });
+    for (let gy = 9; gy < 40; gy += 7) add("line", { x1: 2, y1: gy, x2: 58, y2: gy, stroke: "rgba(255,255,255,.08)", "stroke-width": 1 });
+    for (const z of zones || []) add("rect", { x: z[0], y: z[1], width: z[2], height: z[3], rx: 2, fill: shots ? "rgba(255,176,32,.32)" : "rgba(255,176,32,.85)" });
+    add("path", { d: "M2 41V2h56v39", fill: "none", stroke: "#e3242b", "stroke-width": 3, "stroke-linejoin": "round" });
+    add("line", { x1: 0, y1: 41, x2: 60, y2: 41, stroke: "#e3242b", "stroke-width": 1.5 });
+    for (const r of shots || []) {
+      if (typeof r.x !== "number") continue;
+      const cx = Math.max(1.5, Math.min(58.5, 30 + r.x * (28 / NET_HW))), cy = Math.max(1.5, Math.min(41, 40 - r.y * (38 / NET_H)));
+      add("circle", { cx, cy, r: 2.6, fill: r.k === "goal" ? "#e3242b" : r.k === "save" ? "#7fb3ff" : "#8f9bb3", stroke: "#05080f", "stroke-width": 0.8 });
+    }
+    return svg;
+  }
+  function renderScout() {
+    const el = document.getElementById("scout"); el.replaceChildren();
+    const badge = document.createElement("div"); badge.className = "badge"; badge.textContent = String(goalie.number); badge.setAttribute("aria-hidden", "true");
+    const txt = document.createElement("div"); txt.className = "txt";
+    const b = document.createElement("b"); b.textContent = "Scouting #" + goalie.number;
+    const tend = document.createElement("span"); tend.className = "tend"; tend.textContent = tendencyLine();
+    txt.append(b, document.createTextNode(scoutLine() + " "), tend);
+    el.append(badge, txt, miniNet(goalie.weak.zones));
+  }
   function persist() { if (mode === "daily") { db.daily = { day, G }; save(); } }
   function cur() { return goalie.shots[Math.min(G.i, SHOTS - 1)]; }
+  // the shot being animated (G.i has already moved on once it's fired)
+  function cur0() { return goalie.shots[Math.min(Math.max(0, shownN), SHOTS - 1)]; }
   function beginAim() { phase = "aimX"; phaseT0 = clock; shot = null; puckMesh.visible = true; puckMesh.position.set(START.x, START.y, START.z - 2); setBtn("Lock left–right", false); hint("The red line sweeps across the net. Tap to lock it, then tap again to pick the height and shoot."); }
 
   function action() {
@@ -201,80 +414,23 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
     else if (phase === "aimY") fire();
   }
   function fire() {
-    shot = { tx: aimX, ty: aimY, t0: clock, dur: 0.5, reactAt: clock + cur().react, done: false };
+    // The outcome is decided and saved the moment the puck leaves the stick, so reloading or switching modes can't retake it.
+    const sim = simulateShot(goalie, G.i, pose, clock, aimX, aimY);
+    const res = { k: sim.k, p: sim.p, x: +aimX.toFixed(2), y: +aimY.toFixed(2) };
+    G.results.push(res); G.i++;
+    if (G.i >= SHOTS) { G.done = true; recordStats(); }
+    persist();
+    shot = { tx: aimX, ty: aimY, t0: clock, dur: FLIGHT, reactAt: clock + cur0().react, sim, res, done: false };
     phase = "flying"; setBtn("…", true); hint("");
   }
 
-  // ---------- goalie behaviour ----------
-  function idlePose(t) {
-    const s = cur(), w = goalie.weak.key;
-    const lat = w === "lateral" ? 1.25 : 1;
-    const gx = s.shufAmp * lat * Math.sin((2 * Math.PI * t) / s.shufPer + s.shufPh);
-    const dc = (Math.sin((2 * Math.PI * t) / s.dropPer + s.dropPh) + 1) / 2; // 0..1
-    const drop = dc > 1 - s.dropDuty ? 1 : 0;
-    const gl = Math.sin((2 * Math.PI * t) / s.glovePer + s.glovePh);
-    return {
-      gx, drop,
-      gloveX: 1.35, gloveY: drop ? 1.7 + 0.4 * gl : 2.4 + 0.5 * gl,
-      blockX: -1.35, blockY: drop ? 1.4 : 1.9 + 0.25 * Math.sin((2 * Math.PI * t) / (s.glovePer * 1.3) + 1),
-    };
-  }
-  function approach(v, target, maxStep) { return Math.abs(target - v) <= maxStep ? target : v + Math.sign(target - v) * maxStep; }
-  function updateGoalie(dt) {
-    const w = goalie.weak.key;
-    let tgt = idlePose(clock), sp = { gx: 2.5, drop: 4, glove: 6, block: 6 };
-    if (shot && clock >= shot.reactAt && !shot.done) {
-      // predicted crossing at goalie plane
-      const k = (START.z - GZ) / START.z;
-      const px = START.x + (shot.tx - START.x) * k, py = START.y + (shot.ty - START.y) * k;
-      const rel = px - pose.gx;
-      tgt = Object.assign({}, tgt);
-      tgt.gx = pose.gx + Math.max(-0.8, Math.min(0.8, rel * 0.5));
-      sp.gx = w === "lateral" ? 1.1 : 2.0;
-      if (py < 1.1) { tgt.drop = 1; sp.drop = w === "lowCorners" ? 1.8 : 3.5; }
-      if (rel > 0.3) { tgt.gloveX = Math.min(2.2, Math.max(0.9, rel)); tgt.gloveY = Math.max(1.2, Math.min(3.7, py)); sp.glove = w === "gloveHigh" && py > 2.6 ? 2.5 : 5.5; }
-      if (rel < -0.3) { tgt.blockX = Math.max(-2.2, Math.min(-0.9, rel)); tgt.blockY = Math.max(1.2, Math.min(3.5, py)); sp.block = w === "blockerHigh" && py > 2.4 ? 2 : 4.5; }
-    }
-    pose.gx = approach(pose.gx, tgt.gx, sp.gx * dt);
-    pose.drop = approach(pose.drop, tgt.drop, sp.drop * dt);
-    pose.gloveX = approach(pose.gloveX, tgt.gloveX, sp.glove * dt);
-    pose.gloveY = approach(pose.gloveY, tgt.gloveY, sp.glove * dt);
-    pose.blockX = approach(pose.blockX, tgt.blockX, sp.block * dt);
-    pose.blockY = approach(pose.blockY, tgt.blockY, sp.block * dt);
-  }
-  // Hit test in goalie-plane coordinates; returns the part that stopped it, or null.
-  function goalieHit(px, py) {
-    const g = pose, d = g.drop, w = goalie.weak.key;
-    const r = PUCK_R;
-    const inRect = (cx, cy, hw, hh) => Math.abs(px - cx) < hw + r && Math.abs(py - cy) < hh + r;
-    const inCirc = (cx, cy, rad) => Math.hypot(px - cx, py - cy) < rad + r;
-    const torsoY = 2.75 - 1.05 * d;
-    if (inCirc(g.gx + g.gloveX, g.gloveY, 0.5)) return "glove";
-    if (inRect(g.gx + g.blockX, g.blockY, 0.38, 0.55)) return "blocker";
-    if (inCirc(g.gx, torsoY + 1.15, 0.38)) return "mask";
-    if (inRect(g.gx, torsoY, 0.85, 0.75)) return "chest";
-    // pads: standing = two upright pads with a gap; butterfly = wide flat wall
-    const standW = 0.4, gap = w === "fiveHole" ? 0.32 : 0.16;
-    const padH = 2.0 * (1 - d) + 0.85 * d;
-    const padSpread = (gap + standW) * (1 - d) + 1.15 * d;
-    const padHW = standW * (1 - d) + 0.75 * d;
-    if (inRect(g.gx - padSpread, padH / 2, padHW, padH / 2)) return "pad";
-    if (inRect(g.gx + padSpread, padH / 2, padHW, padH / 2)) return "pad";
-    if (d > 0.5 && inRect(g.gx, 0.35, 0.5, 0.35)) return "pad";
-    // stick blade guards the ice between the pads when standing
-    if (d < 0.5 && inRect(g.gx, 0.12, gap + 0.15, 0.12) && w !== "fiveHole") return "stick";
-    return null;
-  }
-
   function resolveShot(kind, part) {
-    shot.done = true; phase = "result";
-    G.results.push({ k: kind, p: part || null });
-    const words = { goal: G.i === SHOTS - 1 && G.results.filter(r => r.k === "goal").length === SHOTS ? "PERFECT" : "GOAL", save: { glove: "GLOVE SAVE", blocker: "BLOCKER", pad: "PAD SAVE", chest: "SAVE", mask: "OFF THE MASK", stick: "STICK SAVE" }[part] || "SAVE", miss: part === "post" ? "POST" : part === "bar" ? "CROSSBAR" : "WIDE" };
+    shot.done = true; phase = "result"; shownN = Math.min(G.results.length, shownN + 1);
+    const words = { goal: shownN === SHOTS && G.results.filter(r => r.k === "goal").length === SHOTS ? "PERFECT" : "GOAL", save: { glove: "GLOVE SAVE", blocker: "BLOCKER", pad: "PAD SAVE", chest: "SAVE", mask: "OFF THE MASK", stick: "STICK SAVE" }[part] || "SAVE", miss: part === "post" ? "POST" : part === "bar" ? "CROSSBAR" : "WIDE" };
     flash(kind, kind === "save" ? words.save : kind === "miss" ? words.miss : words.goal);
     if (kind === "goal") horn(); else if (part === "post" || part === "bar") ping(); else thud();
-    G.i++;
-    if (G.i >= SHOTS) { G.done = true; recordStats(); }
-    persist(); renderTally();
+    shotFx(kind, part);
+    renderTally();
     const myGen = gen;
     setTimeout(() => {
       if (myGen !== gen) return;
@@ -292,38 +448,55 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   }
 
   // ---------- UI ----------
-  function setBtn(t, dis) { const b = document.getElementById("shootBtn"); b.textContent = t; b.disabled = dis; }
+  function setBtn(t, dis) { const b = document.getElementById("shootBtn"); b.textContent = t; b.disabled = dis; b.classList.toggle("armed", t === "Shoot"); }
   function hint(t) { document.getElementById("hint").textContent = t; }
   function flash(kind, word) { const f = document.getElementById("flash"); f.className = "flash " + kind; f.querySelector(".word").textContent = word; void f.offsetWidth; f.classList.add("on"); }
+  let shownResults = -1, shownN = 0;
   function renderTally() {
+    const all = G.results, R = all.slice(0, shownN), fin = G.done && shownN >= SHOTS;
     const p = document.getElementById("pucks"); p.replaceChildren();
+    const fresh = shownResults >= 0 && R.length === shownResults + 1 ? R.length - 1 : -1;
     for (let i = 0; i < SHOTS; i++) {
-      const r = G.results[i]; const el = document.createElement("div");
-      el.className = "pk" + (r ? " " + r.k : "") + (!G.done && i === G.i ? " cur" : "");
+      const r = R[i]; const el = document.createElement("div");
+      el.className = "pk" + (r ? " " + r.k : "") + (!fin && i === shownN ? " cur" : "");
       el.textContent = r ? (r.k === "goal" ? "✓" : r.k === "save" ? "S" : "–") : "";
       el.title = r ? r.k : "Shot " + (i + 1);
+      if (i === fresh) el.classList.add("pop");
       p.append(el);
     }
-    document.getElementById("score").textContent = String(G.results.filter(r => r.k === "goal").length);
+    const sc = document.getElementById("score"), goals = String(R.filter(r => r.k === "goal").length);
+    if (fresh >= 0 && R[fresh].k === "goal") { sc.classList.remove("bump"); void sc.offsetWidth; sc.classList.add("bump"); }
+    sc.textContent = goals;
+    const label = fin ? "" : "Shot " + (Math.min(shownN, SHOTS - 1) + 1) + " of " + SHOTS;
+    document.getElementById("shotLabel").textContent = label;
+    shownResults = R.length;
   }
+  const WEAK_LABEL = { gloveHigh: "high on the glove side", blockerHigh: "high on the blocker side", gloveLow: "low on the glove side", blockerLow: "low on the blocker side", fiveHole: "the five-hole", lowCorners: "the low corners", lateral: "the far side as he drifts", dropsEarly: "up high once he drops", cheatsGlove: "the blocker side (he cheats to his glove)", cheatsBlocker: "the glove side (he cheats to his blocker)" };
+  function inWeak(r) { if (typeof r.x !== "number") return false; const mx = 30 + r.x * (28 / NET_HW), my = 40 - r.y * (38 / NET_H); return goalie.weak.zones.some(z => mx > z[0] - 3 && mx < z[0] + z[2] + 3 && my > z[1] - 3 && my < z[1] + z[3] + 3); }
   function emoji(r) { return r.k === "goal" ? "🚨" : r.k === "miss" ? "❌" : r.p === "glove" ? "🧤" : "🛡️"; }
-  function shareText() { const g = G.results.filter(r => r.k === "goal").length; return "Breakaway " + (mode === "daily" ? "#" + (day + 1) : "practice") + " · " + g + "/" + SHOTS + "\n" + G.results.map(emoji).join(""); }
+  function shareText() { const g = G.results.filter(r => r.k === "goal").length; return "Breakaway " + (mode === "daily" ? "#" + (day + 1) : "practice") + " · " + g + "/" + SHOTS + " vs #" + goalie.number + "\n" + G.results.map(emoji).join(""); }
   function showResult(restoring) {
     const g = G.results.filter(r => r.k === "goal").length, st = db.stats, text = shareText();
     const verdict = ["Stoned. He stood on his head.", "One got through.", "Respectable night.", "You won the shootout.", "Dangles for days.", "Perfect. Five for five."][g];
     const card = document.createElement("div"); card.className = "card";
     card.innerHTML = `<h2>${mode === "daily" ? "Final · Shootout #" + (day + 1) : "Practice final"}</h2>
-      <p class="big">${g}/${SHOTS}</p><p class="hint">${verdict}</p><p class="grid"></p>
+      <p class="big">${g}/${SHOTS}</p><p class="verdict">${verdict}</p><p class="grid"></p>
       ${mode === "daily" ? `<div class="stats"><div class="stat"><b>${st.played}</b><span>Played</span></div><div class="stat"><b>${st.streak}</b><span>Streak</span></div><div class="stat"><b>${st.bestGoals}/5</b><span>Best</span></div><div class="stat"><b>${st.played ? Math.round(st.goals / (st.played * SHOTS) * 100) : 0}%</b><span>Shooting</span></div></div>` : ""}
       <div class="row"><button class="btn primary" id="copyBtn">Copy result</button><button class="btn" id="againBtn">${mode === "daily" ? "Practice shootout" : "New practice goalie"}</button></div>
       <textarea class="sharebox" readonly hidden aria-label="Your result"></textarea>
       ${mode === "daily" ? '<p class="hint">A new goalie drops at midnight your time.</p>' : ""}`;
     card.querySelector(".grid").textContent = G.results.map(emoji).join(" ");
+    // shot chart: where each puck went, over the goalie's weak spot
+    const hits = G.results.filter(r => inWeak(r)).length, chart = document.createElement("div"); chart.className = "chart";
+    const cap = document.createElement("p"); cap.className = "verdict small";
+    cap.textContent = "His weak spot: " + WEAK_LABEL[goalie.weak.key] + ". " + (hits === 0 ? "None of your shots went there." : hits + " of your " + SHOTS + " shots went there" + (G.results.filter(r => inWeak(r) && r.k === "goal").length ? ", " + G.results.filter(r => inWeak(r) && r.k === "goal").length + " scored." : ", none scored."));
+    chart.append(miniNet(goalie.weak.zones, G.results), cap);
+    card.querySelector(".grid").after(chart);
     const ta = card.querySelector("textarea"); ta.value = text;
     card.querySelector("#copyBtn").addEventListener("click", async e => { try { await navigator.clipboard.writeText(text); e.target.textContent = "Copied"; } catch (err) { ta.hidden = false; ta.focus(); ta.select(); e.target.textContent = "Select and copy below"; } });
     card.querySelector("#againBtn").addEventListener("click", () => startMode("practice"));
     document.getElementById("resultBox").replaceChildren(card);
-    if (!restoring) card.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!restoring) card.scrollIntoView({ behavior: RM ? "auto" : "smooth", block: "start" });
   }
 
   // ---------- sound ----------
@@ -342,170 +515,337 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   // ---------- 3D scene ----------
   const stage = document.getElementById("stage");
   let renderer;
-  try { renderer = new THREE.WebGLRenderer({ antialias: true }); } catch (e) { document.getElementById("fallback").style.display = "grid"; return; }
-  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" }); } catch (e) {
+    const fb = document.getElementById("fallback");
+    if (typeof THREE === "undefined") fb.textContent = "The 3D engine didn't load. Check your connection and reload the page.";
+    fb.style.display = "grid"; document.getElementById("shootBtn").disabled = true; return;
+  }
+  const PHONE = Math.min(window.innerWidth, window.innerHeight) < 560;
+  renderer.setPixelRatio(Math.min(PHONE ? 2 : 2, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
   stage.prepend(renderer.domElement);
+  const C = hex => new THREE.Color(hex).convertSRGBToLinear();
+  const srgb = t => { t.encoding = THREE.sRGBEncoding; return t; };
+  const ANISO = Math.min(8, renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 1);
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0e1626);
-  scene.fog = new THREE.Fog(0x0e1626, 40, 90);
+  scene.background = C(0x0e1626);
+  scene.fog = new THREE.Fog(C(0x0e1626), 40, 90);
   const camera = new THREE.PerspectiveCamera(42, 4 / 3, 0.1, 200);
-  camera.position.set(0, 3.1, 13.5); camera.lookAt(0, 1.8, 0);
+  const CAM = new THREE.Vector3(0, 3.1, 13.5), LOOK = new THREE.Vector3(0, 1.8, 0);
+  camera.position.copy(CAM); camera.lookAt(LOOK);
 
-  scene.add(new THREE.HemisphereLight(0xdfe9ff, 0x334055, 0.75));
-  const sun = new THREE.DirectionalLight(0xffffff, 0.85); sun.position.set(-6, 22, 14); sun.castShadow = true;
-  sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 1, far: 60 });
+  // arena lighting: cool fill, one shadowing key from the roof, a cool rim from behind the net (the crease light pool is baked into the ice)
+  const hemi = new THREE.HemisphereLight(C(0xdfe9ff), C(0x26324a), 0.62); scene.add(hemi);
+  const HEMI_SKY = hemi.color.clone(), LAMP_SKY = C(0xff6a6a);
+  const sun = new THREE.DirectionalLight(C(0xfff8ef), 0.8); sun.position.set(-5, 22, 14); sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024); sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
+  Object.assign(sun.shadow.camera, { left: -7, right: 7, top: 7, bottom: -5, near: 5, far: 50 });
   scene.add(sun);
+  const rim = new THREE.DirectionalLight(C(0xa8c4ff), 0.45); rim.position.set(3, 9, -12); scene.add(rim);
 
-  // ice with markings
+  // ice with markings (crease and goal line are real geometry so they stay crisp)
   function iceTexture() {
-    const c = document.createElement("canvas"); c.width = 1024; c.height = 1024; const x = c.getContext("2d");
-    x.fillStyle = "#eef3f8"; x.fillRect(0, 0, 1024, 1024);
-    for (let i = 0; i < 2500; i++) { x.fillStyle = `rgba(180,195,215,${Math.random() * 0.08})`; x.fillRect(Math.random() * 1024, Math.random() * 1024, Math.random() * 30, 1); }
-    // plane is 60 x 60 ft centered at (0, z=10); 1 ft = 1024/60 px; goal line at z=0 -> v = (z - (-20)) ...
-    const f = 1024 / 60, Z = z => (z + 20) * f, Xc = xx => (xx + 30) * f;
-    x.fillStyle = "#e3242b"; x.fillRect(0, Z(0) - 2.5, 1024, 5);
-    x.beginPath(); x.moveTo(Xc(-6), Z(0)); x.arc(Xc(0), Z(0), 6 * f, 0, Math.PI); x.closePath(); x.fillStyle = "rgba(76,140,230,0.45)"; x.fill(); x.strokeStyle = "#e3242b"; x.lineWidth = 3; x.stroke();
+    const S = 1024, c = document.createElement("canvas"); c.width = c.height = S; const x = c.getContext("2d");
+    const g = x.createRadialGradient(S / 2, S * 0.36, 40, S / 2, S * 0.4, S * 0.75); g.addColorStop(0, "#f2f6fa"); g.addColorStop(1, "#dbe3ec");
+    x.fillStyle = g; x.fillRect(0, 0, S, S);
+    // skate cuts: long faint arcs, heavier in front of the crease
+    x.lineCap = "round";
+    for (let i = 0; i < 260; i++) {
+      const cx = Math.random() * S, cy = S * 0.3 + Math.random() * S * 0.5, r = 60 + Math.random() * 380, a = Math.random() * 6.28;
+      x.strokeStyle = `rgba(150,170,195,${0.04 + Math.random() * 0.08})`; x.lineWidth = 0.6 + Math.random() * 1.2;
+      x.beginPath(); x.arc(cx, cy, r, a, a + 0.15 + Math.random() * 0.5); x.stroke();
+    }
+    for (let i = 0; i < 1800; i++) { x.fillStyle = `rgba(175,192,214,${Math.random() * 0.07})`; x.fillRect(Math.random() * S, Math.random() * S, Math.random() * 26, 1); }
+    // snow build-up along the crease edge
+    const f = S / 60, Z = z => (z + 20) * f, Xc = xx => (xx + 30) * f;
+    for (let i = 0; i < 500; i++) { const a = Math.random() * Math.PI, rr = (6.2 + Math.random() * 1.6) * f; x.fillStyle = `rgba(255,255,255,${Math.random() * 0.35})`; x.beginPath(); x.arc(Xc(0) + Math.cos(a) * rr, Z(0) + Math.sin(a) * rr, 1 + Math.random() * 3, 0, 6.28); x.fill(); }
     x.fillStyle = "#e3242b"; x.beginPath(); x.arc(Xc(-22), Z(20), 0.9 * f, 0, 6.28); x.fill(); x.beginPath(); x.arc(Xc(22), Z(20), 0.9 * f, 0, 6.28); x.fill();
     x.strokeStyle = "#e3242b"; x.lineWidth = 3; x.beginPath(); x.arc(Xc(-22), Z(20), 15 * f, 0, 6.28); x.stroke(); x.beginPath(); x.arc(Xc(22), Z(20), 15 * f, 0, 6.28); x.stroke();
-    const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+    const t = srgb(new THREE.CanvasTexture(c)); t.anisotropy = ANISO; return t;
   }
-  const ice = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshStandardMaterial({ map: iceTexture(), roughness: 0.35, metalness: 0 }));
+  const iceMat = new THREE.MeshStandardMaterial({ map: iceTexture(), roughness: 0.22, metalness: 0 });
+  const ice = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), iceMat);
   ice.rotation.x = -Math.PI / 2; ice.position.set(0, 0, 10); ice.receiveShadow = true; scene.add(ice);
-  // end boards and glass
-  const boardsMat = new THREE.MeshStandardMaterial({ color: 0xf6f6f2, roughness: 0.6 });
-  const endBoard = new THREE.Mesh(new THREE.BoxGeometry(60, 3.5, 0.5), boardsMat); endBoard.position.set(0, 1.75, -11); scene.add(endBoard);
-  const kick = new THREE.Mesh(new THREE.BoxGeometry(60, 0.6, 0.52), new THREE.MeshStandardMaterial({ color: 0xf0c419 })); kick.position.set(0, 0.3, -11); scene.add(kick);
-  const glass = new THREE.Mesh(new THREE.PlaneGeometry(60, 8), new THREE.MeshStandardMaterial({ color: 0x9fb4d0, transparent: true, opacity: 0.12 })); glass.position.set(0, 7.5, -11.2); scene.add(glass);
-  // crowd: dim blocks of colour behind the glass
+  const decal = (geo, color, y, opacity) => { const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: C(color), roughness: 0.45, transparent: opacity < 1, opacity, polygonOffset: true, polygonOffsetFactor: -2 - y * 100, polygonOffsetUnits: -2 })); m.rotation.x = -Math.PI / 2; m.position.y = y; m.receiveShadow = true; scene.add(m); return m; };
+  decal(new THREE.PlaneGeometry(60, 0.2), 0xd81e26, 0.004, 1);
+  const crease = decal(new THREE.CircleGeometry(6, 48, Math.PI, Math.PI), 0x6fa7e6, 0.006, 0.55);
+  decal(new THREE.RingGeometry(5.9, 6.08, 64, 1, Math.PI, Math.PI), 0xd81e26, 0.008, 1);
+  // end boards, rail and glass
+  const boardsMat = new THREE.MeshStandardMaterial({ color: C(0xf2f2ee), roughness: 0.55 });
+  const endBoard = new THREE.Mesh(new THREE.BoxGeometry(60, 3.5, 0.5), boardsMat); endBoard.position.set(0, 1.75, -11); endBoard.receiveShadow = true; scene.add(endBoard);
+  const kick = new THREE.Mesh(new THREE.BoxGeometry(60, 0.6, 0.52), new THREE.MeshStandardMaterial({ color: C(0xf0c419), roughness: 0.5 })); kick.position.set(0, 0.3, -11); scene.add(kick);
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(60, 0.22, 0.8), new THREE.MeshStandardMaterial({ color: C(0x2a3550), roughness: 0.5 })); rail.position.set(0, 3.6, -11); scene.add(rail);
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(60, 8), new THREE.MeshStandardMaterial({ color: C(0x9fb4d0), transparent: true, opacity: 0.12, roughness: 0.05, metalness: 0.2 })); glass.position.set(0, 7.5, -11.2); scene.add(glass);
+  const seamMat = new THREE.MeshBasicMaterial({ color: C(0xc8d6ea), transparent: true, opacity: 0.07 });
+  for (let i = -3; i <= 3; i++) { const sm = new THREE.Mesh(new THREE.PlaneGeometry(0.08, 8), seamMat); sm.position.set(i * 5.5, 7.6, -11.15); scene.add(sm); }
+  // goal lamp above the glass
+  const lampMat = new THREE.MeshStandardMaterial({ color: C(0x5a1015), emissive: C(0xff2020), emissiveIntensity: 0, roughness: 0.3 });
+  const lampDome = new THREE.Mesh(new THREE.SphereGeometry(0.42, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), lampMat); lampDome.position.set(0, 11.6, -11.3); scene.add(lampDome);
+  const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.18, 18), new THREE.MeshStandardMaterial({ color: C(0x222a3a) })); lampBase.position.set(0, 11.55, -11.3); scene.add(lampBase);
+  // crowd: rows of fans behind the glass, darker toward the top
   (function crowd() {
-    const c = document.createElement("canvas"); c.width = 512; c.height = 128; const x = c.getContext("2d");
-    x.fillStyle = "#121a2b"; x.fillRect(0, 0, 512, 128);
-    const cols = ["#7a1f2b", "#2a3a5c", "#c9c2b3", "#1d2740", "#e3242b", "#3b4a6b"];
-    for (let i = 0; i < 1400; i++) { x.fillStyle = cols[Math.floor(Math.random() * cols.length)]; x.globalAlpha = 0.25 + Math.random() * 0.35; x.beginPath(); x.arc(Math.random() * 512, 10 + Math.random() * 118, 2 + Math.random() * 2, 0, 6.28); x.fill(); }
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(80, 20), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c) })); m.position.set(0, 13, -16); scene.add(m);
+    const W = 1024, H = 256, c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
+    const bg = x.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, "#070b14"); bg.addColorStop(1, "#141d31"); x.fillStyle = bg; x.fillRect(0, 0, W, H);
+    const cols = ["#7a1f2b", "#2a3a5c", "#c9c2b3", "#1d2740", "#e3242b", "#3b4a6b", "#7a1f2b"];
+    for (let row = 0; row < 14; row++) {
+      const y = H - 8 - row * 17, a = 0.75 - row * 0.04;
+      x.fillStyle = `rgba(0,0,0,${0.25})`; x.fillRect(0, y + 6, W, 3);
+      for (let px = Math.random() * 6; px < W; px += 5 + Math.random() * 4) {
+        x.globalAlpha = Math.max(0.12, a * (0.55 + Math.random() * 0.45)); x.fillStyle = cols[Math.floor(Math.random() * cols.length)];
+        x.beginPath(); x.ellipse(px, y, 2.4, 4, 0, 0, 6.28); x.fill();
+        x.globalAlpha *= 0.8; x.fillStyle = "#d9b99a"; x.beginPath(); x.arc(px, y - 5.5, 1.7, 0, 6.28); x.fill();
+      }
+    }
+    x.globalAlpha = 1;
+    const t = srgb(new THREE.CanvasTexture(c)); t.anisotropy = ANISO;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(80, 20), new THREE.MeshBasicMaterial({ map: t, color: C(0xb8c0d0) })); m.position.set(0, 13, -16); scene.add(m);
   })();
 
   // net
-  const red = new THREE.MeshStandardMaterial({ color: 0xd1181f, roughness: 0.4, metalness: 0.3 });
-  const pipe = (len) => new THREE.CylinderGeometry(0.11, 0.11, len, 16);
+  const red = new THREE.MeshStandardMaterial({ color: C(0xd1181f), roughness: 0.32, metalness: 0.35 });
+  const pipe = (len) => new THREE.CylinderGeometry(0.11, 0.11, len, 20);
   const postL = new THREE.Mesh(pipe(NET_H), red); postL.position.set(-NET_HW, NET_H / 2, 0); postL.castShadow = true; scene.add(postL);
-  const postR = postL.clone(); postR.position.x = NET_HW; scene.add(postR);
+  const postR = new THREE.Mesh(pipe(NET_H), red); postR.position.set(NET_HW, NET_H / 2, 0); postR.castShadow = true; scene.add(postR);
   const bar = new THREE.Mesh(pipe(NET_HW * 2 + 0.22), red); bar.rotation.z = Math.PI / 2; bar.position.set(0, NET_H, 0); bar.castShadow = true; scene.add(bar);
-  const backPipe = new THREE.Mesh(new THREE.TorusGeometry(2.4, 0.08, 8, 24, Math.PI), new THREE.MeshStandardMaterial({ color: 0xd1181f })); backPipe.rotation.x = -Math.PI / 2; backPipe.position.set(0, 0.08, -0.6); backPipe.scale.set(1.25, 1, 1); scene.add(backPipe);
-  function meshTexture() { const c = document.createElement("canvas"); c.width = c.height = 128; const x = c.getContext("2d"); x.strokeStyle = "rgba(255,255,255,0.95)"; x.lineWidth = 3; for (let i = 0; i <= 128; i += 16) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 128); x.stroke(); x.beginPath(); x.moveTo(0, i); x.lineTo(128, i); x.stroke(); } const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6, 4); return t; }
-  const netMat = new THREE.MeshBasicMaterial({ map: meshTexture(), transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false });
-  const netBack = new THREE.Mesh(new THREE.PlaneGeometry(6, 4.4), netMat); netBack.position.set(0, 2, -3.2); netBack.rotation.x = -0.55; scene.add(netBack);
+  for (const sx of [-1, 1]) { const j = new THREE.Mesh(new THREE.SphereGeometry(0.115, 16, 10), red); j.position.set(sx * NET_HW, NET_H, 0); scene.add(j); }
+  const backPipe = new THREE.Mesh(new THREE.TorusGeometry(2.4, 0.08, 8, 28, Math.PI), red); backPipe.rotation.x = -Math.PI / 2; backPipe.position.set(0, 0.08, -0.6); backPipe.scale.set(1.25, 1, 1); scene.add(backPipe);
+  // white skirt padding inside the base frame
+  const skirt = new THREE.Mesh(new THREE.CylinderGeometry(2.36, 2.36, 0.42, 32, 1, true, Math.PI / 2, Math.PI), new THREE.MeshStandardMaterial({ color: C(0xf4f4f0), roughness: 0.8, side: THREE.DoubleSide }));
+  skirt.position.set(0, 0.22, -0.6); skirt.scale.set(1.25, 1, 1); skirt.receiveShadow = true; scene.add(skirt);
+  function meshTexture() {
+    const S = 256, c = document.createElement("canvas"); c.width = c.height = S; const x = c.getContext("2d");
+    x.strokeStyle = "rgba(255,255,255,0.95)"; x.lineWidth = 2.6; x.lineCap = "round";
+    // diamond knit
+    for (let i = -S; i <= S * 2; i += 32) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i + S, S); x.stroke(); x.beginPath(); x.moveTo(i, S); x.lineTo(i + S, 0); x.stroke(); }
+    x.fillStyle = "rgba(255,255,255,1)";
+    for (let i = 0; i <= S; i += 32) for (let j = 0; j <= S; j += 32) { x.beginPath(); x.arc(i, j, 2.4, 0, 6.28); x.fill(); x.beginPath(); x.arc(i + 16, j + 16, 2.4, 0, 6.28); x.fill(); }
+    const t = srgb(new THREE.CanvasTexture(c)); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 2); t.anisotropy = ANISO; return t;
+  }
+  const netMat = new THREE.MeshBasicMaterial({ map: meshTexture(), color: C(0xf0f2f6), transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false });
+  const netBack = new THREE.Mesh(new THREE.PlaneGeometry(6, 4.4, 8, 6), netMat); netBack.position.set(0, 2, -3.2); netBack.rotation.x = -0.55; scene.add(netBack);
+  const netBackBase = netBack.geometry.attributes.position.array.slice();
   const sideGeo = new THREE.PlaneGeometry(3.3, 4); const sideL = new THREE.Mesh(sideGeo, netMat); sideL.rotation.y = Math.PI / 2; sideL.position.set(-NET_HW, 2, -1.5); scene.add(sideL);
   const sideR = sideL.clone(); sideR.position.x = NET_HW; scene.add(sideR);
   const netTop = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.4), netMat); netTop.rotation.x = Math.PI / 2; netTop.position.set(0, 4, -0.7); scene.add(netTop);
-  const shadowBox = new THREE.Mesh(new THREE.PlaneGeometry(6, 3), new THREE.MeshBasicMaterial({ color: 0x0a0f1a, transparent: true, opacity: 0.18 })); shadowBox.rotation.x = -Math.PI / 2; shadowBox.position.set(0, 0.02, -1.5); scene.add(shadowBox);
+  const shadowBox = new THREE.Mesh(new THREE.PlaneGeometry(6, 3), new THREE.MeshBasicMaterial({ color: C(0x0a0f1a), transparent: true, opacity: 0.22, depthWrite: false })); shadowBox.rotation.x = -Math.PI / 2; shadowBox.position.set(0, 0.012, -1.5); scene.add(shadowBox);
 
-  // goalie
-  const jersey = new THREE.MeshStandardMaterial({ color: 0x7a1f2b, roughness: 0.8 });
-  const white = new THREE.MeshStandardMaterial({ color: 0xf3f1ea, roughness: 0.7 });
-  const trim = new THREE.MeshStandardMaterial({ color: 0x7a1f2b, roughness: 0.7 });
-  const dark = new THREE.MeshStandardMaterial({ color: 0x1a1d24, roughness: 0.6 });
-  const tan = new THREE.MeshStandardMaterial({ color: 0xc89a5b, roughness: 0.8 });
+  // goalie (shapes match the save zones used by goalieHit; this is only the look)
+  function roundedBox(w, h, d, r, seg) {
+    const s = new THREE.Shape(), x0 = -w / 2 + r, y0 = -h / 2 + r, iw = w - 2 * r, ih = h - 2 * r, cr = Math.min(iw, ih) * 0.18;
+    s.moveTo(x0 + cr, y0); s.lineTo(x0 + iw - cr, y0); s.quadraticCurveTo(x0 + iw, y0, x0 + iw, y0 + cr); s.lineTo(x0 + iw, y0 + ih - cr); s.quadraticCurveTo(x0 + iw, y0 + ih, x0 + iw - cr, y0 + ih);
+    s.lineTo(x0 + cr, y0 + ih); s.quadraticCurveTo(x0, y0 + ih, x0, y0 + ih - cr); s.lineTo(x0, y0 + cr); s.quadraticCurveTo(x0, y0, x0 + cr, y0);
+    const g = new THREE.ExtrudeGeometry(s, { depth: Math.max(0.01, d - 2 * r), bevelEnabled: true, bevelThickness: r, bevelSize: r, bevelSegments: seg || 2, curveSegments: 2 });
+    g.translate(0, 0, -(d - 2 * r) / 2); g.computeVertexNormals(); return g;
+  }
+  // texture for an extruded cap: shape coords (-w/2..w/2) map onto the canvas
+  function capTex(c, w, h) { const t = srgb(new THREE.CanvasTexture(c)); t.repeat.set(1 / w, 1 / h); t.offset.set(0.5, 0.5); t.anisotropy = ANISO; return t; }
+  const jersey = new THREE.MeshStandardMaterial({ color: C(0x7a1f2b), roughness: 0.78 });
+  const white = new THREE.MeshStandardMaterial({ color: C(0xf3f1ea), roughness: 0.6 });
+  const trim = new THREE.MeshStandardMaterial({ color: C(0x7a1f2b), roughness: 0.65 });
+  const dark = new THREE.MeshStandardMaterial({ color: C(0x1a1d24), roughness: 0.55 });
+  const tan = new THREE.MeshStandardMaterial({ color: C(0xc89a5b), roughness: 0.75 });
   const goalieG = new THREE.Group(); goalieG.position.z = GZ; scene.add(goalieG);
   const cast = m => { m.castShadow = true; return m; };
-  function numberTex(n) { const c = document.createElement("canvas"); c.width = c.height = 128; const x = c.getContext("2d"); x.fillStyle = "#7a1f2b"; x.fillRect(0, 0, 128, 128); x.fillStyle = "#fff"; x.font = "900 70px 'Big Shoulders Display', Impact, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(String(n), 64, 70); x.fillStyle = "#f3f1ea"; x.fillRect(0, 96, 128, 10); return new THREE.CanvasTexture(c); }
-  const torsoMat = [jersey, jersey, jersey, jersey, new THREE.MeshStandardMaterial({ map: numberTex(31), roughness: 0.8 }), jersey];
-  const torso = cast(new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.5, 0.9), torsoMat)); goalieG.add(torso);
-  const shoulders = cast(new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.45, 0.95), jersey)); goalieG.add(shoulders);
+  const jerseyCanvas = document.createElement("canvas"); jerseyCanvas.width = 256; jerseyCanvas.height = 228;
+  function drawJersey(n) {
+    const x = jerseyCanvas.getContext("2d"), W = 256, H = 228;
+    x.fillStyle = "#7a1f2b"; x.fillRect(0, 0, W, H);
+    x.fillStyle = "#f3f1ea"; x.fillRect(0, H - 50, W, 16); x.fillStyle = "#c9a86a"; x.fillRect(0, H - 34, W, 5);
+    x.font = "900 112px 'Big Shoulders Display', Impact, 'Arial Narrow', sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.lineJoin = "round"; x.lineWidth = 12; x.strokeStyle = "#2a0a0f"; x.strokeText(String(n), W / 2, H * 0.42);
+    x.fillStyle = "#f3f1ea"; x.fillText(String(n), W / 2, H * 0.42);
+  }
+  drawJersey(31);
+  const torsoFace = new THREE.MeshStandardMaterial({ map: capTex(jerseyCanvas, 1.7, 1.5), roughness: 0.8 });
+  const torso = cast(new THREE.Mesh(roundedBox(1.7, 1.5, 0.9, 0.12), [torsoFace, jersey])); goalieG.add(torso);
+  let jerseyNum = null;
+  function setJersey(n, force) { if (n === jerseyNum && !force) return; jerseyNum = n; drawJersey(n); torsoFace.map.needsUpdate = true; }
+  const shoulders = (new THREE.Mesh(roundedBox(2.1, 0.45, 0.95, 0.18, 3), jersey)); goalieG.add(shoulders);
+  const yoke = new THREE.Mesh(roundedBox(2.12, 0.1, 0.97, 0.04), white); goalieG.add(yoke);
   const head = new THREE.Group(); goalieG.add(head);
-  head.add(cast(new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 16), white)));
-  const cage = new THREE.Mesh(new THREE.SphereGeometry(0.36, 12, 8, -0.9, 1.8, 0.9, 1.0), new THREE.MeshStandardMaterial({ color: 0x222222, wireframe: true })); cage.rotation.y = 0; cage.position.z = 0.12; head.add(cage);
-  const padGeo = new THREE.BoxGeometry(0.78, 2.0, 0.55);
-  function makePad() { const g = new THREE.Group(); const p = cast(new THREE.Mesh(padGeo, white)); p.position.y = 1.0; g.add(p); for (const y of [0.45, 1.05, 1.65]) { const s = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.12, 0.57), trim); s.position.y = y; g.add(s); } return g; }
+  // painted mask: white shell with a maroon stripe
+  const maskC = document.createElement("canvas"); maskC.width = 256; maskC.height = 128; { const x = maskC.getContext("2d"); x.fillStyle = "#f3f1ea"; x.fillRect(0, 0, 256, 128); x.fillStyle = "#7a1f2b"; x.fillRect(0, 0, 256, 22); x.beginPath(); x.moveTo(100, 0); x.lineTo(156, 0); x.lineTo(140, 60); x.lineTo(116, 60); x.fill(); x.fillStyle = "#c9a86a"; x.fillRect(0, 22, 256, 4); }
+  const shell = cast(new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 14), new THREE.MeshStandardMaterial({ map: srgb(new THREE.CanvasTexture(maskC)), roughness: 0.35 })));
+  shell.rotation.y = -Math.PI / 2; head.add(shell);
+  const chin = (new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 6, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), white)); chin.position.set(0, -0.22, 0.1); head.add(chin);
+  const cageMat = new THREE.MeshStandardMaterial({ color: C(0x2b2f38), roughness: 0.3, metalness: 0.7 });
+  for (const y of [-0.2, -0.05, 0.1]) { const bar2 = new THREE.Mesh(new THREE.TorusGeometry(0.33 - Math.abs(y) * 0.25, 0.018, 4, 12, Math.PI * 0.9), cageMat); bar2.rotation.set(Math.PI / 2, 0, Math.PI * 0.05); bar2.rotation.x = -Math.PI / 2; bar2.rotation.z = Math.PI + Math.PI * 0.05; bar2.position.set(0, y, 0.12); head.add(bar2); }
+  for (const xx of [-0.1, 0.1]) { const v = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.42, 4), cageMat); v.position.set(xx, -0.05, 0.43 - Math.abs(xx) * 0.35); head.add(v); }
+  // pads: rounded, with maroon bands and knee rolls
+  const padC = document.createElement("canvas"); padC.width = 128; padC.height = 320;
+  { const x = padC.getContext("2d"); x.fillStyle = "#f3f1ea"; x.fillRect(0, 0, 128, 320);
+    for (const y of [0.45, 1.05, 1.65]) { const py = 320 - (y / 2.0) * 320; x.fillStyle = "#7a1f2b"; x.fillRect(0, py - 10, 128, 20); }
+    x.strokeStyle = "rgba(120,110,95,.35)"; x.lineWidth = 2; for (const xx of [36, 64, 92]) { x.beginPath(); x.moveTo(xx, 8); x.lineTo(xx, 312); x.stroke(); }
+    x.fillStyle = "rgba(0,0,0,.06)"; x.fillRect(0, 140, 128, 30); }
+  const padFace = new THREE.MeshStandardMaterial({ map: capTex(padC, 0.78, 2.0), roughness: 0.6 });
+  const padGeo = roundedBox(0.78, 2.0, 0.55, 0.1);
+  function makePad() {
+    const g = new THREE.Group(); const p = cast(new THREE.Mesh(padGeo, [padFace, white])); p.position.y = 1.0; g.add(p);
+    const roll = (new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 12), white)); roll.rotation.z = 0; roll.position.set(0, 1.0, 0.34); g.add(roll);
+    const toe = (new THREE.Mesh(roundedBox(0.8, 0.14, 0.62, 0.05), trim)); toe.position.y = 0.07; g.add(toe);
+    return g;
+  }
   const padL = makePad(), padR = makePad(); goalieG.add(padL, padR);
   // catching glove (goalie's left = shooter's right)
   const glove = new THREE.Group(); goalieG.add(glove);
-  const gPalm = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.45, 0.25, 20), tan)); gPalm.rotation.x = Math.PI / 2; glove.add(gPalm);
-  const gPocket = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.27, 16), new THREE.MeshStandardMaterial({ color: 0x8a6436 })); gPocket.rotation.x = Math.PI / 2; gPocket.position.z = 0.02; glove.add(gPocket);
-  const gCuff = cast(new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.35, 0.3), trim)); gCuff.position.set(-0.15, -0.55, 0); glove.add(gCuff);
+  const gPalm = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.45, 0.25, 28), tan)); gPalm.rotation.x = Math.PI / 2; glove.add(gPalm);
+  const gRim = new THREE.Mesh(new THREE.TorusGeometry(0.47, 0.07, 6, 24), new THREE.MeshStandardMaterial({ color: C(0xa77a42), roughness: 0.7 })); gRim.position.z = 0.12; glove.add(gRim);
+  const gPocket = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.27, 20), new THREE.MeshStandardMaterial({ color: C(0x8a6436), roughness: 0.85 })); gPocket.rotation.x = Math.PI / 2; gPocket.position.z = 0.02; glove.add(gPocket);
+  const gWeb = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.5, 0.05), new THREE.MeshStandardMaterial({ color: C(0x5c4024) })); gWeb.position.set(0.16, 0.12, 0.15); gWeb.rotation.z = -0.4; glove.add(gWeb);
+  const gWeb2 = gWeb.clone(); gWeb2.rotation.z = 0.4; gWeb2.position.x = 0.02; glove.add(gWeb2);
+  const gCuff = (new THREE.Mesh(roundedBox(0.55, 0.35, 0.3, 0.06), trim)); gCuff.position.set(-0.15, -0.55, 0); glove.add(gCuff);
   // blocker
   const blocker = new THREE.Group(); goalieG.add(blocker);
-  const bBoard = cast(new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.05, 0.18), white)); blocker.add(bBoard);
-  const bStripe = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.18, 0.2), trim); bStripe.position.y = 0.2; blocker.add(bStripe);
+  const bBoard = cast(new THREE.Mesh(roundedBox(0.72, 1.05, 0.18, 0.05), white)); blocker.add(bBoard);
+  const bStripe = new THREE.Mesh(roundedBox(0.74, 0.18, 0.2, 0.04), trim); bStripe.position.y = 0.2; blocker.add(bStripe);
+  const bEdge = new THREE.Mesh(roundedBox(0.74, 0.08, 0.2, 0.03), trim); bEdge.position.y = -0.45; blocker.add(bEdge);
   // stick
   const stick = new THREE.Group(); goalieG.add(stick);
-  const shaft = cast(new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.2, 0.12), dark)); shaft.position.y = 1.1; stick.add(shaft);
-  const paddle = cast(new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.9, 0.13), dark)); paddle.position.y = 0.45; stick.add(paddle);
+  const shaft = (new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.2, 0.12), dark)); shaft.position.y = 1.1; stick.add(shaft);
+  const knob = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.25, 0.13), white); knob.position.y = 2.1; stick.add(knob);
+  const paddle = (new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.9, 0.13), dark)); paddle.position.y = 0.45; stick.add(paddle);
   const blade = cast(new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.24, 0.13), dark)); blade.position.set(0.45, 0.12, 0); stick.add(blade);
+  const tape = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.245, 0.135), white); tape.position.set(0.55, 0.12, 0); stick.add(tape);
+  // soft contact shadow that follows the goalie (cheap, keeps him grounded on any device)
+  const blobC = document.createElement("canvas"); blobC.width = blobC.height = 64; { const x = blobC.getContext("2d"), g = x.createRadialGradient(32, 32, 2, 32, 32, 32); g.addColorStop(0, "rgba(0,0,0,.45)"); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, 64, 64); }
+  const blob = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.4), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(blobC), transparent: true, depthWrite: false })); blob.rotation.x = -Math.PI / 2; blob.position.set(0, 0.014, GZ); scene.add(blob);
 
   function poseGoalie() {
     const g = pose, d = g.drop;
-    goalieG.position.x = g.gx;
-    const torsoY = 2.75 - 1.05 * d;
-    torso.position.set(0, torsoY, 0); shoulders.position.set(0, torsoY + 0.7, 0);
+    goalieG.position.x = g.gx; blob.position.x = g.gx; blob.scale.x = 1 + 0.5 * d;
+    const L = bodyLayout(goalie, g), torsoY = L.torsoY;
+    torso.position.set(0, torsoY, 0); shoulders.position.set(0, torsoY + 0.7, 0); yoke.position.set(0, torsoY + 0.5, 0);
     head.position.set(0, torsoY + 1.15, 0.05);
-    const gap = goalie.weak.key === "fiveHole" ? 0.32 : 0.16, standW = 0.4;
-    const spread = (gap + standW) * (1 - d) + 0.5 * d;
-    // butterfly: pads rotate flat and flare out
-    padL.position.set(-spread, 0, 0.1); padR.position.set(spread, 0, 0.1);
+    const spread = (L.gap + L.standW) * (1 - d) + 0.5 * d;
+    // butterfly: pads rotate flat and flare out (a lazy pad flares less)
+    padL.position.set(-spread + (L.padSpread - L.padOutB) * 0.6, 0, 0.1); padR.position.set(spread - (L.padSpread - L.padOutG) * 0.6, 0, 0.1);
     padL.rotation.set(0, 0, d * (Math.PI / 2 - 0.25)); padR.rotation.set(0, 0, -d * (Math.PI / 2 - 0.25));
     padL.scale.y = 1 - 0.1 * d; padR.scale.y = 1 - 0.1 * d;
-    glove.position.set(g.gloveX, g.gloveY, 0.35);
+    glove.position.set(g.gloveX, g.gloveY, 0.35); glove.rotation.z = -0.15 + 0.1 * Math.sin(clock * 2);
     blocker.position.set(g.blockX, g.blockY, 0.4);
     stick.position.set(g.blockX * 0.55, 0, 0.45 + 0.1 * d); stick.rotation.z = 0.08 + d * 0.2;
+    // a goalie who leaves the five-hole open carries his blade off to the side
+    blade.position.x = goalie.m.stick ? 0.45 : 0.75; tape.position.x = goalie.m.stick ? 0.55 : 0.85;
   }
 
-  // aim guides (drawn over everything)
-  
-  const guideFill = new THREE.MeshBasicMaterial({ color: 0xff3b3b, depthTest: false, transparent: true, opacity: 0.9 });
+  // aim guides (drawn over everything): the sweeping line is red, a locked line turns amber
+  const guideFill = new THREE.MeshBasicMaterial({ color: 0xff3b3b, depthTest: false, transparent: true, opacity: 0.95, toneMapped: false });
+  const guideLock = new THREE.MeshBasicMaterial({ color: 0xffb020, depthTest: false, transparent: true, opacity: 0.95, toneMapped: false });
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0xff3b3b, depthTest: false, transparent: true, opacity: 0.22, toneMapped: false });
   const vLine = new THREE.Mesh(new THREE.PlaneGeometry(0.07, NET_H + 0.8), guideFill); vLine.geometry.translate(0, (NET_H + 0.8) / 2, 0.05); vLine.renderOrder = 10; scene.add(vLine);
+  const vGlow = new THREE.Mesh(new THREE.PlaneGeometry(0.28, NET_H + 0.8), glowMat); vGlow.geometry.translate(0, (NET_H + 0.8) / 2, 0.04); vGlow.renderOrder = 9; vLine.add(vGlow);
   const hLine = new THREE.Mesh(new THREE.PlaneGeometry(NET_HW * 2 + 1.6, 0.07), guideFill); hLine.position.z = 0.05; hLine.renderOrder = 10; scene.add(hLine);
-  const ring = new THREE.Mesh(new THREE.RingGeometry(0.24, 0.36, 28), new THREE.MeshBasicMaterial({ color: 0xffb020, depthTest: false, transparent: true })); ring.renderOrder = 11; scene.add(ring);
-  const puckMesh = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 24), new THREE.MeshStandardMaterial({ color: 0x0b0d12, roughness: 0.5 }))); scene.add(puckMesh);
+  const hGlow = new THREE.Mesh(new THREE.PlaneGeometry(NET_HW * 2 + 1.6, 0.28), glowMat); hGlow.position.z = -0.01; hGlow.renderOrder = 9; hLine.add(hGlow);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.24, 0.36, 40), new THREE.MeshBasicMaterial({ color: 0xffb020, depthTest: false, transparent: true, toneMapped: false })); ring.renderOrder = 11; scene.add(ring);
+  const dot = new THREE.Mesh(new THREE.CircleGeometry(0.06, 16), new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, transparent: true, toneMapped: false })); dot.renderOrder = 12; ring.add(dot);
+  const puckMat = new THREE.MeshStandardMaterial({ color: C(0x0b0d12), roughness: 0.45 });
+  const puckMesh = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.1, 28), puckMat)); scene.add(puckMesh);
+  // motion trail: a few fading ghost pucks behind the real one
+  const TRAIL = 7, trail = [], trailPts = [];
+  for (let i = 0; i < TRAIL; i++) { const m = new THREE.Mesh(puckMesh.geometry, new THREE.MeshBasicMaterial({ color: 0x0b0d12, transparent: true, opacity: 0.22 * (1 - i / TRAIL), depthWrite: false })); m.visible = false; m.scale.setScalar(1 - i * 0.07); scene.add(m); trail.push(m); }
+  // ice spray / net snow particles
+  const NP = 48, pGeo = new THREE.BufferGeometry(), pPos = new Float32Array(NP * 3), pVel = new Float32Array(NP * 3);
+  pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
+  const pMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.09, transparent: true, opacity: 0, depthWrite: false });
+  const spray = new THREE.Points(pGeo, pMat); spray.frustumCulled = false; spray.visible = false; scene.add(spray);
+  let sprayT = -1, bulge = 0, shake = 0, lampT = -1, postGlow = 0;
+  function burst(x, y, z, spread, up, back) {
+    for (let i = 0; i < NP; i++) { pPos[i * 3] = x; pPos[i * 3 + 1] = y; pPos[i * 3 + 2] = z; pVel[i * 3] = (Math.random() - 0.5) * spread; pVel[i * 3 + 1] = Math.random() * up; pVel[i * 3 + 2] = (Math.random() - 0.3) * back; }
+    pGeo.attributes.position.needsUpdate = true; sprayT = 0; spray.visible = true;
+  }
+  function shotFx(kind, part) {
+    const p = puckMesh.position;
+    if (kind === "goal") { bulge = 1; lampT = 0; if (!RM) shake = 0.55; burst(p.x, Math.max(0.2, p.y), -0.4, 3, 2.5, -4); }
+    else if (kind === "save") { burst(p.x, p.y, GZ + 0.2, 5, 4, 5); if (!RM) shake = 0.2; }
+    else if (part === "post" || part === "bar") { postGlow = 1; if (!RM) shake = 0.3; }
+  }
+  function updateFx(dt) {
+    if (sprayT >= 0) {
+      sprayT += dt; const life = 0.9;
+      for (let i = 0; i < NP; i++) { pVel[i * 3 + 1] -= 9 * dt; pPos[i * 3] += pVel[i * 3] * dt; pPos[i * 3 + 1] = Math.max(0.02, pPos[i * 3 + 1] + pVel[i * 3 + 1] * dt); pPos[i * 3 + 2] += pVel[i * 3 + 2] * dt; }
+      pGeo.attributes.position.needsUpdate = true; pMat.opacity = Math.max(0, 0.9 * (1 - sprayT / life)); if (sprayT > life) { sprayT = -1; spray.visible = false; }
+    }
+    // net bulge: push the back mesh out where the puck went in, then settle
+    if (bulge > 0.001) {
+      bulge = Math.max(0, bulge - dt * 1.6);
+      const a = netBack.geometry.attributes.position, arr = a.array, k = (RM ? 0.4 : 1) * Math.sin(Math.min(1, bulge) * Math.PI) * 0.55;
+      const hx = shot ? shot.tx : 0, hy = shot ? shot.ty - 2 : 0;
+      for (let i = 0; i < a.count; i++) { const bx = netBackBase[i * 3], by = netBackBase[i * 3 + 1]; const f = Math.exp(-((bx - hx) ** 2 + (by - hy) ** 2) / 2.2); arr[i * 3 + 2] = netBackBase[i * 3 + 2] - k * f; }
+      a.needsUpdate = true;
+    }
+    if (lampT >= 0) { lampT += dt; const on = lampT < 3 ? (RM ? 1 : 0.6 + 0.4 * Math.sin(lampT * 14)) : 0; hemi.color.copy(HEMI_SKY).lerp(LAMP_SKY, 0.35 * on); lampMat.emissiveIntensity = 2.5 * on; if (lampT >= 3) lampT = -1; }
+    if (postGlow > 0) { postGlow = Math.max(0, postGlow - dt * 2.5); red.emissive.setRGB(postGlow * 0.8, postGlow * 0.6, postGlow * 0.5); }
+    if (shake > 0) { shake = Math.max(0, shake - dt); const m = shake * 0.12; camera.position.set(CAM.x + (Math.random() - 0.5) * m, CAM.y + (Math.random() - 0.5) * m, CAM.z); camera.lookAt(LOOK); }
+    else if (camera.position.x !== CAM.x || camera.position.y !== CAM.y) { camera.position.copy(CAM); camera.lookAt(LOOK); }
+  }
+  function updateTrail(active) {
+    if (active) { trailPts.unshift(puckMesh.position.clone()); if (trailPts.length > TRAIL * 2) trailPts.length = TRAIL * 2; }
+    else if (trailPts.length) trailPts.pop();
+    for (let i = 0; i < TRAIL; i++) { const pt = trailPts[i * 2 + 1]; trail[i].visible = !!pt && puckMesh.visible; if (pt) { trail[i].position.copy(pt); trail[i].rotation.copy(puckMesh.rotation); } }
+  }
 
+  // keep the frame rate up on slow devices: step the render resolution down if frames run long (game timing is unaffected)
+  let pr = renderer.getPixelRatio(), slowT = 0, slowN = 0, allN = 0;
+  // last step on very slow devices: drop the real-time shadow map (the goalie keeps his soft contact shadow)
+  function adapt(rawDt) {
+    if ((pr <= 1 && !sun.castShadow) || document.hidden) return;
+    slowT += rawDt; allN++; if (rawDt > 0.026) slowN++;
+    if (slowT >= 2) {
+      if (slowN > allN * 0.5) { if (pr > 1) { pr = Math.max(1, pr - 0.5); renderer.setPixelRatio(pr); resize(); } else { sun.castShadow = false; renderer.shadowMap.enabled = false; scene.traverse(o => { if (o.material) [].concat(o.material).forEach(m => { m.needsUpdate = true; }); }); } }
+      slowT = 0; slowN = 0; allN = 0;
+    }
+  }
   function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
   window.addEventListener("resize", resize);
 
   // ---------- loop ----------
   let last = performance.now();
   function frame(now) {
-    const dt = Math.min(0.05, (now - last) / 1000); last = now; clock += dt;
+    const rawDt = (now - last) / 1000, dt = Math.min(0.05, rawDt); last = now; clock += dt;
+    if (rawDt < 0.5) adapt(rawDt);
     const s = cur();
     if (phase === "aimX") aimX = (NET_HW + 0.7) * Math.sin(s.sweepX * 1.4 * (clock - phaseT0));
     if (phase === "aimY") aimY = 2.1 + 2.25 * Math.sin(s.sweepY * 1.4 * (clock - phaseT0) - Math.PI / 2);
-    updateGoalie(dt);
     if (phase === "flying" && shot && !shot.done) {
-      const u = Math.min(1, (clock - shot.t0) / shot.dur);
-      const z = START.z + (0 - START.z) * u;
-      const x = START.x + (shot.tx - START.x) * u, y = START.y + (shot.ty - START.y) * u + Math.sin(Math.PI * u) * 0.25 * (shot.ty > 1 ? 1 : 0);
-      puckMesh.position.set(x, y, z); puckMesh.rotation.x = u * 20;
-      if (!shot.checkedGoalie && z <= GZ) {
-        shot.checkedGoalie = true;
-        const part = goalieHit(x, y);
-        if (part) {
-          // deflect toward the corner
-          shot.def = { vx: (x - pose.gx) * 2 + (Math.random() - .5) * 3, vy: 3 + Math.random() * 3, vz: 8, x, y, z, t: clock };
-          resolveShot("save", part);
-        }
+      // replay the goalie exactly as the shot was decided, then let him keep reacting
+      const el = clock - shot.t0, fr = shot.sim.frames, fi = Math.floor(el / SIM_DT);
+      if (fi < fr.length) Object.assign(pose, fr[Math.max(0, fi)]); else updateGoalie(goalie, cur0(), pose, clock, shot, dt);
+      const u = Math.min(1, el / shot.dur), p = puckAt(shot.tx, shot.ty, Math.min(u, shot.sim.k === "save" ? shot.sim.t / FLIGHT : 1));
+      puckMesh.position.set(p.x, p.y, p.z); puckMesh.rotation.x = u * 20;
+      if (el >= shot.sim.t) {
+        const k = shot.sim.k, part = shot.sim.p;
+        if (k === "save") shot.def = { vx: (p.x - pose.gx) * 2 + (Math.random() - .5) * 3, vy: 3 + Math.random() * 3, vz: 8, x: p.x, y: p.y, z: p.z, t: clock };
+        if (k === "goal") shot.inNet = true;
+        resolveShot(k, part);
       }
-      if (!shot.done && u >= 1) {
-        const ax = Math.abs(shot.tx);
-        if (ax > NET_HW + 0.11 + PUCK_R || shot.ty > NET_H + 0.11 + PUCK_R) resolveShot("miss", "wide");
-        else if (ax > NET_HW - 0.11 - PUCK_R) resolveShot("miss", "post");
-        else if (shot.ty > NET_H - 0.11 - PUCK_R) resolveShot("miss", "bar");
-        else { resolveShot("goal"); shot.inNet = true; }
+    } else {
+      updateGoalie(goalie, cur(), pose, clock, null, dt);
+      if (shot && shot.def) {
+        const t = clock - shot.def.t, d = shot.def;
+        puckMesh.position.set(d.x + d.vx * t, Math.max(0.05, d.y + d.vy * t - 16 * t * t), d.z + d.vz * t);
+      } else if (shot && shot.inNet) {
+        const t = clock - shot.t0 - shot.dur;
+        puckMesh.position.z = Math.max(-2.4, -6 * t);
+        if (puckMesh.position.z <= -2.4) puckMesh.position.y = Math.max(0.05, puckMesh.position.y - 6 * dt);
+      } else if (shot && phase === "result") {
+        const t = clock - shot.t0 - shot.dur, lastR = shot.res, rang = lastR && (lastR.p === "post" || lastR.p === "bar");
+        if (rang) { // ring off the iron and kick back out toward the slot (looks only)
+          puckMesh.position.z = Math.min(9, t * 9); puckMesh.position.x = shot.tx + Math.sign(shot.tx || 1) * t * 3;
+          puckMesh.position.y = lastR.p === "bar" ? Math.max(0.05, shot.ty + 2 * t - 14 * t * t) : Math.max(0.05, shot.ty - 6 * t);
+        } else { puckMesh.position.z = -t * 20; puckMesh.position.x += Math.sign(shot.tx) * dt * 8; }
       }
-    } else if (shot && shot.def) {
-      const t = clock - shot.def.t, d = shot.def;
-      puckMesh.position.set(d.x + d.vx * t, Math.max(0.05, d.y + d.vy * t - 16 * t * t), d.z + d.vz * t);
-    } else if (shot && shot.inNet) {
-      const t = clock - shot.t0 - shot.dur;
-      puckMesh.position.z = Math.max(-2.4, -6 * t);
-      if (puckMesh.position.z <= -2.4) puckMesh.position.y = Math.max(0.05, puckMesh.position.y - 6 * dt);
-    } else if (shot && phase === "result") {
-      const t = clock - shot.t0 - shot.dur; puckMesh.position.z = -t * 20; puckMesh.position.x += Math.sign(shot.tx) * dt * 8;
     }
     poseGoalie();
     const aiming = phase === "aimX" || phase === "aimY";
     vLine.visible = aiming; hLine.visible = phase === "aimY"; ring.visible = phase === "aimY";
+    vLine.material = phase === "aimY" ? guideLock : guideFill; vGlow.visible = phase === "aimX";
     vLine.position.x = aimX; hLine.position.y = aimY; ring.position.set(aimX, aimY, 0.06);
+    if (ring.visible && !RM) ring.scale.setScalar(1 + 0.08 * Math.sin(clock * 9));
     puckMesh.visible = !aiming;
+    updateTrail(!!shot && phase === "flying");
+    updateFx(dt);
     renderer.render(scene, camera);
     requestAnimationFrame(frame);
   }
@@ -523,12 +863,11 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   const sb = document.getElementById("soundBtn"); sb.setAttribute("aria-pressed", String(soundOn));
   sb.addEventListener("click", () => { soundOn = !soundOn; db.sound = soundOn; save(); sb.setAttribute("aria-pressed", String(soundOn)); });
 
-  window.__breakaway = { get phase() { return phase; }, get G() { return G; }, aimAt(x, y) { aimX = x; aimY = y; fire(); }, get pose() { return pose; }, get goalie() { return goalie; } };
+  window.__breakaway = { get phase() { return phase; }, get G() { return G; }, aimAt(x, y) { if (phase !== "aimX" && phase !== "aimY") return false; aimX = x; aimY = y; fire(); return true; }, get pose() { return pose; }, get goalie() { return goalie; }, get clock() { return clock; }, get shown() { return shownN; }, get mode() { return mode; }, get aim() { return [aimX, aimY]; } };
   resize();
   startMode("daily");
-  // number on jersey follows the day's goalie
-  torso.material[4].map = numberTex(goalie.number); torso.material[4].needsUpdate = true;
-  document.getElementById("modePractice").addEventListener("click", () => { torso.material[4].map = numberTex(goalie.number); torso.material[4].needsUpdate = true; });
+  // redraw the jersey number once the display font has arrived
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => setJersey(goalie.number, true)).catch(() => {});
   requestAnimationFrame(frame);
 })();
 </script>

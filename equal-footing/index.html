@@ -27,13 +27,19 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .mark{display:flex;align-items:baseline;gap:12px;min-width:0}
 .mark h1{font-family:"Instrument Serif",serif;font-weight:400;font-size:28px;letter-spacing:-.01em;white-space:nowrap}
 .mark span{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.right{display:flex;align-items:center;gap:16px}
+.right{display:flex;align-items:center;gap:6px}
 .dots{display:flex;gap:7px}
 .dots i{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--muted);transition:all .3s}
 .dots i.done{background:var(--ink);border-color:var(--ink)}
 .dots i.now{border-color:var(--ink);transform:scale(1.25)}
-.icon{font-size:13px;color:var(--muted);padding:6px 2px}
-.icon:hover{color:var(--ink)}
+.icon{font-size:15px;color:var(--muted);width:36px;height:36px;display:grid;place-items:center;border-radius:50%;transition:color .2s,background .2s}
+.icon:hover{color:var(--ink);background:var(--hair)}
+.dots{margin-right:8px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.btn:focus-visible{outline-offset:3px}
+input[type=range]:focus-visible{outline:none}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--hair)}
+input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 4px var(--hair)}
 
 .stage{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:10px 22px;position:relative}
 .panel{position:relative;background:var(--panel);border-radius:6px;min-height:0;min-width:0;transition:background .4s}
@@ -41,7 +47,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .tag{position:absolute;left:14px;bottom:11px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);pointer-events:none}
 .count{position:absolute;right:14px;bottom:10px;font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink);opacity:0;transition:opacity .4s;pointer-events:none}
 .count.on{opacity:1}
-@media (max-aspect-ratio: 4/5){ .stage{grid-template-columns:1fr;grid-template-rows:1fr 1fr;gap:10px;padding:8px 16px} header{padding:14px 16px 4px} .mark span{display:none} }
+@media (max-aspect-ratio: 4/5){ .stage{grid-template-columns:1fr;grid-template-rows:1fr 1fr;gap:10px;padding:8px 16px} header{padding:12px 12px 4px 16px} .mark span{display:none} .stage .summary,.stage .help{inset:8px 16px} }
 
 .controls{height:128px;padding:6px 22px 22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 .sliderRow{display:flex;align-items:center;gap:14px;width:min(560px,100%)}
@@ -54,34 +60,41 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--bg);border:2px solid var(--ink)}
 input[type=range]:active::-webkit-slider-thumb,input[type=range]:focus-visible::-webkit-slider-thumb{transform:scale(1.12)}
 input[type=range]:disabled{opacity:.35;cursor:default}
-.btn{padding:11px 30px;border-radius:999px;background:var(--ink);color:var(--bg);font-weight:500;font-size:15px;letter-spacing:.01em;transition:opacity .2s,transform .1s}
+.btn{min-height:44px;padding:11px 30px;border-radius:999px;background:var(--ink);color:var(--bg);font-weight:500;font-size:15px;letter-spacing:.01em;transition:opacity .2s,transform .1s,box-shadow .2s}
+.btn:hover{opacity:.88}
+.btn.ghost:hover{opacity:1;box-shadow:inset 0 0 0 1.5px var(--muted)}
 .btn:active{transform:scale(.97)}
 .btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--hair)}
 .row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
-.verdict{display:flex;align-items:baseline;gap:14px;min-height:34px}
+.verdict{display:flex;align-items:baseline;gap:14px;min-height:34px;animation:rise .45s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
 .verdict .err{font-size:17px}
 .verdict .pts{font-family:"Instrument Serif",serif;font-size:34px;font-variant-numeric:tabular-nums;line-height:1}
 .verdict .pts small{font-family:"Instrument Sans";font-size:13px;color:var(--muted);margin-left:2px}
 .hidden{display:none!important}
 
 /* summary */
-.summary{position:absolute;inset:10px 22px;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:2}
+.summary{position:absolute;inset:10px 22px;display:flex;align-items:safe center;justify-content:center;background:var(--bg);z-index:2;overflow-y:auto;padding:12px 0;animation:fadein .4s ease both}
 .card{width:min(440px,100%);text-align:center;display:flex;flex-direction:column;gap:18px;align-items:center}
 .card .big{font-family:"Instrument Serif",serif;font-size:88px;line-height:.9;font-variant-numeric:tabular-nums}
 .card .big small{font-family:"Instrument Sans";font-size:18px;color:var(--muted)}
 .card .sub{font-size:14px;color:var(--muted)}
 .rounds{width:100%;border-top:1px solid var(--hair)}
-.rounds div{display:grid;grid-template-columns:28px 1fr auto auto;gap:12px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--hair);font-size:14px;font-variant-numeric:tabular-nums;text-align:left}
+.rounds div{display:grid;grid-template-columns:22px 1fr auto auto;gap:12px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--hair);font-size:14px;font-variant-numeric:tabular-nums;text-align:left}
 .rounds b{font-weight:600;width:36px;text-align:right}
 .rounds em{font-style:normal;color:var(--muted)}
+.rounds span:first-child{color:var(--muted)}
 .stats{display:flex;gap:30px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .stats strong{display:block;font-size:22px;color:var(--ink);font-weight:500;letter-spacing:0}
 .toast{position:fixed;left:50%;bottom:150px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.on{opacity:1}
-.help{position:absolute;inset:10px 22px;z-index:3;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.help{position:absolute;inset:10px 22px;z-index:3;background:var(--bg);display:flex;align-items:safe center;justify-content:center;overflow-y:auto;padding:12px 8px;animation:fadein .25s ease both}
+body.helpOpen .controls{visibility:hidden}
 .help .card{gap:14px;font-size:15px;line-height:1.5}
 .help .card p{max-width:36ch}
-.help h2{font-family:"Instrument Serif",serif;font-weight:400;font-size:34px}
+.help h2{font-family:"Instrument Serif",serif;font-weight:400;font-size:34px;text-wrap:balance}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -96,14 +109,14 @@ input[type=range]:disabled{opacity:.35;cursor:default}
 
 <main class="stage" id="stage">
   <div class="panel" id="pA"><canvas id="cA"></canvas><span class="tag">Match this</span><span class="count" id="countA"></span></div>
-  <div class="panel" id="pB"><canvas id="cB"></canvas><span class="tag">Resize this</span><span class="count" id="countB"></span></div>
+  <div class="panel" id="pB"><canvas id="cB"></canvas><span class="tag" id="tagB">Resize this</span><span class="count" id="countB"></span></div>
   <div class="summary hidden" id="summary"></div>
   <div class="help hidden" id="help">
     <div class="card">
       <h2>Equal Footing</h2>
       <p>Slide to resize the blue shape until it covers the <em>same area</em> as the orange one.</p>
       <p>Its proportions never change. No numbers, no grid, one try per shape. Five shapes a day.</p>
-      <p style="color:var(--muted);font-size:13px">Each round starts at 100 and loses 2 points per 1% of area error.</p>
+      <p style="color:var(--muted);font-size:13px">After you lock in, the dashed outline shows the true size. Each round starts at 100 and loses 2 points per 1% of area error. The set gets trickier as it goes, and the slider never starts near the answer.</p>
       <button class="btn" id="helpClose">Play</button>
     </div>
   </div>
@@ -188,25 +201,84 @@ function normalize(p,rot){
   return {pts:p.map(([x,y])=>[x-bc[0],y-bc[1]]),w:x1-x0,h:y1-y0};
 }
 function inside(p,x,y){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const[xi,yi]=p[i],[xj,yj]=p[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
+/* Display-only: a point to scale the reveal about so guess and true-size outlines nest.
+   Picks a point from which the whole outline is visible (star centre) if one exists,
+   preferring the bbox centre (so convex shapes behave exactly as before). Deterministic, no RNG. */
+function anchorPoint(poly){
+  const p=poly.pts,n=p.length,E=[];
+  for(let i=0;i<n;i++){const[ax,ay]=p[i],[bx,by]=p[(i+1)%n],dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy);if(L>1e-9)E.push([ax,ay,dx/L,dy/L,L])}
+  const cost=(x,y)=>{let v=0,m=1e9;for(const[ax,ay,ux,uy,L]of E){const d=ux*(y-ay)-uy*(x-ax);if(d<m)m=d;if(d<0)v-=d*L}
+    return v*4+.1*Math.hypot(x,y)-Math.min(Math.max(m,0),.06)};
+  let best=[0,0],bc=inside(p,0,0)?cost(0,0):1e9;
+  const search=(x0,y0,x1,y1,N)=>{for(let i=0;i<=N;i++)for(let j=0;j<=N;j++){const x=x0+(x1-x0)*i/N,y=y0+(y1-y0)*j/N;
+    if(!inside(p,x,y))continue;const c=cost(x,y);if(c<bc-1e-9){bc=c;best=[x,y]}}};
+  search(-poly.w/2,-poly.h/2,poly.w/2,poly.h/2,48);
+  const sx=poly.w/48,sy=poly.h/48;search(best[0]-sx,best[1]-sy,best[0]+sx,best[1]+sy,12);
+  return best;
+}
 
-function makeRounds(seed){
-  const R=mulberry32(seed),rr=(a,b)=>a+(b-a)*R(),G=makeGens(R);
-  const pick=(pool,used)=>{const ks=Object.keys(pool).filter(k=>!used.has(k));const k=ks[Math.floor(R()*ks.length)];used.add(k);return[k,pool[k]()]};
-  const used=new Set(),rounds=[];
-  // pattern of [target pool, comparison pool]
-  const plan=[['compact','tricky'],['tricky','compact'],['compact','tricky'],['tricky','tricky'],['compact','tricky']];
+const pairKey=(a,b)=>a<b?a+'+'+b:b+'+'+a;
+const POOLS=(()=>{const g=makeGens(Math.random);return{compact:Object.keys(g.compact),tricky:Object.keys(g.tricky)}})();
+// pattern of [target pool, comparison pool]
+const PLAN=[['compact','tricky'],['tricky','compact'],['compact','tricky'],['tricky','tricky'],['compact','tricky']];
+/* Which shapes meet in each round. Own RNG stream (cheap, no geometry) so the daily schedule can look back over earlier days.
+   avoid: optional Set of pairKeys to steer away from (the daily schedule passes the last week's pairings). */
+function planPairs(seed,avoid){
+  const R=mulberry32((seed^0x5bd1e995)>>>0),used=new Set(),out=[];
+  const pick=(pool,partner)=>{let ks=POOLS[pool].filter(k=>!used.has(k));
+    if(partner&&avoid){const ok=ks.filter(k=>!avoid.has(pairKey(partner,k)));if(ok.length)ks=ok}
+    const k=ks[Math.floor(R()*ks.length)];used.add(k);return k};
+  for(const [a,b] of PLAN){const tk=pick(a),ck=pick(b,tk);out.push([tk,ck])}
+  return out;
+}
+/* How far the naive "outline / box" read is from the truth for a round (log units; 0 = no trap).
+   Used only to balance days and order rounds; models a player who partly judges by bounding box and outline. */
+function bboxOf(p){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const[x,y]of p){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}return(x1-x0)*(y1-y0)}
+function perimOf(p){let s=0;for(let i=0,j=p.length-1;i<p.length;j=i++)s+=Math.hypot(p[i][0]-p[j][0],p[i][1]-p[j][1]);return s}
+function trapOf(r){const lb=Math.log(bboxOf(r.target.pts)/bboxOf(r.comp.pts)),lp=2*Math.log(perimOf(r.target.pts)/perimOf(r.comp.pts));return Math.abs(.6*lb+.4*lp)}
+const ANS_LO=.12,ANS_HI=.88,MIN_GAP=.18,FIT=1.7; // answer anywhere on the slider; start never hints at it; layout never depends on it
+function buildRounds(seed,pairs){
+  const R=mulberry32(seed),rr=(a,b)=>a+(b-a)*R(),G=makeGens(R),rounds=[];
   for(let i=0;i<5;i++){
-    const [tk,tp]=pick(G[plan[i][0]],used),[ck,cp]=pick(G[plan[i][1]],used);
+    const [tk,ck]=pairs[i],tp=G[PLAN[i][0]][tk](),cp=G[PLAN[i][1]][ck]();
     const target=normalize(tp,rr(0,TAU)),comp=normalize(cp,rr(0,TAU));
-    const v0=rr(.3,.7),F=rr(3.2,4.1),lo=Math.pow(F,-v0),hi=Math.pow(F,1-v0);
-    let start=v0+(R()<.5?-1:1)*rr(.22,.32);if(start<.04||start>.96)start=2*v0-start;start=Math.min(.96,Math.max(.04,start));
-    rounds.push({tk,ck,target,comp,lo,hi,start});
+    const v0=rr(ANS_LO,ANS_HI),F=rr(4.6,6.2),lo=Math.pow(F,-v0),hi=Math.pow(F,1-v0);
+    let start=rr(.05,.95);for(let n=0;n<20&&Math.abs(start-v0)<MIN_GAP;n++)start=rr(.05,.95);
+    if(Math.abs(start-v0)<MIN_GAP)start=v0<.5?Math.min(.95,v0+MIN_GAP+.1):Math.max(.05,v0-MIN_GAP-.1);
+    const rd={tk,ck,target,comp,lo,hi,start};rd.trap=trapOf(rd);rounds.push(rd);
   }
   return rounds;
 }
+/* Balance: try a few geometry variants of the same pairings (same shapes, different rotations/proportions) and keep the one
+   whose total trap is closest to a typical day, with at least one real trap; then play easiest-looking first, biggest trap last. */
+const TRAP_DAY=3.9,TRAP_BOSS=.9,VARIANTS=10;
+function makeRounds(seed,avoid){
+  const pairs=planPairs(seed,avoid);let best=null,bc=1e9;
+  for(let c=0;c<VARIANTS;c++){
+    const rs=buildRounds(c?hashStr(seed+':'+c):seed,pairs),tot=rs.reduce((s,r)=>s+r.trap,0),mx=Math.max(...rs.map(r=>r.trap));
+    const cost=Math.abs(tot-TRAP_DAY)+(mx<TRAP_BOSS?1:0);if(cost<bc){bc=cost;best=rs}
+  }
+  return best.slice().sort((a,b)=>a.trap-b.trap);
+}
+
+/* Daily set: walk forward day by day from a fixed start so no shape pairing repeats within PAIR_GAP days.
+   Deterministic for a given date (everyone gets the same set); dates before the start use the plain seed. */
+const SCHED_START=Date.UTC(2026,10,1),PAIR_GAP=7;
+const utcKey=t=>{const d=new Date(t);return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0')};
+function dailyRounds(key){
+  const [y,m,d]=key.split('-').map(Number),target=Date.UTC(y,m-1,d);
+  if(!(target>=SCHED_START))return makeRounds(hashStr('equal-footing:'+key));
+  const recent=[];
+  for(let t=SCHED_START;t<target;t+=864e5){
+    recent.push(planPairs(hashStr('equal-footing:'+utcKey(t)),new Set(recent.flat())).map(p=>pairKey(p[0],p[1])));
+    if(recent.length>PAIR_GAP-1)recent.shift();
+  }
+  return makeRounds(hashStr('equal-footing:'+key),new Set(recent.flat()));
+}
 
 /* ---------- state ---------- */
-const today=localDateKey(), dayNum=Math.floor((Date.UTC(...today.split('-').map((v,i)=>i==1?v-1:+v))-EPOCH)/864e5)+1;
+const numOf=k=>Math.floor((Date.UTC(...k.split('-').map((v,i)=>i==1?v-1:+v))-EPOCH)/864e5)+1;
+let today=localDateKey(), dayNum=numOf(today);
 let mode='daily', rounds, results, idx, phase, revealT0=0, tiles=null;
 let cur=1, want=1; // displayed and wanted area ratio
 const $=id=>document.getElementById(id);
@@ -214,7 +286,7 @@ const slider=$('slider'), cA=$('cA'), cB=$('cB');
 
 function ratioFromSlider(r=rounds[idx]){const v=slider.value/1000;return r.lo*Math.pow(r.hi/r.lo,v)}
 function startDaily(){
-  mode='daily';rounds=makeRounds(hashStr('equal-footing:'+today));
+  mode='daily';rounds=dailyRounds(today);
   const saved=store.get('ef:'+today);results=saved&&saved.results||[];
   idx=results.length; if(idx>=5){showSummary();return;} beginRound();
 }
@@ -224,12 +296,21 @@ function startPractice(){
 }
 function beginRound(){
   phase='play';tiles=null;
-  const r=rounds[idx];slider.value=Math.round(r.start*1000);slider.disabled=false;
+  const r=rounds[idx];if(!r.anchor)r.anchor=anchorPoint(r.comp);slider.value=Math.round(r.start*1000);slider.disabled=false;
   want=cur=ratioFromSlider();
   $('verdict').classList.add('hidden');$('sliderRow').classList.remove('hidden');
   $('goBtn').classList.remove('hidden');$('nextBtn').classList.add('hidden');
   $('countA').classList.remove('on');$('countB').classList.remove('on');$('countA').textContent=$('countB').textContent='';
-  renderDots();slider.focus({preventScroll:true});
+  renderDots();$('tagB').textContent='Resize this';slider.focus({preventScroll:true});
+}
+/* One plain line on why this pair fools the eye, shown after lock-in. */
+function trapNote(r){
+  const b=bboxOf(r.comp.pts)/bboxOf(r.target.pts),p=perimOf(r.comp.pts)/perimOf(r.target.pts),f=x=>x.toFixed(1)+'×';
+  if(b>=1.4)return 'Same area · box '+f(b)+' bigger';
+  if(b<=1/1.4)return 'Same area · box only '+Math.round(b*100)+'% as big';
+  if(p>=1.25)return 'Same area · '+f(p)+' the outline';
+  if(p<=1/1.25)return 'Same area · only '+Math.round(p*100)+'% of the outline';
+  return 'True size';
 }
 function renderDots(){
   $('dots').innerHTML=Array.from({length:5},(_,i)=>`<i class="${i<results.length?'done':i===idx&&phase!=='done'?'now':''}"></i>`).join('');
@@ -238,7 +319,7 @@ function renderDots(){
 slider.addEventListener('input',()=>{if(phase==='play')want=ratioFromSlider()});
 
 function submit(){
-  if(phase!=='play')return;
+  if(phase!=='play'||!$('help').classList.contains('hidden'))return;
   const g=ratioFromSlider(),err=(g-1)*100,score=Math.max(0,Math.round(100-2*Math.abs(err)));
   results.push({g,err,score,tk:rounds[idx].tk,ck:rounds[idx].ck});
   if(mode==='daily')store.set('ef:'+today,{results});
@@ -250,7 +331,7 @@ function submit(){
   $('verdict').classList.remove('hidden');$('sliderRow').classList.add('hidden');
   $('goBtn').classList.add('hidden');
   const nb=$('nextBtn');nb.textContent=idx===4?'See results':'Next shape';nb.classList.remove('hidden');
-  renderDots();
+  renderDots();$('tagB').textContent=trapNote(rounds[idx]);
   if(idx===4&&mode==='daily')updateStats();
 }
 function next(){
@@ -266,16 +347,17 @@ document.addEventListener('keydown',e=>{
 /* ---------- tiles ---------- */
 const TILE=Math.sqrt(1/170); // ~170 tiles fill one target
 function buildTiles(g){
-  const r=rounds[idx],sg=Math.sqrt(g),list=(poly,scaleA,scaleB)=>{
-    const out=[];const m=Math.max(scaleA,scaleB),hw=poly.w*m/2+TILE,hh=poly.h*m/2+TILE;
+  const r=rounds[idx],sg=Math.sqrt(g),list=(poly,scaleA,scaleB,ox=0,oy=0)=>{
+    const out=[];const m=Math.max(scaleA,scaleB),hw=poly.w*m/2+Math.abs(ox)+TILE,hh=poly.h*m/2+Math.abs(oy)+TILE;
     for(let i=Math.floor(-hw/TILE);i<=Math.ceil(hw/TILE);i++)for(let j=Math.floor(-hh/TILE);j<=Math.ceil(hh/TILE);j++){
       const x=(i+.5)*TILE,y=(j+.5)*TILE;
-      const a=inside(poly.pts,x/scaleA,y/scaleA),b=inside(poly.pts,x/scaleB,y/scaleB);
+      const a=inside(poly.pts,x/scaleA,y/scaleA),b=inside(poly.pts,(x-ox)/scaleB,(y-oy)/scaleB);
       if(a||b)out.push({x,y,a,b,k:Math.random()});
     }
     return out;
   };
-  const A=list(r.target,1,1),B=list(r.comp,sg,1);
+  const P=r.anchor||[0,0];
+  const A=list(r.target,1,1),B=list(r.comp,sg,1,(sg-1)*P[0],(sg-1)*P[1]);
   const order=arr=>{arr.forEach(t=>t.d=(t.y+5)*.5+t.k*.35);const mn=Math.min(...arr.map(t=>t.d)),mx=Math.max(...arr.map(t=>t.d));arr.forEach(t=>t.d=(t.d-mn)/(mx-mn||1));};
   order(A);order(B);
   tiles={A,B,nA:A.filter(t=>t.a).length,nB:B.filter(t=>t.a).length,miss:B.filter(t=>!t.a&&t.b).length,extra:B.filter(t=>t.a&&!t.b).length};
@@ -286,24 +368,34 @@ const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim
 let colors={};function readColors(){colors={a:css('--a'),ae:css('--a-edge'),b:css('--b'),be:css('--b-edge'),ink:css('--ink'),panel:css('--panel')}}
 readColors();
 function sizeCanvas(c){const d=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;if(c.width!==Math.round(w*d)||c.height!==Math.round(h*d)){c.width=Math.round(w*d);c.height=Math.round(h*d)}const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);return{ctx,w,h}}
-function path(ctx,pts,s,cx,cy,k){ctx.beginPath();pts.forEach(([x,y],i)=>{const X=cx+x*s*k,Y=cy+y*s*k;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});ctx.closePath()}
+function path(ctx,pts,s,cx,cy,k,ox=0,oy=0){ctx.beginPath();pts.forEach(([x,y],i)=>{const X=cx+(x*s+ox)*k,Y=cy+(y*s+oy)*k;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});ctx.closePath()}
+const hatchCache={};
 function hatch(ctx,color){
-  const d=window.devicePixelRatio||1,c=document.createElement('canvas');c.width=c.height=Math.round(7*d);
+  const d=window.devicePixelRatio||1,key=color+'|'+d;if(hatchCache[key])return hatchCache[key];
+  const c=document.createElement('canvas');c.width=c.height=Math.round(7*d);
   const x=c.getContext('2d');x.strokeStyle=color;x.lineWidth=1.3*d;x.beginPath();
   for(let o=-c.width;o<=c.width*2;o+=c.width){x.moveTo(o,c.height);x.lineTo(o+c.width,0)}x.stroke();
-  const p=ctx.createPattern(c,'repeat');try{p.setTransform(new DOMMatrix().scale(1/d))}catch(e){}return p;
+  const p=ctx.createPattern(c,'repeat');try{p.setTransform(new DOMMatrix().scale(1/d))}catch(e){}return hatchCache[key]=p;
 }
+const RM=window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 
+/* Panel scale depends only on the two shapes (never on the slider range), so on-screen size gives no hint about the answer.
+   Fits the target, and the blue shape up to FIT x its true area; bigger guesses simply run off the panel. */
+function layoutScale(r,W,H){
+  const P=r.anchor||(r.anchor=anchorPoint(r.comp)),pad=Math.min(W,H)*.06+12,sf=Math.sqrt(FIT);
+  if(!r.ext){let ex=0,ey=0;for(const sgx of [1/sf,sf])for(const[x,y]of r.comp.pts){ex=Math.max(ex,Math.abs(x+(sgx-1)*P[0]));ey=Math.max(ey,Math.abs(y+(sgx-1)*P[1]))}r.ext=[ex,ey]}
+  return Math.min((W-2*pad)/r.target.w,(H-2*pad)/r.target.h,(W-2*pad)/(r.comp.w*sf),(H-2*pad)/(r.comp.h*sf),(W/2-pad)/r.ext[0],(H/2-pad)/r.ext[1]);
+}
 function drawFrame(now){
   if(!rounds||idx>=5||phase==='done'){requestAnimationFrame(drawFrame);return}
   const r=rounds[idx];
-  if(phase==='play'){cur+= (want-cur)*.22; if(Math.abs(want-cur)<1e-4)cur=want}
+  if(phase==='play'){cur+= (want-cur)*.22; if(RM.matches||Math.abs(want-cur)<1e-4)cur=want}
+  const P=r.anchor||(r.anchor=anchorPoint(r.comp));
   const A=sizeCanvas(cA),B=sizeCanvas(cB);
   const W=Math.min(A.w,B.w),H=Math.min(A.h,B.h),pad=Math.min(W,H)*.06+12;
-  const shi=Math.sqrt(r.hi);
-  const k=Math.min((W-2*pad)/r.target.w,(H-2*pad)/r.target.h,(W-2*pad)/(r.comp.w*shi),(H-2*pad)/(r.comp.h*shi));
-  const t=phase==='reveal'?now-revealT0:0;
+  const k=layoutScale(r,W,H);
+  const t=phase==='reveal'?(RM.matches?1e5:now-revealT0):0;
   const ghostP=phase==='reveal'?ease(Math.min(1,t/900)):0;
   const tileP=phase==='reveal'?Math.min(1,Math.max(0,(t-1100)/1100)):0;
   const fade=phase==='reveal'?1-.82*Math.min(1,Math.max(0,(t-1000)/500)):1;
@@ -311,23 +403,24 @@ function drawFrame(now){
   // --- target panel
   {const {ctx,w,h}=A,cx=w/2,cy=h/2;ctx.clearRect(0,0,w,h);
     ctx.globalAlpha=fade;path(ctx,r.target.pts,1,cx,cy,k);ctx.fillStyle=colors.a;ctx.fill();ctx.globalAlpha=1;
-    ctx.lineWidth=2;ctx.lineJoin='round';ctx.strokeStyle=colors.ae;ctx.stroke();
+    ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';ctx.strokeStyle=colors.ae;ctx.stroke();
     if(tiles&&tileP>0)drawTiles(ctx,tiles.A,cx,cy,k,tileP,colors.a,colors.ae);
   }
   // --- comparison panel
-  {const {ctx,w,h}=B,cx=w/2,cy=h/2;ctx.clearRect(0,0,w,h);ctx.lineJoin='round';
+  {const {ctx,w,h}=B,cx=w/2,cy=h/2;ctx.clearRect(0,0,w,h);ctx.lineJoin='round';ctx.lineCap='round';
     const sg=Math.sqrt(cur);
     if(phase==='reveal'){
       const sTrue=sg+(1-sg)*ghostP; // animate accurate version out of the guess
-      const bigger=Math.max(sTrue,sg),smaller=Math.min(sTrue,sg);
+      // true-size shape grows/shrinks out of the guess about the anchor P, so the two outlines nest
+      const tx=(sg-sTrue)*P[0],ty=(sg-sTrue)*P[1];
+      const T=c=>path(ctx,r.comp.pts,sTrue,cx,cy,k,tx,ty),Gs=()=>path(ctx,r.comp.pts,sg,cx,cy,k);
+      // works for any shape, nested or not: hatch = the area the two disagree on, solid = the overlap
       ctx.globalAlpha=fade;
-      path(ctx,r.comp.pts,bigger,cx,cy,k);ctx.fillStyle=hatch(ctx,colors.b);ctx.fill();
-      path(ctx,r.comp.pts,smaller,cx,cy,k);ctx.fillStyle=colors.panel;ctx.fill();
-      path(ctx,r.comp.pts,sg,cx,cy,k);ctx.fillStyle=colors.b;ctx.globalAlpha=fade*(cur<1?1:.0);ctx.fill();
-      if(cur>=1){path(ctx,r.comp.pts,sTrue,cx,cy,k);ctx.globalAlpha=fade;ctx.fillStyle=colors.b;ctx.fill()}
+      ctx.fillStyle=hatch(ctx,colors.b);T();ctx.fill();Gs();ctx.fill();
+      ctx.save();Gs();ctx.clip();T();ctx.fillStyle=colors.b;ctx.fill();ctx.restore();
       ctx.globalAlpha=1;
-      path(ctx,r.comp.pts,sg,cx,cy,k);ctx.lineWidth=2;ctx.strokeStyle=colors.be;ctx.stroke();
-      ctx.setLineDash([6,5]);path(ctx,r.comp.pts,sTrue,cx,cy,k);ctx.strokeStyle=colors.ink;ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
+      Gs();ctx.lineWidth=2;ctx.strokeStyle=colors.be;ctx.stroke();
+      ctx.setLineDash([6,5]);T();ctx.strokeStyle=colors.ink;ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
       if(tiles&&tileP>0)drawTiles(ctx,tiles.B,cx,cy,k,tileP,colors.b,colors.be);
     }else{
       path(ctx,r.comp.pts,sg,cx,cy,k);ctx.fillStyle=colors.b;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=colors.be;ctx.stroke();
@@ -361,7 +454,7 @@ const NAMES={circle:'circle',polygon:'polygon',blob:'blob',island:'island',heart
 function updateStats(){
   const st=store.get('ef:stats')||{last:null,streak:0,best:0,played:0,sum:0};
   if(st.last===today)return;
-  const y=new Date();y.setDate(y.getDate()-1);
+  const [yy,mm,dd]=today.split('-').map(Number),y=new Date(yy,mm-1,dd-1);
   st.streak=st.last===localDateKey(y)?st.streak+1:1;st.best=Math.max(st.best,st.streak);st.played++;
   st.sum+=Math.round(results.reduce((s,r)=>s+r.score,0)/5);st.last=today;store.set('ef:stats',st);
 }
@@ -383,7 +476,7 @@ function showSummary(){
     ${mode==='daily'?`<div class="sub" id="countdown"></div>`:''}
   </div>`;
   s.classList.remove('hidden');$('controls').classList.add('hidden');
-  const share=`Equal Footing #${dayNum} · ${avg}/100\n${results.map(r=>emoji(r.score)).join('')}\nAvg error ${avgErr.toFixed(1)}%`;
+  const last=results[results.length-1],share=`Equal Footing #${dayNum} · ${avg}/100\n${results.map(r=>emoji(r.score)).join('')}\nAvg error ${avgErr.toFixed(1)}%`+(last?` · final trap: ${NAMES[last.tk]} → ${NAMES[last.ck]}`:'');
   if($('copyBtn'))$('copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(share);toast('Copied')}catch(e){toast('Copy blocked — select the text instead')}};
   $('practiceBtn').onclick=startPractice;
   if($('backBtn'))$('backBtn').onclick=()=>{$('controls').classList.remove('hidden');s.classList.add('hidden');startDaily()};
@@ -391,21 +484,37 @@ function showSummary(){
 }
 function tickCountdown(){
   const el=$('countdown');if(!el)return;
+  if(localDateKey()!==today){el.innerHTML='A new set is ready <button class="btn ghost" id="newDayBtn" style="margin-left:8px;min-height:36px;padding:6px 18px">Play it</button>';$('newDayBtn').onclick=()=>checkDay(true);return}
   const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);const d=m-n;
   el.textContent=`Next set in ${Math.floor(d/36e5)}h ${Math.floor(d%36e5/6e4)}m`;
   setTimeout(tickCountdown,30000);
 }
+/* A tab left open past midnight moves to the new set: right away if nothing of today's set is in progress,
+   otherwise as soon as the player finishes the set they are on. */
+function checkDay(returning){
+  const k=localDateKey();if(k===today||mode!=='daily')return false;
+  if(!(phase==='play'&&results.length===0)&&!(phase==='done'&&returning))return false;
+  today=k;dayNum=numOf(k);$('summary').classList.add('hidden');$('controls').classList.remove('hidden');
+  startDaily();toast('A new set is out');return true;
+}
+setInterval(()=>checkDay(),30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDay(true)});
+window.addEventListener('focus',()=>checkDay(true));
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1600)}
 
 /* ---------- chrome ---------- */
 function setTheme(t){document.documentElement.dataset.theme=t;store.set('ef:theme',t);requestAnimationFrame(readColors)}
 $('themeBtn').onclick=()=>setTheme(document.documentElement.dataset.theme==='ivory'?'slate':'ivory');
-const savedTheme=store.get('ef:theme');if(savedTheme)setTheme(savedTheme);
-$('helpBtn').onclick=()=>$('help').classList.remove('hidden');
-$('helpClose').onclick=()=>{$('help').classList.add('hidden');store.set('ef:seenHelp',1);slider.focus()};
-if(!store.get('ef:seenHelp'))$('help').classList.remove('hidden');
+const savedTheme=store.get('ef:theme');
+if(savedTheme)setTheme(savedTheme);
+else if(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.dataset.theme='slate';requestAnimationFrame(readColors)}
+function openHelp(focus){$('help').classList.remove('hidden');document.body.classList.add('helpOpen');if(focus)$('helpClose').focus({preventScroll:true})}
+function closeHelp(){$('help').classList.add('hidden');document.body.classList.remove('helpOpen');store.set('ef:seenHelp',1);if(phase==='play')slider.focus({preventScroll:true})}
+$('helpBtn').onclick=()=>openHelp(true);$('helpClose').onclick=closeHelp;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('help').classList.contains('hidden'))closeHelp()});
+if(!store.get('ef:seenHelp'))openHelp();
 
-window.__EF={makeRounds,inside,signedArea}; // for testing
+window.__EF={buildRounds,planPairs,hashStr,layoutScale,trapOf,makeRounds,dailyRounds,inside,signedArea,anchorPoint,state:()=>({rounds,idx,phase})}; // for testing
 startDaily();
 })();
 </script>

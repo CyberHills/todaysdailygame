@@ -13,104 +13,148 @@
   --gold:#e3b341; --gold2:#b8862a; --goldglow:rgba(227,179,65,.35);
   --good:#2f9e6a; --bad:#d0493c; --sky:#9fb3d9;
 }
+/* layout: one centered column of cream question cards on navy; fixed chip bar at the bottom */
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:radial-gradient(1200px 600px at 50% -200px,#1d2f52 0%,var(--bg) 60%) fixed,var(--bg);color:var(--cream);font-family:Inter,system-ui,sans-serif;min-height:100%}
-button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
-.wrap{max-width:760px;margin:0 auto;padding:20px 16px 140px}
+html{color-scheme:dark}
+html,body{background:radial-gradient(1200px 600px at 50% -200px,#1d2f52 0%,var(--bg) 60%) fixed,var(--bg);color:var(--cream);font-family:Inter,system-ui,sans-serif;min-height:100%;-webkit-text-size-adjust:100%}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.card :focus-visible{outline-color:var(--ink)}
+.wrap{max-width:760px;margin:0 auto;padding:22px 16px 200px}
+.wrap.done{padding-bottom:40px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
-h1{font-family:Fraunces,serif;font-weight:800;font-size:30px;letter-spacing:.5px}
+h1{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:30px;letter-spacing:.5px;line-height:1.1}
 h1 span{color:var(--gold)}
-.tag{font-size:13px;color:var(--sky);margin-bottom:18px}
-.hdr-btns{display:flex;gap:8px}
-.pill{border:1px solid var(--line);background:var(--bg2);padding:7px 12px;border-radius:999px;font-size:13px;font-weight:600;color:var(--cream2)}
+.tag{font-size:13px;line-height:1.4;color:var(--sky);margin-bottom:20px;text-wrap:balance}
+.hdr-btns{display:flex;gap:8px;flex:none}
+.pill{border:1px solid var(--line);background:var(--bg2);padding:8px 13px;min-height:36px;border-radius:999px;font-size:13px;font-weight:600;color:var(--cream2);transition:border-color .15s,background .15s}
 .pill:hover{border-color:var(--gold2)}
 .pill.on{background:var(--gold);color:#22190a;border-color:var(--gold)}
 .mode-note{font-size:13px;color:var(--sky);margin:-6px 0 14px}
 
 /* cards */
-.card{background:var(--cream);color:var(--ink);border-radius:14px;padding:16px 16px 14px;margin-bottom:14px;box-shadow:0 6px 0 rgba(0,0,0,.25);position:relative;transition:transform .2s}
-.card .meta{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.card .q{font-family:Fraunces,serif;font-weight:600;font-size:19px;line-height:1.3;margin-bottom:12px}
+.card{background:var(--cream);color:var(--ink);border-radius:14px;padding:16px 16px 14px;margin-bottom:14px;box-shadow:0 6px 0 rgba(0,0,0,.25);position:relative;transition:transform .2s,box-shadow .35s}
+.card .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:26px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.card .q{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:19px;line-height:1.3;margin-bottom:12px;text-wrap:balance}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.opt{text-align:left;background:#fffaf0;border:2px solid var(--cream2);border-radius:10px;padding:9px 11px;font-size:15px;font-weight:500;color:var(--ink);display:flex;gap:8px;align-items:center;transition:border-color .15s,background .15s}
-.opt b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;background:var(--cream2);font-size:12px;flex:none}
+.opt{text-align:left;background:#fffaf0;border:2px solid var(--cream2);border-radius:10px;padding:10px 11px;min-height:46px;font-size:15px;font-weight:500;line-height:1.3;color:var(--ink);display:flex;gap:10px;align-items:center;transition:border-color .15s,background .15s,opacity .3s,transform .1s}
+.opt b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:6px;background:var(--cream2);font-size:12px;flex:none;transition:background .15s,color .15s}
 .opt:hover:not([disabled]){border-color:#c9b98f}
-.opt.sel{border-color:var(--ink);background:#fff}
+.opt:active:not([disabled]){transform:scale(.985)}
+.opt.sel{border-color:var(--ink);background:#fff;box-shadow:0 2px 0 rgba(29,36,51,.12)}
 .opt.sel b{background:var(--ink);color:var(--cream)}
 .opt[disabled]{cursor:default}
 .opt.right{border-color:var(--good);background:#e4f4ea}
 .opt.right b{background:var(--good);color:#fff}
 .opt.wrong{border-color:var(--bad);background:#fbe5e2}
 .opt.wrong b{background:var(--bad);color:#fff}
-.opt.dim{opacity:.55}
+.opt.wrong span{text-decoration:line-through;text-decoration-color:rgba(208,73,60,.6);text-decoration-thickness:2px}
+.opt.dim{opacity:.5}
+.tier{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:11px;letter-spacing:.06em;background:var(--cream2);color:var(--muted);vertical-align:1px}
+.tier.t-h{background:#f6d9d4;color:#9b2f24}.tier.t-b{background:#dfe8f7;color:#2c4a7c}.tier.t-e{background:#e1efe6;color:#256b4a}
+.daytype{font-size:14px;line-height:1.5;color:var(--cream2);margin:-4px 0 12px}.daytype b{color:var(--gold)}
+.opt .tick{margin-left:auto;font-style:normal;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--good);flex:none}
+.opt.wrong .tick{color:var(--bad)}
 
-.alloc{display:flex;align-items:center;gap:10px;border-top:1px dashed #d8cdb2;padding-top:11px}
-.alloc .lbl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;min-width:74px}
-.step{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--cream);font-size:18px;font-weight:700;line-height:1;display:grid;place-items:center}
-.step[disabled]{opacity:.25;cursor:default}
-.slots{display:flex;gap:6px;flex:1}
-.slot{width:28px;height:28px;border-radius:50%;border:2px dashed #cbbd99;position:relative;transition:transform .15s}
+.alloc{display:flex;align-items:center;gap:10px;border-top:1px dashed #d8cdb2;padding-top:12px}
+.alloc .lbl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;min-width:80px}
+.step{width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--cream);font-size:20px;font-weight:700;line-height:1;display:grid;place-items:center;flex:none;transition:transform .1s,opacity .15s}
+.step:active:not([disabled]){transform:scale(.92)}
+.step[disabled]{opacity:.22;cursor:default}
+.slots{display:flex;gap:6px;flex:1;justify-content:flex-start}
+.slot{width:28px;height:28px;border-radius:50%;border:2px dashed #cbbd99;position:relative;cursor:pointer;transition:transform .15s;flex:none}
+.slot::before{content:"";position:absolute;inset:-6px -3px}
 .slot.f{border:none;background:radial-gradient(circle at 35% 30%,#ffe7a3,var(--gold) 45%,var(--gold2));box-shadow:0 2px 0 #8a6219,inset 0 0 0 3px rgba(255,255,255,.25)}
 .slot.f::after{content:"";position:absolute;inset:7px;border-radius:50%;border:1.5px solid rgba(120,80,10,.45)}
+.slot.new{animation:chipIn .28s cubic-bezier(.3,1.6,.6,1)}
+@keyframes chipIn{0%{transform:translateY(-8px) scale(.6);opacity:.3}100%{transform:none;opacity:1}}
 .slot:hover:not(.lock){transform:translateY(-2px)}
 .slot.lock{cursor:default}
-.count{font-family:Fraunces,serif;font-weight:800;font-size:22px;min-width:26px;text-align:right}
+.count{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px;min-width:26px;text-align:right;font-variant-numeric:tabular-nums}
 
-.delta{position:absolute;right:16px;top:12px;font-family:Fraunces,serif;font-weight:800;font-size:28px;opacity:0;pointer-events:none}
-.delta.show{animation:pop 1s ease-out forwards}
+.delta{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:24px;line-height:1;letter-spacing:0;opacity:0;pointer-events:none;font-variant-numeric:tabular-nums}
+.delta.show{animation:pop .9s ease-out forwards}
 .delta.pos{color:var(--good)} .delta.neg{color:var(--bad)}
-@keyframes pop{0%{opacity:0;transform:translateY(10px) scale(.7)}30%{opacity:1;transform:translateY(-4px) scale(1.15)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes pop{0%{opacity:0;transform:translateY(8px) scale(.7)}30%{opacity:1;transform:translateY(-3px) scale(1.12)}100%{opacity:1;transform:translateY(0) scale(1)}}
 .card.shake{animation:shake .4s}
 @keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 .card.glow{box-shadow:0 6px 0 rgba(0,0,0,.25),0 0 0 3px var(--good)}
 .card.redglow{box-shadow:0 6px 0 rgba(0,0,0,.25),0 0 0 3px var(--bad)}
-.explain{display:none;font-size:14px;line-height:1.45;color:#3a3a3a;background:#efe6d0;border-radius:8px;padding:9px 11px;margin-top:10px}
-.explain.show{display:block}
+.card.glow.lift{animation:lift .5s ease-out}
+@keyframes lift{40%{transform:translateY(-4px)}100%{transform:none}}
+.explain{display:none;font-size:14px;line-height:1.5;color:#3a3a3a;background:#efe6d0;border-left:3px solid #d8c99f;border-radius:8px;padding:9px 12px;margin-top:12px}
+.explain.show{display:block;animation:fadeIn .35s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 
 /* bottom bar */
-.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(15,26,46,.96);backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:12px 16px 16px;z-index:5}
-.bar-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.bank{display:flex;gap:5px;flex-wrap:wrap}
-.bank i{width:18px;height:18px;border-radius:50%;border:1.5px dashed #3c4f78;display:block;transition:all .2s}
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(15,26,46,.96);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:12px 16px calc(14px + env(safe-area-inset-bottom));z-index:5;box-shadow:0 -8px 24px rgba(0,0,0,.25)}
+.bar-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap}
+.bank{display:flex;gap:5px;flex-wrap:nowrap}
+.bank i{width:18px;height:18px;border-radius:50%;border:1.5px dashed #3c4f78;display:block;transition:background .2s,box-shadow .2s,border-color .2s,transform .2s}
 .bank i.f{border:none;background:radial-gradient(circle at 35% 30%,#ffe7a3,var(--gold) 45%,var(--gold2));box-shadow:0 0 8px var(--goldglow)}
 .bank-txt{font-size:14px;color:var(--cream2);min-width:110px}
-.bank-txt b{color:var(--gold);font-size:17px}
-.go{margin-left:auto;background:var(--gold);color:#22190a;font-weight:700;padding:12px 20px;border-radius:10px;font-size:15px;box-shadow:0 3px 0 var(--gold2)}
-.go[disabled]{background:#33456b;color:#93a2c3;box-shadow:none;cursor:default}
-.rules{font-size:12px;color:var(--sky);width:100%}
+.bank-txt b{color:var(--gold);font-size:17px;font-variant-numeric:tabular-nums}
+.go{margin-left:auto;background:var(--gold);color:#22190a;font-weight:700;padding:12px 20px;min-height:46px;border-radius:10px;font-size:15px;box-shadow:0 3px 0 var(--gold2);transition:background .2s,color .2s,box-shadow .2s,transform .1s}
+.go:active:not([disabled]){transform:translateY(2px);box-shadow:0 1px 0 var(--gold2)}
+.go[disabled]{background:#33456b;color:#a7b4d0;box-shadow:none;cursor:default}
+.rules{font-size:12px;line-height:1.4;color:var(--sky);width:100%}
 
 /* results */
-.total{text-align:center;margin:6px 0 16px}
-.total .n{font-family:Fraunces,serif;font-weight:800;font-size:56px;line-height:1}
-.total .s{font-size:13px;color:var(--sky);margin-top:4px}
+.total{text-align:center;margin:4px 0 18px}
+.total .n{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.total .s{font-size:13px;color:var(--sky);margin-top:6px}
 .panel{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
-.panel h3{font-family:Fraunces,serif;font-size:17px;margin-bottom:10px;color:var(--gold)}
+.panel h3{font-family:Fraunces,Georgia,serif;font-size:17px;margin-bottom:10px;color:var(--gold)}
 .brk{width:100%;border-collapse:collapse;font-size:14px}
-.brk td{padding:6px 4px;border-bottom:1px solid var(--line)}
+.brk td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
+.brk td:nth-child(2){color:var(--sky);white-space:nowrap;font-variant-numeric:tabular-nums}
 .brk td:last-child{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
 .brk tr:last-child td{border:none}
+.mk{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;font-size:11px;font-weight:800;margin-right:6px;vertical-align:-3px;color:#fff}
+.mk.ok{background:var(--good)}.mk.no{background:var(--bad)}
 .pos{color:#5fd39a}.neg{color:#ff7a6c}
 .verdict{font-size:14px;line-height:1.5;color:var(--cream2);margin-top:10px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.btn{background:var(--gold);color:#22190a;font-weight:700;padding:10px 16px;border-radius:10px;box-shadow:0 3px 0 var(--gold2)}
+.btn{background:var(--gold);color:#22190a;font-weight:700;padding:11px 16px;min-height:44px;border-radius:10px;box-shadow:0 3px 0 var(--gold2);transition:transform .1s,box-shadow .1s,border-color .15s}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gold2)}
 .btn.ghost{background:transparent;color:var(--cream);border:1px solid var(--line);box-shadow:none}
-.share{white-space:pre;font-family:ui-monospace,monospace;font-size:14px;background:#0b1424;border-radius:8px;padding:10px 12px;margin:10px 0;color:var(--cream2)}
-.cal{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:14px}
+.btn.ghost:hover{border-color:var(--gold2)}
+.btn.ghost:active{box-shadow:none}
+.share{white-space:pre;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;line-height:1.5;background:#0b1424;border-radius:8px;padding:10px 12px;margin:10px 0 12px;color:var(--cream2)}
+.cal{display:grid;grid-template-columns:auto 1fr auto;gap:8px 10px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums}
 .cal .b{height:10px;background:#0b1424;border-radius:5px;overflow:hidden}
-.cal .b span{display:block;height:100%;background:var(--gold)}
-.stats{display:flex;gap:10px;margin-bottom:12px}
-.stat{flex:1;text-align:center;background:#0b1424;border-radius:10px;padding:9px 4px}
-.stat .v{font-family:Fraunces,serif;font-weight:800;font-size:22px}
-.stat .k{font-size:11px;color:var(--sky);text-transform:uppercase;letter-spacing:.06em}
-.next{font-size:13px;color:var(--sky);margin-top:8px}
+.cal .b span{display:block;height:100%;background:var(--gold);border-radius:5px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.stat{text-align:center;background:#0b1424;border-radius:10px;padding:10px 4px}
+.stat .v{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:22px;font-variant-numeric:tabular-nums}
+.stat .k{font-size:11px;color:var(--sky);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.next{font-size:13px;line-height:1.45;color:var(--sky);margin-top:8px;font-variant-numeric:tabular-nums}
 .hide{display:none!important}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--cream);color:var(--ink);padding:8px 14px;border-radius:8px;font-weight:600;font-size:14px;opacity:0;transition:opacity .2s;z-index:9;pointer-events:none}
-.toast.show{opacity:1}
-.modal{position:fixed;inset:0;background:rgba(5,10,20,.75);display:grid;place-items:center;z-index:10;padding:16px}
-.modal .box{background:var(--cream);color:var(--ink);border-radius:14px;max-width:440px;padding:20px;line-height:1.5;font-size:15px}
-.modal h2{font-family:Fraunces,serif;margin-bottom:8px}
-.modal ul{margin:8px 0 14px 18px}
-@media (max-width:520px){.opts{grid-template-columns:1fr}.slot{width:24px;height:24px}.alloc .lbl{display:none}h1{font-size:26px}.card .q{font-size:17px}}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(6px);background:var(--cream);color:var(--ink);padding:9px 16px;border-radius:8px;font-weight:600;font-size:14px;opacity:0;transition:opacity .2s,transform .2s;z-index:9;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.modal{position:fixed;inset:0;background:rgba(5,10,20,.75);display:grid;place-items:center;z-index:10;padding:16px;animation:fadeIn .2s ease-out}
+.modal .box{background:var(--cream);color:var(--ink);border-radius:14px;max-width:440px;width:100%;max-height:calc(100% - 8px);overflow-y:auto;padding:22px;line-height:1.5;font-size:15px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.modal h2{font-family:Fraunces,Georgia,serif;margin-bottom:8px}
+.modal ul{margin:8px 0 14px 18px;display:grid;gap:4px}
+@media (max-width:520px){
+  .wrap{padding-bottom:230px}
+  .opts{grid-template-columns:1fr}
+  .slot{width:26px;height:26px}.slot.f::after{inset:6px}.slots{gap:5px}
+  .alloc{gap:8px}.alloc .lbl{display:none}
+  h1{font-size:26px}.card .q{font-size:17px}
+  .pill{padding:8px 11px}
+  .bar-in{gap:8px 10px}
+  .bank i{width:15px;height:15px}.bank{gap:4px}
+  .bank-txt{min-width:0;margin-left:auto}
+  .go{width:100%;margin-left:0}
+  .total .n{font-size:48px}
+  .stat .v{font-size:19px}.stat .k{font-size:10px;letter-spacing:.04em}
+}
+@media (max-width:360px){.slot{width:22px;height:22px}.slot.f::after{inset:5px}.step{width:32px;height:32px}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .delta.show{opacity:1}
+}
 </style>
 </head>
 <body>
@@ -123,10 +167,11 @@ h1 span{color:var(--gold)}
     </div>
   </header>
   <div class="tag" id="tagline">Knowing the answer helps. Knowing how sure you are wins.</div>
+  <div class="mode-note hide" id="streakNote"></div>
   <div class="mode-note hide" id="modeNote">Practice round — random questions, doesn't count toward your stats.</div>
 
   <div id="results" class="hide">
-    <div class="total"><div class="n" id="totalN">0</div><div class="s" id="totalS">points</div></div>
+    <div class="total" aria-live="polite"><div class="n" id="totalN">0</div><div class="s" id="totalS">points</div></div>
   </div>
   <div id="cards"></div>
   <div id="after" class="hide"></div>
@@ -135,20 +180,21 @@ h1 span{color:var(--gold)}
 <div class="bar" id="bar">
   <div class="bar-in">
     <div class="bank" id="bank"></div>
-    <div class="bank-txt" id="bankTxt"></div>
+    <div class="bank-txt" id="bankTxt" aria-live="polite"></div>
     <button class="go" id="go" disabled>Lock it in</button>
     <div class="rules">10 chips · at least 1, at most 6 per question · right = +10 per chip, wrong = −10 per chip</div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="modal hide" id="how"><div class="box">
-  <h2>How to play</h2>
+<div class="modal hide" id="how" role="dialog" aria-modal="true" aria-labelledby="howTitle"><div class="box">
+  <h2 id="howTitle">How to play</h2>
   <p>Three questions, four choices each. Pick your answers, then back them with <b>10 confidence chips</b>.</p>
   <ul>
     <li>Every question needs at least 1 chip, and no more than 6.</li>
     <li>Right answer: <b>+10</b> per chip. Wrong answer: <b>−10</b> per chip.</li>
     <li>Change anything you like — then lock all three in together.</li>
+    <li>Watch out: some questions are traps where the obvious answer is wrong. Some only <i>look</i> like traps. A day can have two traps — or none.</li>
   </ul>
   <p>Scores run from −100 to +100. A new puzzle every day at midnight. Over time you'll see how often your confident answers are actually right.</p>
   <div class="row" style="margin-top:14px"><button class="btn" id="howClose">Got it</button></div>
@@ -160,69 +206,154 @@ h1 span{color:var(--gold)}
    d: e = easy, m = medium, h = hard/misconception. Each daily set has one of each. */
 const BANK = {
 e:[
- {c:"Geography",q:"Which of these countries has the largest land area?",a:["Russia","Canada","China","Brazil"],x:"Russia covers about 17.1 million km² — nearly double Canada, the runner-up."},
- {c:"Space",q:"Which planet is closest to the Sun?",a:["Mercury","Venus","Mars","Earth"],x:"Mercury orbits at an average of about 58 million km from the Sun."},
- {c:"Geography",q:"Which is the largest ocean?",a:["Pacific","Atlantic","Indian","Arctic"],x:"The Pacific covers about a third of Earth's surface — more than all the land combined."},
- {c:"Art",q:"Who painted the Mona Lisa?",a:["Leonardo da Vinci","Michelangelo","Raphael","Botticelli"],x:"Leonardo worked on it in the early 1500s; it hangs in the Louvre."},
- {c:"Science",q:"Which is the hardest natural material?",a:["Diamond","Corundum","Topaz","Quartz"],x:"Diamond tops the Mohs scale at 10. Corundum (ruby and sapphire) is 9."},
- {c:"Science",q:"Which gas do plants take in for photosynthesis?",a:["Carbon dioxide","Oxygen","Nitrogen","Hydrogen"],x:"Plants take in CO₂ and release oxygen as a by-product."},
- {c:"Geography",q:"Which is the tallest mountain above sea level?",a:["Everest","K2","Kangchenjunga","Denali"],x:"Everest stands about 8,849 m; K2 is second at about 8,611 m."},
- {c:"Sport",q:"How many players does each soccer team have on the field?",a:["11","10","9","12"],x:"Eleven a side, including the goalkeeper."},
- {c:"Music",q:"How many keys are on a standard modern piano?",a:["88","76","84","96"],x:"52 white keys and 36 black keys make 88."},
- {c:"Science",q:"At what temperature does water freeze in Fahrenheit?",a:["32°F","0°F","28°F","40°F"],x:"32°F is 0°C."},
- {c:"History",q:"Which country gave the Statue of Liberty to the United States?",a:["France","United Kingdom","Spain","Italy"],x:"France gifted it in 1886; Gustave Eiffel designed its internal frame."},
- {c:"Space",q:"Which planet is known as the Red Planet?",a:["Mars","Jupiter","Venus","Mercury"],x:"Iron oxide — rust — in its dust gives Mars its color."},
- {c:"Nature",q:"Which of these animals is NOT a mammal?",a:["Penguin","Bat","Dolphin","Platypus"],x:"Penguins are birds. The platypus lays eggs but is still a mammal."},
- {c:"Geography",q:"Which is the smallest country by area?",a:["Vatican City","Monaco","San Marino","Liechtenstein"],x:"Vatican City is about 0.44 km² — smaller than many city parks."},
- {c:"History",q:"Who was the first person to walk on the Moon?",a:["Neil Armstrong","Buzz Aldrin","Yuri Gagarin","John Glenn"],x:"Armstrong stepped out first in July 1969; Aldrin followed minutes later."},
- {c:"Literature",q:"Who wrote Romeo and Juliet?",a:["William Shakespeare","Christopher Marlowe","Charles Dickens","Geoffrey Chaucer"],x:"Shakespeare wrote it in the mid-1590s."},
- {c:"Space",q:"Which is the largest planet in our solar system?",a:["Jupiter","Saturn","Neptune","Uranus"],x:"Jupiter is more than twice as massive as all the other planets combined."},
- {c:"Geography",q:"What is the main language of Brazil?",a:["Portuguese","Spanish","French","English"],x:"Brazil was a Portuguese colony; it's the largest Portuguese-speaking country."}
+ {c:"Geography",q:"Which of these countries has the largest land area?",a:["Russia","Canada","China","Brazil"],x:"Russia covers about 17.1 million km² — nearly double Canada, the runner-up.",s:"https://www.britannica.com/place/Russia"},
+ {c:"Space",q:"Which planet is closest to the Sun?",a:["Mercury","Venus","Mars","Earth"],x:"Mercury orbits at an average of about 58 million km from the Sun.",s:"https://science.nasa.gov/mercury/facts/"},
+ {c:"Geography",q:"Which is the largest ocean?",a:["Pacific","Atlantic","Indian","Arctic"],x:"The Pacific covers about a third of Earth's surface — more than all the land combined.",s:"https://www.britannica.com/place/Pacific-Ocean"},
+ {c:"Art",q:"Who painted the Mona Lisa?",a:["Leonardo da Vinci","Michelangelo","Raphael","Botticelli"],x:"Leonardo worked on it in the early 1500s; it hangs in the Louvre.",s:"https://www.louvre.fr/en/explore/the-palace/from-the-mona-lisa-to-the-wedding-feast-at-cana"},
+ {c:"Science",q:"Which is the hardest natural material?",a:["Diamond","Corundum","Topaz","Quartz"],x:"Diamond tops the Mohs scale at 10. Corundum (ruby and sapphire) is 9.",s:"https://www.britannica.com/science/Mohs-hardness"},
+ {c:"Science",q:"Which gas do plants take in for photosynthesis?",a:["Carbon dioxide","Oxygen","Nitrogen","Hydrogen"],x:"Plants take in CO₂ and release oxygen as a by-product.",s:"https://www.britannica.com/science/photosynthesis"},
+ {c:"Geography",q:"Which is the tallest mountain above sea level?",a:["Everest","K2","Kangchenjunga","Denali"],x:"Everest stands about 8,849 m; K2 is second at about 8,611 m.",s:"https://www.britannica.com/place/Mount-Everest"},
+ {c:"Sport",q:"How many players does each soccer team have on the field?",a:["11","10","9","12"],x:"Eleven a side, including the goalkeeper.",s:"https://www.theifab.com/laws/latest/the-players/"},
+ {c:"Music",q:"How many keys are on a standard modern piano?",a:["88","76","84","96"],x:"52 white keys and 36 black keys make 88.",s:"https://www.britannica.com/art/piano"},
+ {c:"Science",q:"At what temperature does water freeze in Fahrenheit?",a:["32°F","0°F","28°F","40°F"],x:"32°F is 0°C.",s:"https://www.britannica.com/science/Fahrenheit-temperature-scale"},
+ {c:"History",q:"Which country gave the Statue of Liberty to the United States?",a:["France","United Kingdom","Spain","Italy"],x:"A gift from the people of France, dedicated in 1886; Gustave Eiffel designed its internal frame.",s:"https://www.nps.gov/stli/learn/historyculture/index.htm"},
+ {c:"Space",q:"Which planet is known as the Red Planet?",a:["Mars","Jupiter","Venus","Mercury"],x:"Iron oxide — rust — in its dust gives Mars its color.",s:"https://science.nasa.gov/mars/facts/"},
+ {c:"Nature",q:"Which of these animals is NOT a mammal?",a:["Penguin","Bat","Dolphin","Platypus"],x:"Penguins are birds. The platypus lays eggs but is still a mammal.",s:"https://www.britannica.com/animal/platypus"},
+ {c:"Geography",q:"Which is the smallest country by area?",a:["Vatican City","Monaco","San Marino","Liechtenstein"],x:"Vatican City is about 0.44 km² — smaller than many city parks.",s:"https://www.britannica.com/place/Vatican-City"},
+ {c:"History",q:"Who was the first person to walk on the Moon?",a:["Neil Armstrong","Buzz Aldrin","Yuri Gagarin","John Glenn"],x:"Armstrong stepped out first in July 1969; Aldrin followed minutes later.",s:"https://www.nasa.gov/history/apollo-11/"},
+ {c:"Literature",q:"Who wrote Romeo and Juliet?",a:["William Shakespeare","Christopher Marlowe","Charles Dickens","Geoffrey Chaucer"],x:"Shakespeare wrote it in the mid-1590s.",s:"https://www.britannica.com/topic/Romeo-and-Juliet"},
+ {c:"Space",q:"Which is the largest planet in our solar system?",a:["Jupiter","Saturn","Neptune","Uranus"],x:"Jupiter is more than twice as massive as all the other planets combined.",s:"https://science.nasa.gov/jupiter/facts/"},
+ {c:"Language",q:"What is the main language of Brazil?",a:["Portuguese","Spanish","French","English"],x:"Brazil was a Portuguese colony; it's the largest Portuguese-speaking country.",s:"https://www.britannica.com/place/Brazil"},
+ {c:"Language",q:"How many letters are in the English alphabet?",a:["26","24","25","28"],x:"Twenty-six, from A to Z.",s:"https://www.britannica.com/topic/English-alphabet"},
+ {c:"Food",q:"Which nut is the main ingredient of marzipan?",a:["Almond","Walnut","Hazelnut","Cashew"],x:"Marzipan is a sweet paste of ground almonds and sugar.",s:"https://www.foodnetwork.com/how-to/packages/food-network-essentials/what-is-marzipan"},
+ {c:"Sport",q:"In which sport would you see a slam dunk?",a:["Basketball","Volleyball","Tennis","Rugby"],x:"A slam dunk is a basketball shot forced down through the hoop from above.",s:"https://www.britannica.com/sports/basketball"},
+ {c:"Sport",q:"How many holes are played in a standard round of golf?",a:["18","9","12","20"],x:"Eighteen. St Andrews set the standard in 1764 when it cut its Old Course from 22 holes to 18.",s:"https://www.scotsman.com/sport/golf/st-andrews-honours-250th-birthday-18-hole-golf-1524473"},
+ {c:"Art",q:"Who painted The Starry Night?",a:["Vincent van Gogh","Claude Monet","Paul Gauguin","Paul Cézanne"],x:"Van Gogh painted it in June 1889 at Saint-Rémy; it now hangs at MoMA in New York.",s:"https://www.moma.org/collection/works/79802"},
+ {c:"Music",q:"How many strings does a standard guitar have?",a:["6","4","5","8"],x:"Six. A standard bass guitar has four.",s:"https://www.britannica.com/art/guitar"},
+ {c:"Geography",q:"What is the capital of Italy?",a:["Rome","Milan","Florence","Venice"],x:"Rome has been the capital of unified Italy since 1871.",s:"https://www.britannica.com/place/Rome"},
+ {c:"Geography",q:"Which river flows through Paris?",a:["Seine","Loire","Rhône","Thames"],x:"The Seine runs right through the centre of Paris on its way to the English Channel.",s:"https://www.britannica.com/place/Seine-River"},
+ {c:"Nature",q:"How many legs does a spider have?",a:["8","6","10","12"],x:"Spiders are arachnids, with eight legs. Insects have six.",s:"https://www.britannica.com/animal/spider-arachnid"},
+ {c:"Nature",q:"Which is the fastest land animal?",a:["Cheetah","Pronghorn","Lion","Greyhound"],x:"Cheetahs sprint at around 100 km/h (60+ mph). The pronghorn is the runner-up, but it can keep its speed up for far longer.",s:"https://www.livescience.com/32116-what-is-the-worlds-fastest-animal.html"},
+ {c:"Nature",q:"Which is the largest animal alive today?",a:["Blue whale","African elephant","Whale shark","Giant squid"],x:"Blue whales reach about 30 m long and well over 100 tonnes.",s:"https://www.fisheries.noaa.gov/species/blue-whale"},
+ {c:"History",q:"Who was the first President of the United States?",a:["George Washington","John Adams","Thomas Jefferson","Benjamin Franklin"],x:"Washington took office in 1789 and served two terms.",s:"https://www.whitehouse.gov/about-the-white-house/presidents/"},
+ {c:"Sport",q:"In which country were the ancient Olympic Games held?",a:["Greece","Italy","Egypt","Turkey"],x:"They were held at Olympia, Greece — traditionally from 776 BC.",s:"https://www.britannica.com/sports/ancient-Olympic-Games"},
+ {c:"Literature",q:"Who wrote the Harry Potter books?",a:["J.K. Rowling","Roald Dahl","C.S. Lewis","Philip Pullman"],x:"The first book came out in 1997; the seventh and last in 2007.",s:"https://www.britannica.com/biography/J-K-Rowling"},
+ {c:"Geography",q:"On which continent is the Sahara Desert?",a:["Africa","Asia","Australia","South America"],x:"The Sahara stretches across northern Africa, from the Atlantic to the Red Sea.",s:"https://www.britannica.com/place/Sahara-desert-Africa"},
+ {c:"Food",q:"Paella comes from which country?",a:["Spain","Italy","Portugal","Mexico"],x:"Paella is a rice dish from the Valencia region of Spain.",s:"https://en.wikipedia.org/wiki/Paella"},
+ {c:"Food",q:"What is the main ingredient of hummus?",a:["Chickpeas","Lentils","Fava beans","Peas"],x:"Hummus is mashed chickpeas, usually with tahini, lemon and garlic.",s:"https://www.britannica.com/topic/hummus"},
+ {c:"Music",q:"Who composed the Moonlight Sonata?",a:["Ludwig van Beethoven","Wolfgang Amadeus Mozart","Frédéric Chopin","Johann Sebastian Bach"],x:"Beethoven wrote it in 1801. The nickname came later, from the critic Ludwig Rellstab.",s:"https://www.britannica.com/topic/Moonlight-Sonata"},
+ {c:"Sport",q:"In tennis, what is a score of zero called?",a:["Love","Nil","Duck","Blank"],x:"'Love' means zero in tennis. 'Duck' is zero in cricket.",s:"https://www.merriam-webster.com/wordplay/word-origin-of-love-in-tennis"},
+ {c:"Geography",q:"Which is the longest river in South America?",a:["Amazon","Paraná","Orinoco","São Francisco"],x:"The Amazon runs about 6,400 km and carries more water than any other river.",s:"https://www.britannica.com/place/Amazon-River"},
+ {c:"Music",q:"Which ballet features the Dance of the Sugar Plum Fairy?",a:["The Nutcracker","Swan Lake","Sleeping Beauty","Giselle"],x:"Tchaikovsky's The Nutcracker (1892) — the tune is played on a celesta.",s:"https://www.britannica.com/topic/The-Nutcracker"},
+ {c:"Language",q:"\"Hola\" means hello in which language?",a:["Spanish","Italian","Portuguese","French"],x:"Hola is Spanish. Italian says ciao, Portuguese olá, French bonjour.",s:"https://dle.rae.es/hola"},
+ {c:"Geography",q:"Which is the largest continent by area?",a:["Asia","Africa","North America","Antarctica"],x:"Asia covers about 44 million km² — roughly 30% of Earth's land.",s:"https://www.britannica.com/place/Asia"},
+ {c:"Science",q:"What is the centre of an atom called?",a:["Nucleus","Electron","Orbit","Ion"],x:"The nucleus holds the protons and neutrons; electrons surround it.",s:"https://www.britannica.com/science/atom"}
 ],
 m:[
- {c:"Inventions",q:"Which of these was invented first?",a:["Printing press","Telescope","Pendulum clock","Steam engine"],x:"Gutenberg's press dates to about 1440. Telescope 1608, pendulum clock 1656, Newcomen's steam engine 1712."},
- {c:"Nature",q:"Which of these animals typically lives the longest?",a:["Galápagos tortoise","African elephant","Chimpanzee","Horse"],x:"Galápagos tortoises often pass 100 years. Elephants reach about 60–70."},
- {c:"Geography",q:"What is the capital of Australia?",a:["Canberra","Sydney","Melbourne","Perth"],x:"Canberra was purpose-built as a compromise between rivals Sydney and Melbourne."},
- {c:"Geography",q:"What is the capital of Canada?",a:["Ottawa","Toronto","Montreal","Vancouver"],x:"Ottawa, in Ontario, has been the capital since 1857."},
- {c:"Science",q:"Which gas makes up most of Earth's atmosphere?",a:["Nitrogen","Oxygen","Argon","Carbon dioxide"],x:"Nitrogen is about 78%; oxygen only about 21%."},
- {c:"Space",q:"Which planet is the hottest?",a:["Venus","Mercury","Mars","Jupiter"],x:"Venus's thick CO₂ atmosphere traps heat at around 465°C — hotter than Mercury, though Mercury is closer to the Sun."},
- {c:"Science",q:"What is the chemical symbol for gold?",a:["Au","Ag","Gd","Go"],x:"Au, from the Latin aurum. Ag is silver."},
- {c:"Geography",q:"Which country has the largest population?",a:["India","China","United States","Indonesia"],x:"UN estimates show India passed China in 2023."},
- {c:"Body",q:"Which is the longest bone in the human body?",a:["Femur","Tibia","Humerus","Fibula"],x:"The femur (thigh bone) is roughly a quarter of your height."},
- {c:"Body",q:"How many bones are in a typical adult human body?",a:["206","186","212","230"],x:"206. Babies are born with closer to 300 — many fuse as they grow."},
- {c:"Geography",q:"Which country has the longest coastline?",a:["Canada","Russia","Indonesia","Australia"],x:"Canada's coastline, with its Arctic islands, runs over 200,000 km."},
- {c:"Geography",q:"Which is the largest country in Africa by area?",a:["Algeria","DR Congo","Sudan","Libya"],x:"Algeria took the title in 2011, when South Sudan split from Sudan."},
- {c:"Sport",q:"Which city hosted the first modern Olympic Games?",a:["Athens","Paris","London","Rome"],x:"Athens, 1896. Paris hosted the second, in 1900."},
- {c:"Science",q:"Which metal is liquid at normal room temperature?",a:["Mercury","Gallium","Sodium","Tin"],x:"Mercury. Gallium melts at about 30°C — it'll melt in your hand, but not on the shelf."},
- {c:"Nature",q:"How many hearts does an octopus have?",a:["3","1","2","8"],x:"Two pump blood through the gills; the third serves the rest of the body."},
- {c:"Space",q:"Which planet has the most known moons?",a:["Saturn","Jupiter","Uranus","Neptune"],x:"Saturn pulled well ahead of Jupiter after a wave of discoveries — it now has well over 200 confirmed."},
- {c:"Body",q:"What is the largest organ of the human body?",a:["Skin","Liver","Brain","Lungs"],x:"Skin, at roughly 2 m² for an adult. The liver is the largest internal organ."},
- {c:"Space",q:"Where is Olympus Mons, the tallest volcano in the solar system?",a:["Mars","Earth","Venus","Io (moon of Jupiter)"],x:"Olympus Mons on Mars rises about 22 km — two and a half Everests."},
- {c:"Literature",q:"Who wrote Pride and Prejudice?",a:["Jane Austen","Charlotte Brontë","Emily Brontë","Mary Shelley"],x:"Austen published it in 1813."},
- {c:"Inventions",q:"Which of these was patented first?",a:["Telephone","Incandescent light bulb (Edison)","Gasoline car (Benz)","Radio (Marconi)"],x:"Bell's telephone patent: 1876. Edison's bulb 1879/80, Benz's car 1886, Marconi's radio 1896."},
- {c:"Geography",q:"Which country has the most lakes?",a:["Canada","Finland","Russia","United States"],x:"Canada is commonly estimated to hold more than half of the world's lakes."},
- {c:"Body",q:"Which blood type is the universal red-cell donor?",a:["O negative","AB positive","O positive","A negative"],x:"O negative red cells lack A, B and Rh antigens, so almost anyone can receive them."}
+ {c:"Inventions",q:"Which of these was invented first?",a:["Printing press","Telescope","Pendulum clock","Steam engine"],x:"Gutenberg's press dates to about 1440. Telescope 1608, pendulum clock 1656, Newcomen's steam engine 1712.",s:"https://www.britannica.com/biography/Johannes-Gutenberg"},
+ {c:"Nature",q:"Which of these animals typically lives the longest?",a:["Galápagos tortoise","African elephant","Chimpanzee","Horse"],x:"Galápagos tortoises often pass 100 years. Elephants reach about 60–70.",s:"https://www.britannica.com/animal/Galapagos-tortoise"},
+ {c:"Geography",q:"What is the capital of Australia?",a:["Canberra","Sydney","Melbourne","Perth"],x:"Canberra was purpose-built as a compromise between rivals Sydney and Melbourne.",s:"https://www.britannica.com/place/Canberra"},
+ {c:"Geography",q:"What is the capital of Canada?",a:["Ottawa","Toronto","Montreal","Vancouver"],x:"Queen Victoria chose Ottawa in 1857; it has been the capital of Canada since Confederation in 1867.",s:"https://parks.canada.ca/culture/designation/lieu-site/capitale-capital"},
+ {c:"Science",q:"Which gas makes up most of Earth's atmosphere?",a:["Nitrogen","Oxygen","Argon","Carbon dioxide"],x:"Nitrogen is about 78%; oxygen only about 21%.",s:"https://www.britannica.com/science/atmosphere"},
+ {c:"Space",q:"Which planet is the hottest?",a:["Venus","Mercury","Mars","Jupiter"],x:"Venus's thick CO₂ atmosphere traps heat at around 465°C — hotter than Mercury, though Mercury is closer to the Sun.",s:"https://science.nasa.gov/venus/facts/"},
+ {c:"Science",q:"What is the chemical symbol for gold?",a:["Au","Ag","Gd","Go"],x:"Au, from the Latin aurum. Ag is silver.",s:"https://www.britannica.com/science/gold-chemical-element"},
+ {c:"Geography",q:"As of 2025, which country has the largest population?",a:["India","China","United States","Indonesia"],x:"UN estimates show India overtook China in April 2023.",s:"https://www.un.org/development/desa/pd/node/4293"},
+ {c:"Body",q:"Which is the longest bone in the human body?",a:["Femur","Tibia","Humerus","Fibula"],x:"The femur (thigh bone) is roughly a quarter of your height.",s:"https://www.britannica.com/science/femur"},
+ {c:"Body",q:"How many bones are in a typical adult human body?",a:["206","186","212","230"],x:"206. Babies are born with closer to 300 — many fuse as they grow.",s:"https://www.britannica.com/science/human-skeleton"},
+ {c:"Geography",q:"Which country has the longest coastline?",a:["Canada","Russia","Indonesia","Australia"],x:"Canada's coastline, with its Arctic islands, runs over 200,000 km.",s:"https://www.cia.gov/the-world-factbook/field/coastline/"},
+ {c:"Geography",q:"Which is the largest country in Africa by area?",a:["Algeria","DR Congo","Sudan","Libya"],x:"Algeria took the title in 2011, when South Sudan split from Sudan.",s:"https://www.britannica.com/place/Algeria"},
+ {c:"Sport",q:"Which city hosted the first modern Olympic Games?",a:["Athens","Paris","London","Rome"],x:"Athens, 1896. Paris hosted the second, in 1900.",s:"https://www.olympics.com/en/olympic-games/athens-1896"},
+ {c:"Science",q:"Which metal is liquid at normal room temperature?",a:["Mercury","Gallium","Sodium","Tin"],x:"Mercury. Gallium melts at about 30°C — it'll melt in your hand, but not on the shelf.",s:"https://www.britannica.com/science/gallium"},
+ {c:"Nature",q:"How many hearts does an octopus have?",a:["3","1","2","8"],x:"Two pump blood through the gills; the third serves the rest of the body.",s:"https://www.britannica.com/animal/octopus-mollusk"},
+ {c:"Space",q:"As of 2025, which planet had the most confirmed moons?",a:["Saturn","Jupiter","Uranus","Neptune"],x:"In March 2025 astronomers announced 128 new moons of Saturn, taking it to 274 — far ahead of Jupiter, which had under 100.",s:"https://www.nationalgeographic.com/science/article/saturn-new-moons-record"},
+ {c:"Body",q:"What is the largest organ of the human body?",a:["Skin","Liver","Brain","Lungs"],x:"Skin, at roughly 1.5–2 m² for an adult. The liver is the largest internal organ.",s:"https://www.britannica.com/science/human-skin"},
+ {c:"Space",q:"Where is Olympus Mons, the tallest volcano in the solar system?",a:["Mars","Earth","Venus","Io (moon of Jupiter)"],x:"Olympus Mons on Mars rises about 22 km — two and a half Everests.",s:"https://science.nasa.gov/mars/facts/"},
+ {c:"Literature",q:"Who wrote Pride and Prejudice?",a:["Jane Austen","Charlotte Brontë","Emily Brontë","Mary Shelley"],x:"Austen published it in 1813.",s:"https://www.britannica.com/topic/Pride-and-Prejudice"},
+ {c:"Inventions",q:"Which of these was patented first?",a:["Telephone","Incandescent light bulb (Edison)","Gasoline car (Benz)","Radio (Marconi)"],x:"Bell's telephone patent: 1876. Edison's bulb 1879/80, Benz's car 1886, Marconi's radio 1896.",s:"https://www.britannica.com/technology/telephone"},
+ {c:"Geography",q:"Which country has the most lakes?",a:["Canada","Finland","Russia","United States"],x:"Canada is commonly estimated to hold more than half of the world's lakes.",s:"https://www.worldatlas.com/articles/which-country-has-the-most-lakes-in-the-world.html"},
+ {c:"Body",q:"Which blood type is the universal red-cell donor?",a:["O negative","AB positive","O positive","A negative"],x:"O negative red cells lack A, B and Rh antigens, so almost anyone can receive them.",s:"https://www.redcrossblood.org/donate-blood/blood-types.html"},
+ {c:"Language",q:"Which language has the most native speakers?",a:["Mandarin Chinese","English","Spanish","Hindi"],x:"Mandarin has roughly 900+ million native speakers. English leads only when second-language speakers are counted.",s:"https://en.wikipedia.org/wiki/List_of_languages_by_number_of_native_speakers"},
+ {c:"Body",q:"How many teeth does a full adult set have, wisdom teeth included?",a:["32","28","30","36"],x:"32 permanent teeth, including four wisdom teeth. Children have 20 baby teeth.",s:"https://www.colgate.com/en-gb/oral-health/mouth-and-teeth-anatomy/how-many-teeth-do-we-have"},
+ {c:"Geography",q:"What is the capital of Turkey?",a:["Ankara","Istanbul","Izmir","Antalya"],x:"Ankara has been the capital since 1923. Istanbul is the biggest city.",s:"https://www.britannica.com/place/Ankara"},
+ {c:"Geography",q:"Which is the longest river in Europe?",a:["Volga","Danube","Rhine","Dnieper"],x:"The Volga runs about 3,530 km through Russia to the Caspian Sea. The Danube is second.",s:"https://www.britannica.com/place/Volga-River"},
+ {c:"History",q:"In which year did the Berlin Wall fall?",a:["1989","1991","1987","1990"],x:"The border opened on 9 November 1989. Germany reunified in 1990; the USSR broke up in 1991.",s:"https://www.cvce.eu/en/obj/berlin_the_fall_of_the_wall_9_november_1989-en-103b72d9-4352-4183-bd73-1d72f2ed178b.html"},
+ {c:"History",q:"Which civilisation built Machu Picchu?",a:["Inca","Aztec","Maya","Olmec"],x:"The Inca built it in the 1400s, probably as an estate for the emperor Pachacuti.",s:"https://www.britannica.com/place/Machu-Picchu"},
+ {c:"Science",q:"What is the most abundant element in the universe?",a:["Hydrogen","Helium","Oxygen","Carbon"],x:"Hydrogen makes up about three-quarters of all normal matter by mass; helium most of the rest.",s:"https://www.britannica.com/science/hydrogen"},
+ {c:"Science",q:"What is the SI unit of electrical resistance?",a:["Ohm","Volt","Ampere","Watt"],x:"The ohm (Ω), named after Georg Ohm. Volts measure voltage, amperes current, watts power.",s:"https://www.britannica.com/science/ohm"},
+ {c:"Art",q:"Who painted The Persistence of Memory, with its melting clocks?",a:["Salvador Dalí","René Magritte","Joan Miró","Max Ernst"],x:"Dalí painted it in 1931; it's in MoMA's collection in New York.",s:"https://www.britannica.com/topic/The-Persistence-of-Memory"},
+ {c:"Art",q:"Who carved the marble David in Florence's Accademia Gallery?",a:["Michelangelo","Bernini","Rodin","Canova"],x:"Michelangelo carved it from a single block between 1501 and 1504.",s:"https://www.britannica.com/topic/David-sculpture-by-Michelangelo"},
+ {c:"Sport",q:"How long is a marathon?",a:["42.195 km","40 km","45 km","38.5 km"],x:"42.195 km (26.2 miles) — the length of the 1908 London Olympic course, made standard in 1921.",s:"https://www.worldathletics.org/disciplines/road/marathon"},
+ {c:"Sport",q:"Which country won the first FIFA World Cup, in 1930?",a:["Uruguay","Brazil","Argentina","Italy"],x:"Hosts Uruguay beat Argentina 4–2 in the final in Montevideo.",s:"https://en.wikipedia.org/wiki/1930_FIFA_World_Cup"},
+ {c:"Food",q:"Saffron comes from which part of a plant?",a:["Crocus flower stigmas","Pepper seeds","Lily bulbs","Orchid pods"],x:"Saffron is the dried stigmas of the saffron crocus, picked by hand. (Vanilla comes from orchid pods.)",s:"https://www.britannica.com/topic/saffron"},
+ {c:"Food",q:"As of 2024, which country produces the most coffee?",a:["Brazil","Colombia","Vietnam","Ethiopia"],x:"Brazil grows about a third of the world's coffee; Vietnam is a distant second.",s:"https://dailycoffeenews.com/2024/11/27/inside-brazil-and-colombia-semi-annual-coffee-market-reports"},
+ {c:"Literature",q:"Who wrote One Hundred Years of Solitude?",a:["Gabriel García Márquez","Jorge Luis Borges","Pablo Neruda","Mario Vargas Llosa"],x:"The Colombian author published it in 1967 and won the Nobel Prize in 1982.",s:"https://www.history.com/this-day-in-history/may-30/one-hundred-years-of-solitude-is-published"},
+ {c:"Literature",q:"Which novel opens with \"Call me Ishmael\"?",a:["Moby-Dick","Treasure Island","Robinson Crusoe","The Old Man and the Sea"],x:"Herman Melville's Moby-Dick, 1851.",s:"https://en.wikipedia.org/wiki/Moby-Dick"},
+ {c:"Language",q:"What is a group of crows called?",a:["A murder","A parliament","A gaggle","A pride"],x:"A murder of crows. A parliament is owls, a gaggle geese, a pride lions.",s:"https://www.merriam-webster.com/wordplay/a-drudge-of-lexicographers-presents-collective-nouns"},
+ {c:"Geography",q:"Which country has three capital cities?",a:["South Africa","Nigeria","Kenya","Egypt"],x:"Pretoria (government), Cape Town (parliament) and Bloemfontein (courts).",s:"https://www.britannica.com/place/South-Africa"},
+ {c:"History",q:"Who was the first woman to win a Nobel Prize?",a:["Marie Curie","Rosalind Franklin","Florence Nightingale","Ada Lovelace"],x:"Marie Curie shared the 1903 Physics prize, then won Chemistry outright in 1911.",s:"https://www.guinnessworldrecords.com/world-records/93501-first-woman-to-win-a-nobel-prize"},
+ {c:"Music",q:"The tango was born in the port cities of which region?",a:["Río de la Plata","Mississippi Delta","Andalusia","The Caribbean"],x:"It grew up in Buenos Aires and Montevideo in the late 1800s; UNESCO lists it as shared heritage of Argentina and Uruguay.",s:"https://ich.unesco.org/en/RL/00258"}
 ],
 h:[
- {c:"History",q:"Cleopatra lived closest in time to which of these?",a:["The Moon landing","Building the Great Pyramid of Giza","The first writing in Sumer","The first stage of Stonehenge"],x:"Cleopatra died in 30 BC — about 2,000 years before the Moon landing, but about 2,500 years after the Great Pyramid was built."},
- {c:"History",q:"Which of these existed first?",a:["Teaching at Oxford University","The Aztec city of Tenochtitlan","Machu Picchu","Gutenberg's printing press"],x:"Teaching at Oxford was under way by 1096. Tenochtitlan was founded in 1325; Machu Picchu built around 1450."},
- {c:"Geography",q:"Which country spans the most time zones?",a:["France","Russia","United States","China"],x:"Counting its overseas territories, France spans 12. Russia and the US have 11 each; China uses one."},
- {c:"Geography",q:"Which is the largest desert in the world?",a:["Antarctica","Sahara","Arabian","Gobi"],x:"A desert is defined by low precipitation, not heat. Antarctica (~14M km²) beats the Sahara (~9M km²)."},
- {c:"Nature",q:"Which of these is a berry, botanically speaking?",a:["Banana","Strawberry","Raspberry","Cherry"],x:"Bananas are true berries. Strawberries and raspberries aren't; cherries are drupes."},
- {c:"Nature",q:"What is the hippopotamus's closest living relative?",a:["Whales","Pigs","Rhinos","Elephants"],x:"Genetics shows hippos and whales (and dolphins) share a common ancestor."},
- {c:"History",q:"How long did the Hundred Years' War last?",a:["116 years","100 years","99 years","104 years"],x:"It ran from 1337 to 1453."},
- {c:"Space",q:"On average over time, which planet is closest to Earth?",a:["Mercury","Venus","Mars","Jupiter"],x:"Venus comes closest at times, but spends long stretches on the far side of the Sun. Averaged over time, Mercury is nearest — to every planet, in fact."},
- {c:"Nature",q:"What color is a polar bear's skin?",a:["Black","White","Pink","Grey"],x:"Black skin under hollow, translucent fur that looks white."},
- {c:"History",q:"Which country has the most ancient pyramids?",a:["Sudan","Egypt","Mexico","Peru"],x:"Sudan has around 200 Nubian pyramids — more than Egypt's roughly 120."},
- {c:"Space",q:"Which planet is less dense than water?",a:["Saturn","Jupiter","Neptune","Uranus"],x:"Saturn's average density is about 0.69 g/cm³ — it would float, given a big enough bathtub."},
- {c:"Business",q:"Which of these companies was founded first?",a:["Nintendo","Ford","Harley-Davidson","IBM"],x:"Nintendo began making playing cards in 1889. Ford and Harley-Davidson: 1903. IBM's forerunner: 1911."},
- {c:"History",q:"Which of these monuments is the oldest?",a:["Stonehenge","Great Pyramid of Giza","Great Wall of China","Colosseum"],x:"Stonehenge's earliest stage dates to about 3000 BC, roughly 400 years before the Great Pyramid."},
- {c:"Culture",q:"What is the national animal of Scotland?",a:["Unicorn","Red deer","Lion","Golden eagle"],x:"The unicorn — a symbol of purity and power in Scottish heraldry."},
- {c:"Nature",q:"What shape is wombat poop?",a:["Cubes","Spirals","Flat discs","Long ropes"],x:"Wombats produce cube-shaped droppings, thanks to the varying elasticity of their intestines."},
- {c:"History",q:"Which was the shortest war on record?",a:["Anglo-Zanzibar War","Six-Day War","Football War","Falklands War"],x:"In 1896 Zanzibar surrendered to Britain after about 40 minutes."},
- {c:"Space",q:"Which planet takes the longest to spin once on its axis?",a:["Venus","Mercury","Mars","Neptune"],x:"Venus takes about 243 Earth days to rotate once — longer than its year."},
- {c:"Food",q:"Where does the kiwifruit originally come from?",a:["China","New Zealand","Australia","Chile"],x:"It's native to China, where it was called the Chinese gooseberry. New Zealand renamed and popularized it."},
- {c:"Nature",q:"Which appeared on Earth first?",a:["Sharks","Trees","Dinosaurs","Flowering plants"],x:"Sharks date back about 450 million years; the first trees about 385 million."}
+ {c:"History",q:"Cleopatra lived closest in time to which of these?",a:["The Moon landing","Building the Great Pyramid of Giza","The first writing in Sumer","The first stage of Stonehenge"],x:"Cleopatra died in 30 BC — about 2,000 years before the Moon landing, but about 2,500 years after the Great Pyramid was built.",s:"https://www.britannica.com/biography/Cleopatra-queen-of-Egypt"},
+ {c:"History",q:"Which of these existed first?",a:["Teaching at Oxford University","The Aztec city of Tenochtitlan","Machu Picchu","Gutenberg's printing press"],x:"Teaching at Oxford was under way by 1096. Tenochtitlan was founded in 1325; Machu Picchu built around 1450.",s:"https://www.ox.ac.uk/about/organisation/history"},
+ {c:"Geography",q:"Which country spans the most time zones?",a:["France","Russia","United States","China"],x:"Counting its overseas territories, France spans 12. Russia and the US have 11 each; China uses one.",s:"https://www.worldatlas.com/articles/countries-that-have-the-highest-number-of-time-zones.html"},
+ {c:"Geography",q:"Which is the largest desert in the world?",a:["Antarctica","Sahara","Arabian","Gobi"],x:"A desert is defined by low precipitation, not heat. Antarctica (~14M km²) beats the Sahara (~9M km²).",s:"https://www.britannica.com/science/desert"},
+ {c:"Nature",q:"Which of these is a berry, botanically speaking?",a:["Banana","Strawberry","Raspberry","Cherry"],x:"Bananas are true berries. Strawberries and raspberries aren't; cherries are drupes.",s:"https://www.britannica.com/science/berry-plant-reproductive-body"},
+ {c:"Nature",q:"What is the hippopotamus's closest living relative?",a:["Whales","Pigs","Rhinos","Elephants"],x:"Genetics shows hippos and whales (and dolphins) share a common ancestor.",s:"https://www.britannica.com/animal/hippopotamus-mammal-species"},
+ {c:"History",q:"How long did the Hundred Years' War last?",a:["116 years","100 years","99 years","104 years"],x:"It ran from 1337 to 1453.",s:"https://www.britannica.com/event/Hundred-Years-War"},
+ {c:"Space",q:"On average over time, which planet is closest to Earth?",a:["Mercury","Venus","Mars","Jupiter"],x:"Venus comes closest at times, but spends long stretches on the far side of the Sun. Averaged over time, Mercury is nearest — to every planet, in fact.",s:"https://physicstoday.aip.org/opinion/venus-is-not-earths-closest-neighbor"},
+ {c:"Nature",q:"What color is a polar bear's skin?",a:["Black","White","Pink","Grey"],x:"Black skin under hollow, translucent fur that looks white.",s:"https://polarbearsinternational.org/polar-bears-changing-arctic/polar-bear-facts/"},
+ {c:"History",q:"Which country has the most ancient pyramids?",a:["Sudan","Egypt","Mexico","Peru"],x:"Sudan has around 200 Nubian pyramids — more than Egypt's roughly 120.",s:"https://www.history.co.uk/articles/sudan-so-many-pyramids"},
+ {c:"Space",q:"Which planet is less dense than water?",a:["Saturn","Jupiter","Neptune","Uranus"],x:"Saturn's average density is about 0.69 g/cm³ — it would float, given a big enough bathtub.",s:"https://science.nasa.gov/saturn/facts/"},
+ {c:"Business",q:"Which of these companies was founded first?",a:["Nintendo","Ford","Harley-Davidson","IBM"],x:"Nintendo began making playing cards in 1889. Ford and Harley-Davidson: 1903. IBM's forerunner: 1911.",s:"https://www.britannica.com/topic/Nintendo-Company-Ltd"},
+ {c:"History",q:"Which of these monuments is the oldest?",a:["Stonehenge","Great Pyramid of Giza","Great Wall of China","Colosseum"],x:"Stonehenge's earliest stage dates to about 3000 BC, roughly 400 years before the Great Pyramid.",s:"https://www.english-heritage.org.uk/visit/places/stonehenge/history-and-stories/history/"},
+ {c:"Culture",q:"What is the national animal of Scotland?",a:["Unicorn","Red deer","Lion","Golden eagle"],x:"The unicorn — a symbol of purity and power in Scottish heraldry.",s:"https://www.visitscotland.com/inspiration/culture/unicorn-national-animal"},
+ {c:"Nature",q:"What shape is wombat poop?",a:["Cubes","Spirals","Flat discs","Long ropes"],x:"Wombats produce cube-shaped droppings, thanks to the varying elasticity of their intestines.",s:"https://www.britannica.com/animal/wombat"},
+ {c:"History",q:"Which was the shortest war on record?",a:["Anglo-Zanzibar War","Six-Day War","Football War","Falklands War"],x:"In 1896 Zanzibar surrendered to Britain after about 40 minutes.",s:"https://www.guinnessworldrecords.com/world-records/shortest-war"},
+ {c:"Space",q:"Which planet takes the longest to spin once on its axis?",a:["Venus","Mercury","Mars","Neptune"],x:"Venus takes about 243 Earth days to rotate once — longer than its year.",s:"https://science.nasa.gov/venus/facts/"},
+ {c:"Food",q:"Where does the kiwifruit originally come from?",a:["China","New Zealand","Australia","Chile"],x:"It's native to China, where it was called the Chinese gooseberry. New Zealand renamed and popularized it.",s:"https://www.britannica.com/plant/kiwi-plant"},
+ {c:"Nature",q:"Which appeared on Earth first?",a:["Sharks","Trees","Dinosaurs","Flowering plants"],x:"Sharks date back about 450 million years; the first trees about 385 million.",s:"https://www.nhm.ac.uk/discover/news/2022/june/sharks-older-than-trees.html"},
+ {c:"Science",q:"What color is an airliner's \"black box\" flight recorder?",a:["Bright orange","Black","Silver","Yellow and black stripes"],x:"Flight recorders are painted bright orange so they're easier to find in wreckage.",s:"https://aviationweek.com/business-aviation/five-surprising-facts-about-black-boxes"},
+ {c:"Space",q:"Which human-made structure can you see with the naked eye from the Moon?",a:["None of them","The Great Wall of China","The Pyramids of Giza","Dubai's Palm Jumeirah"],x:"None — from the Moon, even whole continents are hard to make out. The Great Wall is very hard to spot even from low orbit.",s:"https://www.britannica.com/question/Can-you-see-the-Great-Wall-of-China-from-space"},
+ {c:"Science",q:"About how often is the Empire State Building struck by lightning?",a:["About 20–25 times a year","Never — it's protected","About once a year","About once a decade"],x:"Lightning often hits the same place — tall, pointed buildings most of all. The Empire State Building takes about 20–25 strikes a year.",s:"https://www.livescience.com/13704-empire-state-building-lightning-strike.html"},
+ {c:"Nature",q:"How long can a goldfish remember things?",a:["Months","About 3 seconds","About 30 seconds","About a day"],x:"The 3-second memory is a myth. Experiments show goldfish can learn tasks and remember them for months.",s:"https://www.howitworksdaily.com/why-goldfish-having-a-three-second-memory-is-a-myth/"},
+ {c:"History",q:"What did Viking warriors' helmets have on them?",a:["Nothing — no horns or wings","Horns","Wings","Feathers"],x:"No Viking-age horned helmet has ever been found. The look comes from 19th-century art and opera costumes.",s:"https://www.historyhit.com/myths-about-the-viking-age/"},
+ {c:"Food",q:"In which country was the Caesar salad invented?",a:["Mexico","Italy","United States","Spain"],x:"Restaurateur Caesar Cardini created it in Tijuana, Mexico, in 1924.",s:"https://www.kuow.org/stories/hail-caesar-salad-born-100-years-ago-in-tijuana"},
+ {c:"Geography",q:"Which of these cities is farthest north?",a:["London","Calgary","Kyiv","Vancouver"],x:"London (51.5°N) is north of Calgary (51.0°N), Kyiv (50.5°N) and Vancouver (49.3°N).",s:"https://www.livescience.com/planet-earth/weather/why-do-european-cities-have-milder-winters-than-those-in-north-america-despite-being-at-the-same-latitude"},
+ {c:"Geography",q:"Which of these cities is farthest west?",a:["Reno, Nevada","Los Angeles","San Diego","Las Vegas"],x:"California's coast curves east as it heads south, so Reno (119.8°W) sits west of Los Angeles (118.2°W).",s:"https://springylib.libanswers.com/faq?qid=231955"},
+ {c:"Geography",q:"Which US state is closest to Africa?",a:["Maine","Florida","North Carolina","Massachusetts"],x:"Quoddy Head, Maine, is about 5,000 km from Morocco — closer than any point in Florida.",s:"https://www.sciencealert.com/which-us-state-is-closest-to-africa"},
+ {c:"Food",q:"Botanically, what is a peanut?",a:["A legume","A nut","A grain","A drupe"],x:"Peanuts grow in pods underground and belong to the pea and bean family.",s:"https://www.britannica.com/plant/peanut"},
+ {c:"Language",q:"The word \"ketchup\" most likely comes from which language?",a:["Chinese (Hokkien)","Dutch","Spanish","French"],x:"From Hokkien kê-tsiap, a fermented fish sauce. Tomatoes came much later.",s:"https://en.wiktionary.org/wiki/ketchup"},
+ {c:"Language",q:"The word \"robot\" comes from which language?",a:["Czech","German","Russian","Greek"],x:"From Karel Čapek's 1920 play R.U.R. Czech robota means forced labour.",s:"https://www.sciencefriday.com/segments/the-origin-of-the-word-robot/"},
+ {c:"Nature",q:"Tyrannosaurus rex lived closer in time to which of these?",a:["Humans today","Stegosaurus","Brachiosaurus","Allosaurus"],x:"T. rex lived about 68–66 million years ago — closer to us than to Stegosaurus, which died out about 145 million years ago.",s:"https://gizmodo.com/less-time-separates-us-from-t-rex-than-t-rex-from-stego-1614025559"},
+ {c:"Geography",q:"Which is the world's largest lake by area?",a:["Caspian Sea","Lake Superior","Lake Victoria","Lake Baikal"],x:"Despite its name, the landlocked Caspian (about 371,000 km²) counts as a lake. Superior is the largest freshwater lake by area.",s:"https://www.britannica.com/topic/worlds-largest-lakes-2228655"},
+ {c:"Science",q:"What mostly decides which way water swirls down a sink?",a:["The basin's shape and how the water was moving","Which hemisphere you're in","Earth's magnetic field","The Moon's pull"],x:"The Coriolis effect is far too weak at sink scale. Basin shape and leftover motion decide the swirl.",s:"https://www.livescience.com/physics-mathematics/does-water-drain-in-different-directions-in-the-northern-and-southern-hemispheres"},
+ {c:"Nature",q:"Which bird lays the largest egg for its body size?",a:["Kiwi","Ostrich","Emu","Albatross"],x:"A kiwi egg can be about 20% of the mother's weight. Ostriches lay the biggest eggs outright, but they're small for her size.",s:"https://www.guinnessworldrecords.com/world-records/83111-largest-bird-egg-relative-to-body-size"},
+ {c:"Geography",q:"Which mountain is tallest measured from base to peak?",a:["Mauna Kea","Everest","K2","Denali"],x:"Mauna Kea rises about 10,200 m from the Pacific floor, though only about 4,200 m is above sea level.",s:"https://www.guinnessworldrecords.com/world-records/tallest-mountain"},
+ {c:"History",q:"\"Let them eat cake\" first appears in the writing of…",a:["Jean-Jacques Rousseau","Marie Antoinette","Voltaire","Louis XVI"],x:"Rousseau credited it to \"a great princess\" in his Confessions, written when Marie Antoinette was a child in Austria.",s:"https://www.britannica.com/story/did-marie-antoinette-really-say-let-them-eat-cake"},
+ {c:"Nature",q:"What mainly makes a bull charge a matador's cape?",a:["Its movement","Its red color","Its smell","The crowd's noise"],x:"Bulls are red-green colorblind. They charge the moving cape whatever its color.",s:"https://www.livescience.com/33700-bulls-charge-red.html"},
+ {c:"History",q:"Which was the first self-governing country to give all women the vote?",a:["New Zealand","United States","United Kingdom","Finland"],x:"New Zealand, in 1893. Finland followed in 1906, the UK in 1918/1928, the US in 1920.",s:"https://nzhistory.govt.nz/politics/womens-suffrage"},
+ {c:"History",q:"About how tall was Napoleon?",a:["About 1.69 m (5 ft 7 in)","About 1.57 m (5 ft 2 in)","About 1.52 m (5 ft)","About 1.83 m (6 ft)"],x:"His recorded \"5 ft 2\" was in French units — about 1.69 m, average or a bit above for his time.",s:"https://www.britannica.com/story/was-napoleon-short"},
+ {c:"Sport",q:"Where did table tennis begin?",a:["England","China","Japan","South Korea"],x:"It began as an after-dinner parlour game in Victorian England in the 1880s. China came to dominate it much later.",s:"https://en.wikipedia.org/wiki/Table_tennis"},
+ {c:"Space",q:"What color do sunsets look on Mars?",a:["Blue","Red","Orange","Green"],x:"Fine Martian dust scatters blue light forward, so the sky around the setting Sun glows blue — NASA's Curiosity photographed it in 2015.",s:"https://science.nasa.gov/resource/sunset-at-mars-gale-crater-curiosity"}
+],
+/* b = double bluff (v2): sounds like a trick question, but the obvious answer is right. */
+b:[
+ {c:"Geography",q:"Which is the largest hot desert in the world?",a:["Sahara","Arabian","Kalahari","Gobi"],x:"The Sahara, at about 9 million km². Antarctica is bigger overall, but it's a cold desert — so this time the obvious answer was right.",s:"https://www.britannica.com/place/Sahara-desert-Africa"},
+ {c:"Nature",q:"Which bird lays the biggest eggs, outright?",a:["Ostrich","Kiwi","Emu","Albatross"],x:"Ostrich eggs weigh about 1.4 kg. The kiwi only wins relative to its body size.",s:"https://www.britannica.com/animal/ostrich"},
+ {c:"History",q:"Which of these happened first?",a:["The Titanic sank","World War I began","The Russian Revolution","The first nonstop transatlantic flight"],x:"Titanic: April 1912. World War I began in July 1914, the Russian Revolution came in 1917, and Alcock and Brown flew nonstop across the Atlantic in 1919.",s:"https://www.britannica.com/topic/Titanic"},
+ {c:"Inventions",q:"Who was granted the first US patent for the telephone?",a:["Alexander Graham Bell","Antonio Meucci","Elisha Gray","Thomas Edison"],x:"Bell's patent was granted on 7 March 1876. Meucci and Gray did related work, but the patent was Bell's.",s:"https://www.britannica.com/biography/Alexander-Graham-Bell"},
+ {c:"Language",q:"Counting second-language speakers too, which language has the most speakers?",a:["English","Mandarin Chinese","Hindi","Spanish"],x:"About 1.5 billion people speak English. Mandarin leads only when you count native speakers.",s:"https://www.ethnologue.com/insights/ethnologue200/"},
+ {c:"Geography",q:"Not counting Australia, which is the world's largest island?",a:["Greenland","New Guinea","Borneo","Madagascar"],x:"Greenland, at about 2.17 million km². New Guinea is a distant second.",s:"https://www.britannica.com/place/Greenland"},
+ {c:"Science",q:"Is a lightning bolt hotter than the surface of the Sun?",a:["Yes — several times hotter","No — about half as hot","About the same","No — far cooler"],x:"Lightning heats the air to about 50,000°F — roughly five times hotter than the Sun's surface.",s:"https://www.weather.gov/safety/lightning-science-overview"},
+ {c:"Food",q:"Botanically speaking, is a tomato a fruit or a vegetable?",a:["A fruit","A vegetable","A root","A legume"],x:"A fruit — technically a berry — even though cooks treat it as a vegetable. (In 1893 the US Supreme Court called it a vegetable for tax purposes.)",s:"https://www.britannica.com/plant/tomato"},
+ {c:"History",q:"Which of these was built first?",a:["Great Pyramid of Giza","Parthenon","Colosseum","Ming Great Wall"],x:"Great Pyramid: about 2560 BC. Parthenon 447–432 BC, Colosseum AD 70–80, and most of the Ming wall in the 1300s–1600s.",s:"https://www.britannica.com/topic/Pyramids-of-Giza"},
+ {c:"Space",q:"How strong is gravity on the Moon?",a:["About 1/6 of Earth's","About 1/100 of Earth's","There's none — astronauts float","About half of Earth's"],x:"About 1.62 m/s², roughly one-sixth of Earth's. Astronauts bounce because they weigh less, not because there's no gravity.",s:"https://science.nasa.gov/moon/facts/"},
+ {c:"Body",q:"Roughly how much of an adult human body is water?",a:["About 60%","About 30%","About 85%","About 95%"],x:"Up to about 60% for adults — more in babies, less with age.",s:"https://www.usgs.gov/special-topics/water-science-school/science/water-you-water-and-human-body"},
+ {c:"Nature",q:"Counting dives, which animal is the fastest of all?",a:["Peregrine falcon","Cheetah","Sailfish","Pronghorn"],x:"A diving peregrine can top 300 km/h (about 200 mph). The cheetah is only the fastest on land.",s:"https://www.britannica.com/animal/peregrine-falcon"},
+ {c:"Art",q:"Which painter cut off part of his own ear?",a:["Vincent van Gogh","Paul Gauguin","Pablo Picasso","Edvard Munch"],x:"Van Gogh, in Arles in December 1888, after a quarrel with Gauguin. A fringe theory blames Gauguin's sword, but the evidence points to Vincent himself.",s:"https://www.vangoghmuseum.nl/en/art-and-stories/vincent-van-gogh-faq/why-did-vincent-van-gogh-cut-off-his-ear"},
+ {c:"History",q:"In which country did the Renaissance begin?",a:["Italy","France","Greece","England"],x:"In Italy — Florence above all — in the 1300s, before spreading across Europe.",s:"https://www.britannica.com/event/Renaissance"},
+ {c:"Geography",q:"Which is colder on average, the North Pole or the South Pole?",a:["The South Pole","The North Pole","They're about the same","It depends on the year"],x:"The South Pole averages about −49°C; the North Pole about −18°C. The South Pole sits high on a thick ice sheet; the North Pole is sea ice over ocean.",s:"https://nsidc.org/learn/ask-scientist/what-difference-between-arctic-and-antarctic"}
 ]};
 
 /* ---------- utils ---------- */
@@ -232,51 +363,122 @@ function shuffle(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const 
 const LAUNCH=new Date(2026,10,5);
 function todayKey(d=new Date()){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function dayIndex(){const n=new Date();const a=new Date(n.getFullYear(),n.getMonth(),n.getDate());return Math.round((a-LAUNCH)/864e5)}
-const store={get(){try{return JSON.parse(localStorage.getItem("sg_v1"))||{hist:{}}}catch(e){return{hist:{}}}},set(v){try{localStorage.setItem("sg_v1",JSON.stringify(v))}catch(e){}}};
+/* sg_v1 format unchanged. In-memory copy keeps results/stats working when storage is blocked. */
+let memStore=null;
+const store={get(){try{return JSON.parse(localStorage.getItem("sg_v1"))||(memStore?JSON.parse(memStore):{hist:{}})}catch(e){return memStore?JSON.parse(memStore):{hist:{}}}},set(v){memStore=JSON.stringify(v);try{localStorage.setItem("sg_v1",memStore)}catch(e){}}};
+/* Separate key for an unfinished daily round, so a reload keeps picks and chips. */
+const draft={get(k){try{const d=JSON.parse(localStorage.getItem("sg_v1_draft"));if(!d||d.k!==k||!Array.isArray(d.ans)||!Array.isArray(d.alloc)||d.ans.length!==3||d.alloc.length!==3)return null;
+    if(d.alloc.some(n=>!Number.isInteger(n)||n<1||n>6)||d.alloc.reduce((a,b)=>a+b,0)>10)return null;
+    if(d.ans.some(a=>a!==null&&!(Number.isInteger(a)&&a>=0&&a<4)))return null;return d}catch(e){return null}},
+  set(k,ans,alloc){try{localStorage.setItem("sg_v1_draft",JSON.stringify({k,ans,alloc}))}catch(e){}},
+  clear(){try{localStorage.removeItem("sg_v1_draft")}catch(e){}}};
+const reduceMotion=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
+const scrollB=()=>reduceMotion()?"auto":"smooth";
 
+/* Daily schedule (v2). Each day follows a 7-day cycle of question mixes, so the format never gives the answer away:
+   most days are one easy (e), one medium (m), one trap (h); some have two traps, or a "double bluff" (b) — a question that
+   sounds like a trap but where the obvious answer is right. Over each 7 days every e/m/h tier is used exactly 6 times
+   (b 3 times), so each tier still walks a fixed shuffled order of its whole bank with no repeats inside 30 days.
+   Days 0–1 (launch) are identical to v1. Within a day categories differ; a tier avoids repeating yesterday's category. */
+const MIXES=["emh","emh","ehh","mhb","eeb","mmb","emh"];
+const DAYTYPE={emh:["Classic day","One easy, one medium, one trap."],ehh:["Double-trap day","Two of today's three were traps — the obvious answer was wrong twice."],
+  mhb:["Trap + bluff day","One trap, and one double bluff: it looked like a trick question, but the obvious answer was right."],
+  eeb:["No-trap day","No traps today. The tricky-looking one was a double bluff — the obvious answer was right."],
+  mmb:["No-gimme day","No easy one today — two mediums and a double bluff."]};
+const TIERNAME={e:"Easy",m:"Medium",h:"Trap",b:"Double bluff"};
+const mod=(a,n)=>((a%n)+n)%n;
+function dayMix(d){return MIXES[mod(d,MIXES.length)]}
+function usedBefore(t,d){const C=MIXES.length,per=MIXES.join("").split(t).length-1;let n=Math.floor(d/C)*per;for(let k=0;k<mod(d,C);k++)n+=MIXES[k].split(t).length-1;return n}
+let ORDER=null;
+function buildOrder(){ORDER={};const T=Object.keys(BANK),rest={};
+  T.forEach(t=>{ORDER[t]=[];rest[t]=shuffle(BANK[t].map((_,i)=>i),rng(t.charCodeAt(0)*101+7))});
+  const used={};T.forEach(t=>used[t]=0);
+  const days=Math.max(...T.map(t=>Math.ceil(BANK[t].length/Math.max(1,usedBefore(t,MIXES.length))*MIXES.length)));
+  for(let d=0;d<days;d++){const today=[];
+    for(const t of dayMix(d)){const B=BANK[t],o=ORDER[t],R=rest[t];let pick;
+      if(R.length){const prev=o.length?B[o[o.length-1]].c:null;
+        const tests=[i=>B[i].c!==prev&&!today.includes(B[i].c),i=>!today.includes(B[i].c),i=>B[i].c!==prev,()=>true];
+        let j=-1;for(const f of tests){j=R.findIndex(f);if(j>=0)break}
+        pick=R.splice(j,1)[0];o.push(pick)}
+      else pick=o[used[t]%o.length];
+      used[t]++;today.push(B[pick].c)}}}
+/* the questions (tier + bank index) scheduled for day d */
+function daySchedule(d){if(!ORDER)buildOrder();const c={};return dayMix(d).split("").map(t=>{const o=ORDER[t];const k=usedBefore(t,d)+(c[t]=(c[t]||0)+1)-1;return{t,i:o[mod(k,o.length)]}})}
+/* Practice only uses questions that are NOT in today's or the next 30 days' puzzles, so practising can't spoil a daily. */
+function practicePool(d){const ban={};for(let k=0;k<=30;k++)daySchedule(d+k).forEach(x=>ban[x.t+x.i]=1);
+  const P={};Object.keys(BANK).forEach(t=>{P[t]=BANK[t].map((_,i)=>i).filter(i=>!ban[t+i]);if(!P[t].length)P[t]=BANK[t].map((_,i)=>i).filter(i=>!daySchedule(d).some(x=>x.t===t&&x.i===i))});return P}
 function buildSet(seed,daily){
-  const r=rng(seed*7919+13);
-  const pick=d=>{
-    if(daily){const perm=shuffle(BANK[d].map((_,i)=>i),rng(d.charCodeAt(0)*101+7));return BANK[d][perm[((seed%perm.length)+perm.length)%perm.length]]}
-    return BANK[d][Math.floor(Math.random()*BANK[d].length)];
-  };
-  const qs=shuffle(["e","m","h"],r).map(d=>{const Q=pick(d);const opts=shuffle(Q.a.map((t,i)=>({t,ok:i===0})),r);return{...Q,d,opts}});
-  return qs;
+  const r=rng(seed*7919+13);let picks,mix;
+  if(daily){mix=dayMix(seed);const sch=daySchedule(seed),c={};
+    picks=t=>{const L=sch.filter(x=>x.t===t);const x=L[(c[t]=(c[t]||0)+1)-1];return BANK[t][x.i]}}
+  else{mix=MIXES[Math.floor(Math.random()*MIXES.length)];const P=practicePool(dayIndex());
+    picks=t=>{const L=P[t];const i=L.splice(Math.floor(Math.random()*L.length),1)[0];return BANK[t][i]}}
+  const qs=shuffle(mix.split(""),r).map((d,j)=>{const Q=picks(d);const opts=shuffle(Q.a.map((t,i)=>({t,ok:i===0})),r);
+    /* v2: balance where the right answer sits. Every run of 4 daily questions uses A, B, C and D once each, so no letter
+       is a better blind guess than another (from day 2 on; launch days unchanged). */
+    if(daily&&seed>=2){const n=seed*3+j,perm=shuffle([0,1,2,3],rng(Math.floor(n/4)*31+5)),tg=perm[n%4],ci=opts.findIndex(o=>o.ok);[opts[ci],opts[tg]]=[opts[tg],opts[ci]]}
+    return{...Q,d,opts}});
+  qs.mix=mix;return qs;
 }
+/* rebuild a saved day's questions exactly as they were shown (so changing the schedule later can't corrupt old results) */
+function rebuildSet(rec){try{if(!rec.q||!rec.o)return null;const all=[];Object.keys(BANK).forEach(t=>BANK[t].forEach(Q=>all.push({Q,t})));
+  const qs=rec.q.map((q,i)=>{const f=all.find(x=>x.Q.q===q);if(!f)throw 0;const o=rec.o[i].map(t=>({t,ok:t===f.Q.a[0]}));if(o.filter(x=>x.ok).length!==1)throw 0;return{...f.Q,d:f.t,opts:o}});
+  qs.mix=rec.mix||qs.map(Q=>Q.d).join("");return qs}catch(e){return null}}
+const scoreQ=(chips,ok)=>(ok?10:-10)*chips;
+const EXPORTS={RULES:{total:10,min:1,max:6},MIXES,daySchedule};
 
 /* ---------- state ---------- */
 let mode="daily", qs, ans, alloc, locked=false, revealing=false;
+let playKey=null, playIdx=0, timers=[], prevAlloc=null;
 const LETTERS="ABCD";
 
 function start(){
-  locked=false;revealing=false;
-  if(mode==="daily"){qs=buildSet(dayIndex(),true)}else{qs=buildSet(Math.floor(Math.random()*1e9),false)}
+  timers.forEach(clearTimeout);timers=[];animTok++;
+  locked=false;revealing=false;prevAlloc=null;
+  playKey=todayKey();playIdx=dayIndex();
+  if(mode==="daily"){qs=buildSet(playIdx,true)}else{qs=buildSet(Math.floor(Math.random()*1e9),false)}
   ans=[null,null,null];alloc=[1,1,1];
   $("#results").classList.add("hide");$("#after").classList.add("hide");$("#bar").classList.remove("hide");
+  $(".wrap").classList.remove("done");
   $("#modeNote").classList.toggle("hide",mode==="daily");
   $("#modeBtn").classList.toggle("on",mode==="practice");
   $("#modeBtn").textContent=mode==="practice"?"Back to daily":"Practice";
-  if(mode==="daily"){const s=store.get();const rec=s.hist[todayKey()];if(rec){ans=rec.ans;alloc=rec.alloc;render();finish(true);return}}
-  render();
+  if(mode==="daily"){const s=store.get();const rec=s.hist[playKey];if(rec){draft.clear();qs=rebuildSet(rec)||qs;ans=rec.ans;alloc=rec.alloc;render();finish(true);return}
+    const d=draft.get(playKey);if(d){ans=d.ans.slice();alloc=d.alloc.slice()}}
+  render();streakNote();
 }
 const left=()=>10-alloc.reduce((a,b)=>a+b,0);
+/* A streak only counts if the last daily played was today or yesterday — otherwise it has lapsed (v1 kept showing the old number). */
+function liveStreak(s){if(!s.last)return 0;const n=new Date(),y=todayKey(new Date(n.getFullYear(),n.getMonth(),n.getDate()-1));return s.last===todayKey()||s.last===y||s.last===playKey?(s.streak||0):0}
+function streakNote(){const el=$("#streakNote");const s=store.get();const played=Object.keys(s.hist).length;
+  if(mode!=="daily"||locked||!played){el.classList.add("hide");return}
+  const st=liveStreak(s);el.classList.remove("hide");
+  el.textContent=st>0?`${st}-day streak — lock in today's to keep it going.`:(s.streak>1?`Your ${s.streak}-day streak ended. Start a new one today.`:"Welcome back. Today's three are ready.")}
+const saveDraft=()=>{if(mode==="daily"&&!locked)draft.set(playKey,ans,alloc)};
 
 function render(){
-  const box=$("#cards");box.innerHTML="";
+  const box=$("#cards");
+  // keep keyboard focus on the same control across re-renders
+  const fa=document.activeElement,fsel=fa&&box.contains(fa)?(fa.classList.contains("opt")?`.opt[data-i="${fa.dataset.i}"][data-j="${fa.dataset.j}"]`:fa.classList.contains("step")?`.step[data-i="${fa.dataset.i}"][data-s="${fa.dataset.s}"]`:null):null;
+  box.innerHTML="";
   qs.forEach((Q,i)=>{
     const c=document.createElement("div");c.className="card";c.id="card"+i;
-    c.innerHTML=`<div class="meta"><span>Question ${i+1} · ${Q.c}</span></div>
-      <div class="delta" id="delta${i}"></div>
-      <div class="q">${Q.q}</div>
-      <div class="opts">${Q.opts.map((o,j)=>`<button class="opt${ans[i]===j?" sel":""}" data-i="${i}" data-j="${j}"${locked?" disabled":""}><b>${LETTERS[j]}</b>${o.t}</button>`).join("")}</div>
+    const was=prevAlloc?prevAlloc[i]:alloc[i];
+    c.innerHTML=`<div class="meta"><span>Question ${i+1} · ${Q.c}</span><span class="delta" id="delta${i}" aria-hidden="true"></span></div>
+      <div class="q" id="q${i}">${Q.q}</div>
+      <div class="opts" role="group" aria-labelledby="q${i}">${Q.opts.map((o,j)=>`<button class="opt${ans[i]===j?" sel":""}" data-i="${i}" data-j="${j}" aria-pressed="${ans[i]===j}"${locked?" disabled":""}><b>${LETTERS[j]}</b><span>${o.t}</span></button>`).join("")}</div>
       <div class="alloc"><span class="lbl">Confidence</span>
-        <button class="step" data-i="${i}" data-s="-1"${locked||alloc[i]<=1?" disabled":""}>−</button>
-        <div class="slots">${[1,2,3,4,5,6].map(n=>`<span class="slot${n<=alloc[i]?" f":""}${locked?" lock":""}" data-i="${i}" data-n="${n}"></span>`).join("")}</div>
-        <button class="step" data-i="${i}" data-s="1"${locked||alloc[i]>=6||left()<=0?" disabled":""}>+</button>
-        <span class="count">${alloc[i]}</span></div>
+        <button class="step" data-i="${i}" data-s="-1" aria-label="Remove a chip from question ${i+1}"${locked||alloc[i]<=1?" disabled":""}>−</button>
+        <div class="slots" aria-hidden="true">${[1,2,3,4,5,6].map(n=>`<span class="slot${n<=alloc[i]?" f":""}${n<=alloc[i]&&n>was?" new":""}${locked?" lock":""}" data-i="${i}" data-n="${n}"></span>`).join("")}</div>
+        <button class="step" data-i="${i}" data-s="1" aria-label="Add a chip to question ${i+1}"${locked||alloc[i]>=6||left()<=0?" disabled":""}>+</button>
+        <span class="count" aria-label="${alloc[i]} chip${alloc[i]===1?"":"s"} on question ${i+1}">${alloc[i]}</span></div>
       <div class="explain" id="ex${i}">${Q.x}</div>`;
     box.appendChild(c);
   });
+  prevAlloc=alloc.slice();
+  if(fsel){let el=box.querySelector(fsel);
+    if(el&&el.disabled&&el.classList.contains("step"))el=box.querySelector(`.step[data-i="${el.dataset.i}"][data-s="${-el.dataset.s}"]`);
+    if(el&&!el.disabled)el.focus({preventScroll:true})}
   renderBar();
 }
 function renderBar(){
@@ -296,28 +498,29 @@ function setAlloc(i,n){
 }
 $("#cards").addEventListener("click",e=>{
   if(locked)return;
-  const o=e.target.closest(".opt");if(o){ans[+o.dataset.i]=+o.dataset.j;render();return}
-  const s=e.target.closest(".step");if(s&&!s.disabled){const i=+s.dataset.i;setAlloc(i,alloc[i]+ +s.dataset.s);return}
-  const sl=e.target.closest(".slot");if(sl){const i=+sl.dataset.i,n=+sl.dataset.n;setAlloc(i,n===alloc[i]&&n>1?n-1:n)}
+  const o=e.target.closest(".opt");if(o){ans[+o.dataset.i]=+o.dataset.j;render();saveDraft();return}
+  const s=e.target.closest(".step");if(s&&!s.disabled){const i=+s.dataset.i;setAlloc(i,alloc[i]+ +s.dataset.s);saveDraft();return}
+  const sl=e.target.closest(".slot");if(sl){const i=+sl.dataset.i,n=+sl.dataset.n;setAlloc(i,n===alloc[i]&&n>1?n-1:n);saveDraft()}
 });
 
 $("#go").onclick=()=>{
-  if(left()!==0||ans.includes(null))return;
+  if(left()!==0||ans.includes(null)||locked)return;
   if(mode==="daily"){
     const s=store.get();
     const res=qs.map((Q,i)=>({chips:alloc[i],ok:Q.opts[ans[i]].ok}));
-    const score=res.reduce((t,r)=>t+(r.ok?10:-10)*r.chips,0);
-    const k=todayKey();const y=new Date();y.setDate(y.getDate()-1);
+    const score=res.reduce((t,r)=>t+scoreQ(r.chips,r.ok),0);
+    // record under the day these questions belong to (matters if the page was left open past midnight)
+    const k=playKey;const [Y,M,D]=k.split("-").map(Number);const y=new Date(Y,M-1,D-1);
     s.streak=(s.last===todayKey(y)?(s.streak||0):0)+1;s.last=k;
     s.best=Math.max(s.best??-100,score);
-    s.hist[k]={ans:ans.slice(),alloc:alloc.slice(),res,score,n:dayIndex()+1};
-    store.set(s);
+    s.hist[k]={ans:ans.slice(),alloc:alloc.slice(),res,score,n:playIdx+1,q:qs.map(Q=>Q.q),o:qs.map(Q=>Q.opts.map(o=>o.t)),mix:qs.mix};
+    store.set(s);draft.clear();
   }
   finish(false);
 };
 
 function finish(instant){
-  locked=true;render();$("#bar").classList.add("hide");
+  locked=true;revealing=!instant;render();streakNote();$("#bar").classList.add("hide");$(".wrap").classList.add("done");
   const res=qs.map((Q,i)=>({chips:alloc[i],ok:Q.opts[ans[i]].ok}));
   const total=res.reduce((t,r)=>t+(r.ok?10:-10)*r.chips,0);
   $("#results").classList.remove("hide");
@@ -326,43 +529,50 @@ function finish(instant){
   const reveal=i=>{
     const Q=qs[i],card=$("#card"+i);
     card.querySelectorAll(".opt").forEach((b,j)=>{
-      if(Q.opts[j].ok)b.classList.add("right");
-      else if(j===ans[i])b.classList.add("wrong");else b.classList.add("dim");
+      if(Q.opts[j].ok){b.classList.add("right");b.insertAdjacentHTML("beforeend",`<em class="tick">${j===ans[i]?"Correct":"Answer"}</em>`)}
+      else if(j===ans[i]){b.classList.add("wrong");b.insertAdjacentHTML("beforeend",`<em class="tick">Your pick</em>`)}else b.classList.add("dim");
     });
     $("#ex"+i).classList.add("show");
+    const lab=card.querySelector(".meta span");if(lab&&!lab.querySelector(".tier"))lab.insertAdjacentHTML("beforeend",`<span class="tier t-${Q.d}">${TIERNAME[Q.d]||""}</span>`);
     const d=(res[i].ok?10:-10)*res[i].chips;
     const el=$("#delta"+i);el.textContent=(d>0?"+":"−")+Math.abs(d);el.className="delta "+(d>0?"pos":"neg")+(instant?"":" show");if(instant)el.style.opacity=1;
     card.classList.add(res[i].ok?"glow":"redglow");
-    if(!instant&&!res[i].ok)card.classList.add("shake");
+    if(!instant)card.classList.add(res[i].ok?"lift":"shake");
     if(!instant)animateTo(running,running+d);running+=d;
   };
-  const done=()=>{tn.textContent=fmt(total);tn.className="n "+(total>0?"pos":total<0?"neg":"");ts.textContent=mode==="daily"?`Puzzle #${dayIndex()+1} · out of a possible 100`:"Practice round · out of a possible 100";showAfter(res,total)};
+  const done=()=>{revealing=false;tn.textContent=fmt(total);tn.className="n "+(total>0?"pos":total<0?"neg":"");const DT=DAYTYPE[qs.mix];ts.textContent=(mode==="daily"?`Puzzle #${playIdx+1}`:"Practice round")+(DT?` · ${DT[0]}`:"")+" · out of a possible 100";showAfter(res,total)};
   if(instant){qs.forEach((_,i)=>reveal(i));done();return}
   // reveal lowest-confidence first so the big bet lands last
   const order=[0,1,2].sort((a,b)=>alloc[a]-alloc[b]);
-  window.scrollTo({top:0,behavior:"smooth"});
-  order.forEach((i,k)=>setTimeout(()=>{reveal(i);$("#card"+i).scrollIntoView({behavior:"smooth",block:"center"})},700+k*1300));
-  setTimeout(()=>{done();window.scrollTo({top:0,behavior:"smooth"})},700+3*1300+200);
+  window.scrollTo({top:0,behavior:scrollB()});
+  order.forEach((i,k)=>timers.push(setTimeout(()=>{reveal(i);$("#card"+i).scrollIntoView({behavior:scrollB(),block:"center"})},700+k*1300)));
+  timers.push(setTimeout(()=>{done();window.scrollTo({top:0,behavior:scrollB()})},700+3*1300+200));
 }
 const fmt=n=>n>0?"+"+n:n<0?"−"+Math.abs(n):"0";
-function animateTo(a,b){const tn=$("#totalN");const t0=performance.now();const f=t=>{const p=Math.min(1,(t-t0)/600);const v=Math.round(a+(b-a)*p);tn.textContent=fmt(v);tn.className="n "+(v>0?"pos":v<0?"neg":"");if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+let animTok=0;
+function animateTo(a,b){const tn=$("#totalN");const tok=animTok;const t0=performance.now();const f=t=>{if(tok!==animTok)return;const p=Math.min(1,(t-t0)/600);const v=Math.round(a+(b-a)*p);tn.textContent=fmt(v);tn.className="n "+(v>0?"pos":v<0?"neg":"");if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
 
 function showAfter(res,total){
   const a=$("#after");a.classList.remove("hide");
-  const rows=qs.map((Q,i)=>{const d=(res[i].ok?10:-10)*res[i].chips;return`<tr><td>${res[i].ok?"✅":"❌"} Q${i+1} · ${Q.opts[ans[i]].t}</td><td>${res[i].chips} chip${res[i].chips>1?"s":""}</td><td class="${d>0?"pos":"neg"}">${fmt(d)}</td></tr>`}).join("");
+  const rows=qs.map((Q,i)=>{const d=(res[i].ok?10:-10)*res[i].chips;return`<tr><td>${res[i].ok?'<span class="mk ok" aria-label="Right">✓</span>':'<span class="mk no" aria-label="Wrong">✗</span>'}Q${i+1} · ${Q.opts[ans[i]].t}</td><td>${res[i].chips} chip${res[i].chips>1?"s":""}</td><td class="${d>0?"pos":"neg"}">${fmt(d)}</td></tr>`}).join("");
   // verdict
   const ix=[0,1,2];const big=ix.reduce((m,i)=>alloc[i]>alloc[m]?i:m,0),small=ix.reduce((m,i)=>alloc[i]<alloc[m]?i:m,0);
   let v;
   const nOk=res.filter(r=>r.ok).length;
   if(nOk===3)v="Clean sweep. The only question now is whether you could have leaned harder on your sure thing.";
   else if(nOk===0)v="Rough one — all three missed. The 1-chip minimum is there for days like this.";
-  else if(!res[big].ok)v=`Your biggest bet (${alloc[big]} chips on Q${big+1}) was the misconception. That's the one to remember.`;
+  else if(!res[big].ok)v=`Your biggest bet (${alloc[big]} chips on Q${big+1}) ${qs[big].d==="h"?"fell for the misconception":qs[big].d==="b"?"second-guessed a double bluff — the obvious answer was right":"was wrong"}. That's the one to remember.`;
+  else if(qs.some((Q,i)=>Q.d==="b"&&res[i].ok&&alloc[i]===Math.min(...alloc)&&alloc[i]<alloc[big]))v="You got the double bluff right but barely backed it. Sometimes the obvious answer really is the answer.";
   else if(res[small].ok&&alloc[small]<alloc[big])v=`Your cautious ${alloc[small]}-chip answer on Q${small+1} was right — you knew more than you thought.`;
   else v="Your confidence lined up with what you knew. That's the whole game.";
-  let html=`<div class="panel"><h3>Breakdown</h3><table class="brk">${rows}</table><div class="verdict">${v}</div></div>`;
+  const DT=DAYTYPE[qs.mix];
+  // what the same answers could have scored with ideal chip placement (biggest piles on the right answers)
+  let bestS=-1e9;for(let x=1;x<=6;x++)for(let y=1;y<=6;y++){const z=10-x-y;if(z<1||z>6)continue;bestS=Math.max(bestS,[x,y,z].reduce((t,c,i)=>t+scoreQ(c,res[i].ok),0))}
+  if(bestS>total)v+=` <span style="color:var(--sky)">With the same answers, perfect chip placement would have scored ${fmt(bestS)}.</span>`;
+  let html=`<div class="panel"><h3>Breakdown</h3>${DT?`<div class="daytype"><b>${DT[0]}.</b> ${DT[1]}</div>`:""}<table class="brk">${rows}</table><div class="verdict">${v}</div></div>`;
   if(mode==="daily"){
     const s=store.get();const H=Object.values(s.hist);
-    const share=`Second Guess #${dayIndex()+1}  ${fmt(total)}\n`+qs.map((_,i)=>(res[i].ok?"✅ ":"❌ ")+"🟡".repeat(res[i].chips)).join("\n");
+    const share=`Second Guess #${playIdx+1}  ${fmt(total)}${DT&&qs.mix!=="emh"?" · "+DT[0].replace(" day",""):""}\n`+qs.map((_,i)=>(res[i].ok?"✅ ":"❌ ")+"🟡".repeat(res[i].chips)).join("\n");
     const avg=Math.round(H.reduce((t,h)=>t+h.score,0)/H.length);
     const cal={};H.forEach(h=>h.res.forEach(r=>{(cal[r.chips]=cal[r.chips]||[0,0]);cal[r.chips][0]+=r.ok?1:0;cal[r.chips][1]++}));
     const calRows=Object.keys(cal).sort((a,b)=>b-a).map(k=>{const[o,n]=cal[k];const p=Math.round(o/n*100);return`<span>${k}-chip</span><div class="b"><span style="width:${p}%"></span></div><span>${p}% <small style="color:var(--sky)">(${o}/${n})</small></span>`}).join("");
@@ -372,7 +582,7 @@ function showAfter(res,total){
       <div class="row"><button class="btn" id="copyBtn">Copy result</button><button class="btn ghost" id="practiceBtn">Play a practice round</button></div>
       <div class="next" id="next"></div></div>
       <div class="panel"><h3>How well do you know what you know?</h3>
-      <div class="stats"><div class="stat"><div class="v">${H.length}</div><div class="k">Played</div></div><div class="stat"><div class="v">${s.streak||1}</div><div class="k">Streak</div></div><div class="stat"><div class="v">${fmt(avg)}</div><div class="k">Average</div></div><div class="stat"><div class="v">${fmt(s.best??total)}</div><div class="k">Best</div></div></div>
+      <div class="stats"><div class="stat"><div class="v">${H.length}</div><div class="k">Played</div></div><div class="stat"><div class="v">${liveStreak(s)}</div><div class="k">Streak</div></div><div class="stat"><div class="v">${fmt(avg)}</div><div class="k">Average</div></div><div class="stat"><div class="v">${fmt(s.best??total)}</div><div class="k">Best</div></div></div>
       <div class="verdict" style="margin:0 0 10px">${headline}</div>
       <div class="cal">${calRows}</div>
       <div class="next">Accuracy by how many chips you placed. Well-calibrated players are right more often on their bigger bets.</div></div>`;
@@ -388,7 +598,8 @@ function showAfter(res,total){
   }
 }
 let timer;
-function tick(){clearInterval(timer);const f=()=>{const el=$("#next");if(!el)return clearInterval(timer);const n=new Date(),m=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1);const s=Math.max(0,Math.floor((m-n)/1000));el.textContent=`Next puzzle in ${Math.floor(s/3600)}h ${String(Math.floor(s%3600/60)).padStart(2,"0")}m ${String(s%60).padStart(2,"0")}s`};f();timer=setInterval(f,1000)}
+function tick(){clearInterval(timer);const f=()=>{const el=$("#next");if(!el)return clearInterval(timer);
+  if(mode==="daily"&&!revealing&&todayKey()!==playKey){clearInterval(timer);start();return}const n=new Date(),m=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1);const s=Math.max(0,Math.floor((m-n)/1000));el.textContent=`Next puzzle in ${Math.floor(s/3600)}h ${String(Math.floor(s%3600/60)).padStart(2,"0")}m ${String(s%60).padStart(2,"0")}s`};f();timer=setInterval(f,1000)}
 function copy(t){
   const ok=()=>toast("Copied!");
   const fb=()=>{try{const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();ok()}catch(e){toast("Select the text to copy")}};
@@ -397,10 +608,14 @@ function copy(t){
 function toast(m){const el=$("#toast");el.textContent=m;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),1400)}
 
 $("#modeBtn").onclick=()=>{mode=mode==="daily"?"practice":"daily";start();window.scrollTo({top:0})};
-$("#howBtn").onclick=()=>$("#how").classList.remove("hide");
-$("#howClose").onclick=()=>$("#how").classList.add("hide");
-$("#how").onclick=e=>{if(e.target.id==="how")$("#how").classList.add("hide")};
-(function(){const s=store.get();if(!Object.keys(s.hist).length&&!s.seen){$("#how").classList.remove("hide");s.seen=1;store.set(s)}})();
+let howReturn=null;
+const openHow=()=>{howReturn=document.activeElement;$("#how").classList.remove("hide");$("#howClose").focus({preventScroll:true})};
+const closeHow=()=>{if($("#how").classList.contains("hide"))return;$("#how").classList.add("hide");if(howReturn&&howReturn.focus)howReturn.focus({preventScroll:true})};
+$("#howBtn").onclick=openHow;
+$("#howClose").onclick=closeHow;
+$("#how").onclick=e=>{if(e.target.id==="how")closeHow()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeHow()});
+(function(){const s=store.get();if(!Object.keys(s.hist).length&&!s.seen){openHow();s.seen=1;store.set(s)}})();
 start();
 </script>
 </body>

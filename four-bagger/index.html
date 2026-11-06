@@ -40,6 +40,10 @@ canvas{border-radius:14px;touch-action:manipulation;cursor:pointer;box-shadow:0 
 #hint b{color:var(--cream)}
 #overlay{position:fixed;inset:0;background:rgba(6,14,11,.72);display:none;align-items:center;justify-content:center;padding:14px;z-index:10;backdrop-filter:blur(3px)}
 #overlay.show{display:flex}
+#overlay.sheet{align-items:flex-end;background:rgba(6,14,11,.38);backdrop-filter:none}
+#overlay.sheet .card{max-height:56dvh}
+.chip.tw{background:#1d3a2f;color:#f5ecd7;border-color:#1d3a2f;font-weight:700}
+#hud b small{font-size:11px;color:var(--gold);font-weight:700;margin-right:6px;font-family:'DM Sans',sans-serif}
 .card{background:#f6eedb;color:#24291f;border-radius:18px;max-width:420px;width:100%;max-height:92dvh;overflow:auto;padding:20px 20px 18px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .card h2{font-family:'Bricolage Grotesque',sans-serif;font-size:27px;margin:2px 0 6px;letter-spacing:-.02em;line-height:1.05}
 .kick{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:#8a6a3c;font-weight:700}
@@ -56,6 +60,9 @@ canvas{border-radius:14px;touch-action:manipulation;cursor:pointer;box-shadow:0 
 .mini div{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;font:800 15px 'Bricolage Grotesque',sans-serif;color:rgba(40,20,8,.55)}
 .mini .h{width:18px;height:18px;border-radius:50%;background:#120a05;left:20px;right:auto;top:14px;color:#f0b43c;font-size:11px}
 .btn{display:block;width:100%;background:#1d3a2f;color:var(--cream);border:0;border-radius:12px;padding:13px;font:800 16px 'Bricolage Grotesque',sans-serif;cursor:pointer;margin-top:10px}
+.stick{position:sticky;bottom:-18px;background:linear-gradient(rgba(246,238,219,0),#f6eedb 30%);padding:6px 0 14px;margin-bottom:-14px}
+.card ul{padding-left:18px;margin:6px 0;font-size:13.5px;line-height:1.4}
+@media (max-width:420px){.card{padding:16px 16px 14px}.card h2{font-size:24px}.chip{font-size:11.5px;padding:3px 9px}}
 .btn.alt{background:#e9dcbd;color:#2b2a20}
 .big{font-family:'Bricolage Grotesque',sans-serif;font-size:56px;font-weight:800;line-height:1;margin:6px 0 2px}
 .big small{font-size:18px;color:#7a6a4a;font-weight:700}
@@ -88,7 +95,7 @@ pre{background:#fff8e8;border:1px solid #e2d3b0;border-radius:10px;padding:10px;
       <button data-shot="slide" class="on">Slide<small>lands short, slides</small></button>
       <button data-shot="lob">Lob<small>high arc, sticks</small></button>
     </div>
-    <button class="dbl" id="dblBtn">Stack 2<small>×2 pts · miss = lose both</small></button>
+    <button class="dbl" id="dblBtn">Stack 2<small>×2 pts · off board −2</small></button>
   </div>
   <div id="hint"></div>
 </div>
@@ -97,38 +104,75 @@ pre{background:#fff8e8;border:1px solid #e2d3b0;border-radius:10px;padding:10px;
 <script>
 // PHYS-START
 const BW=12, BL=48, HOLE={x:0,y:39,r:3}, CAP=2.4, AIRCAP=1.9, DT=1/120, E=0.55;
+// v2 tuning: sweep periods (s), max speed a bag can drop at (faster bags ride over the hole),
+// a stacked double is wider so it needs a more central line to drop.
+const V2={AIM_PERIOD:1.9,POW_PERIOD:2.0,VCAP:34,CAP_DBL:1.6,AIRCAP_DBL:1.3,STACK_OFF:-2};
 const SHOTS={slide:{vy:50,drift:0.45,dur:0.8,peak:55},lob:{vy:22,drift:1.4,dur:1.2,peak:140}};
 const YMIN=-12, YSPAN=66, AIMX=16;
-const SURFACES=[{id:'slick',name:'Fresh wax',desc:'slick, bags slide a long way',mu:48},{id:'normal',name:'Broken in',desc:'normal slide',mu:70},{id:'sticky',name:'Muggy night',desc:'sticky, bags grab early',mu:105}];
-const VENUES=["Uncle Ray's Backyard","Tailgate · Lot C","Lakeside Cabin","Brewery Patio","Cul-de-sac Classic","Ski Lodge Deck","Church Picnic Lawn","Rooftop Bar","Fire Station Cookout","Campground Site 14"];
-const OPPS=[{n:'The Lake Effect',c:'#2f7fc1'},{n:'Bag Daddies',c:'#e1a42b'},{n:'Corn Stars',c:'#7c4dbd'},{n:'Hole Patrol',c:'#1f9e8a'},{n:'Sack Attack',c:'#e07a2e'},{n:'Kernel Panic',c:'#cdb935'},{n:'The Woodies',c:'#5aa04a'},{n:'Toss Bosses',c:'#c2477f'},{n:'Cob Squad',c:'#3d4fb8'},{n:'Dirty Rags',c:'#8a8f98'}];
+const SURFACES=[{id:'slick',name:'Fresh wax',desc:'slick, bags slide a long way',mu:48},{id:'normal',name:'Broken in',desc:'normal slide',mu:70},{id:'sticky',name:'Muggy night',desc:'sticky, bags grab early',mu:105},
+  {id:'glass',name:'Glass board',desc:'just waxed, bags fly',mu:38},{id:'soaked',name:'Soaked board',desc:'wet wood, slides die fast',mu:150}];
+const VENUES=["Uncle Ray's Backyard","Tailgate · Lot C","Lakeside Cabin","Brewery Patio","Cul-de-sac Classic","Ski Lodge Deck","Church Picnic Lawn","Rooftop Bar","Fire Station Cookout","Campground Site 14",
+  "County Fair Midway","Beach Volleyball Courts","Grandma's Porch","Office Parking Garage","Wedding Reception Lawn","Fourth of July Block Party","Dive Bar Back Lot","Marina Dock","Frat Row Front Yard","Farmers Market Square",
+  "Little League Bleachers","Apple Orchard","Barn Dance","Pumpkin Patch","Food Truck Rally","Riverside Pavilion","The 19th Hole","Mountain Trailhead","Alley Behind the Diner","Community Pool Deck"];
+const OPPS=[{n:'The Lake Effect',c:'#2f7fc1'},{n:'Bag Daddies',c:'#e1a42b'},{n:'Corn Stars',c:'#7c4dbd'},{n:'Hole Patrol',c:'#1f9e8a'},{n:'Sack Attack',c:'#e07a2e'},{n:'Kernel Panic',c:'#cdb935'},{n:'The Woodies',c:'#5aa04a'},{n:'Toss Bosses',c:'#c2477f'},{n:'Cob Squad',c:'#3d4fb8'},{n:'Dirty Rags',c:'#8a8f98'},
+  {n:'Bean Counters',c:'#9a6b3f'},{n:'Slide Rules',c:'#3f9fb8'},{n:'Lucky Ducks',c:'#2e8b57'},{n:'Sweet Corn Society',c:'#d4a017'},{n:'Board Members',c:'#6a5acd'}];
+const TWISTS=[
+  {id:'crowded',name:'Crowded board',desc:'an extra blocker in every frame'},
+  {id:'gusty',name:'Gusty',desc:'the wind changes before every throw'},
+  {id:'wall',name:'The Wall',desc:'frame 3 has a bag parked right in front of the hole'},
+  {id:'glass',name:'Glass board',desc:'just waxed and dead calm: bags fly'},
+  {id:'rain',name:'Rain delay',desc:'soaked board, slides die fast'},
+  {id:'cross',name:'Crosswind',desc:'strong wind in every frame'}];
+const EPOCH=Date.UTC(2026,10,5);
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-function makeDay(seed){
+function dayIndex(key){const p=key.split('-').map(Number);return Math.round((Date.UTC(p[0],p[1]-1,p[2])-EPOCH)/864e5)}
+// Daily schedule: venue cycles through 30 (no repeat inside 30 days), opponent through 15 (no repeat inside 15),
+// and every third day brings one of six twists (each twist comes back every 18 days).
+function dayFor(key){const i=dayIndex(key),m=(n,k)=>((n%k)+k)%k;
+  return makeDay(hashStr('fourbagger-'+key),{venue:VENUES[m(i*7,30)],opp:OPPS[m(i*4,15)],twist:m(i,3)===1?TWISTS[m(Math.floor(i/3),6)]:null})}
+function placeBlockers(r,nb,bl){let tries=0;
+  while(bl.length<nb&&tries<400){tries++;
+    const first=bl.length===0;
+    const x=first?(r()*2-1)*3.5:(r()*2-1)*8.5, y=first?20+r()*11:11+r()*24;
+    if(Math.hypot(x-HOLE.x,y-HOLE.y)<7.5)continue;
+    if(bl.some(b=>Math.hypot(b.x-x,b.y-y)<6.6))continue;
+    bl.push({x:+x.toFixed(2),y:+y.toFixed(2),rot:+((r()*2-1)*.5).toFixed(3)});
+  }return bl}
+function makeDay(seed,sched){
   const r=mulberry32(seed); r();r();
-  const venue=VENUES[Math.floor(r()*VENUES.length)], opp=OPPS[Math.floor(r()*OPPS.length)];
-  const sr=r(), surface=SURFACES[sr<.3?0:sr<.72?1:2];
+  let venue=VENUES[Math.floor(r()*10)], opp=OPPS[Math.floor(r()*10)];
+  const sr=r(); let surface=SURFACES[sr<.3?0:sr<.72?1:2];
+  let twist=null;
+  if(sched){venue=sched.venue;opp=sched.opp;twist=sched.twist}
+  else if(r()<.5)twist=TWISTS[Math.floor(r()*TWISTS.length)];   // practice boards: random twist half the time
+  const tid=twist&&twist.id;
+  if(tid==='glass')surface=SURFACES[3];
+  if(tid==='rain')surface=SURFACES[4];
   const frames=[0,1,2].map(i=>{
     const maxW=[3,6,8][i]; let wind=Math.round((r()*2-1)*maxW);
-    const nb=[0,1+(r()<.5?1:0),2+(r()<.5?1:0)][i], bl=[];
-    let tries=0;
-    while(bl.length<nb&&tries<400){tries++;
-      const first=bl.length===0;
-      const x=first?(r()*2-1)*3.5:(r()*2-1)*8.5, y=first?20+r()*11:11+r()*24;
-      if(Math.hypot(x-HOLE.x,y-HOLE.y)<7.5)continue;
-      if(bl.some(b=>Math.hypot(b.x-x,b.y-y)<6.6))continue;
-      bl.push({x:+x.toFixed(2),y:+y.toFixed(2),rot:+((r()*2-1)*.5).toFixed(3)});
-    }
-    return {wind,blockers:bl};
+    if(tid==='glass')wind=0;
+    if(tid==='cross'){const sg=r()<.5?-1:1;wind=sg*(4+Math.floor(r()*[2,3,4][i]))}
+    let nb=[0,1+(r()<.5?1:0),2+(r()<.5?1:0)][i];
+    if(tid==='crowded')nb+=1;
+    const bl=[];
+    if(tid==='wall'&&i===2)bl.push({x:+((r()*2-1)*.6).toFixed(2),y:33.2,rot:+((r()*2-1)*.3).toFixed(3)});
+    placeBlockers(r,nb,bl);
+    const f={wind,blockers:bl};
+    if(tid==='gusty'){const g=[wind];for(let k=1;k<4;k++)g.push(Math.max(-9,Math.min(9,g[k-1]+Math.round((r()*2-1)*4))));f.winds=g}
+    return f;
   });
-  const base={slick:33,normal:34,sticky:32}[surface.id];
+  // targets calibrated from v2 bot runs: roughly the score of a steady casual player
+  const base={glass:36,slick:36,normal:36,sticky:36,soaked:34}[surface.id];
   const windPen=frames.reduce((s,f)=>s+(Math.abs(f.wind)>=6?1:0),0);
-  return {venue,opp,surface,frames,target:base-windPen};
+  const twAdj={crowded:0,gusty:-2,wall:-1,glass:0,rain:0,cross:-3}[tid]||0;
+  return {venue,opp,surface,frames,twist,target:base-windPen+twAdj};
 }
+function windAt(frame,used){return frame.winds?frame.winds[Math.min(3,used)]:frame.wind}
 function landPoint(spec,wind){const S=SHOTS[spec.shot];const drift=wind*S.drift;return{x:spec.aimX+drift,y:YMIN+YSPAN*spec.t,drift}}
 function slideLen(shot,mu){const v=SHOTS[shot].vy;return v*v/(2*mu)}
 function zoneOf(y){return y<16?1:y<32?2:3}
-function bagPts(b){if(b.status==='hole')return b.dbl?12:5;if(b.status!=='board')return 0;const z=zoneOf(b.y);return b.dbl?z*2:z}
+function bagPts(b){if(b.status==='hole')return b.dbl?12:5;if(b.status!=='board')return b.dbl&&b.own?V2.STACK_OFF:0;const z=zoneOf(b.y);return b.dbl?z*2:z}
 function makeBlockers(frame){return frame.blockers.map((p,i)=>({id:100+i,x:p.x,y:p.y,vx:0,vy:0,r:2.9,m:1,own:false,dbl:false,status:'board',rot:p.rot,bumped:false,how:''}))}
 function landBag(bags,spec,wind,id){
   const S=SHOTS[spec.shot], lp=landPoint(spec,wind), dbl=!!spec.dbl;
@@ -140,7 +184,7 @@ function landBag(bags,spec,wind,id){
     ev.push({t:'grass',b});
   }else{
     b.y=Math.min(Math.max(lp.y,0.8),BL-0.3);b.x=Math.max(-BW+0.4,Math.min(BW-0.4,lp.x));
-    if(spec.shot==='lob'&&Math.hypot(b.x-HOLE.x,b.y-HOLE.y)<AIRCAP){b.status='hole';b.how='airmail';ev.push({t:'airmail',b})}
+    if(spec.shot==='lob'&&Math.hypot(b.x-HOLE.x,b.y-HOLE.y)<(dbl?V2.AIRCAP_DBL:AIRCAP)){b.status='hole';b.how='airmail';ev.push({t:'airmail',b})}
     else{b.vy=S.vy;b.vx=S.vy*b.x/(330+b.y)+wind*(spec.shot==='lob'?0.25:0.12);ev.push({t:'land',b})}
   }
   bags.push(b);return ev;
@@ -159,7 +203,11 @@ function step(bags,mu,ev){
         if(sa>sc)c.bumped=true;else a.bumped=true;moving=true;ev.push({t:'hit',b:a,o:c,j:J})}}
   }
   for(const b of act){if(b.status!=='board')continue;
-    if(Math.hypot(b.x-HOLE.x,b.y-HOLE.y)<CAP){b.status='hole';b.vx=b.vy=0;ev.push({t:b.own?(b.bumped?'jumper':'slider'):'oppHole',b});continue}
+    const dh=Math.hypot(b.x-HOLE.x,b.y-HOLE.y);
+    if(dh<(b.dbl?V2.CAP_DBL:CAP)){
+      if(b.bumped||!b.own||Math.hypot(b.vx,b.vy)<=V2.VCAP){b.status='hole';b.vx=b.vy=0;ev.push({t:b.own?(b.bumped?'jumper':'slider'):'oppHole',b});continue}
+      else if(!b.over){b.over=1;ev.push({t:'over',b})}
+    }
     if(Math.abs(b.x)>BW||b.y>BL||b.y<0){b.status='ground';if(Math.abs(b.x)>BW)b.x+=Math.sign(b.x)*3;if(b.y>BL)b.y+=4;if(b.y<0)b.y-=3;b.vx=b.vy=0;ev.push({t:b.own?'off':'cleared',b})}
   }
   return moving;
@@ -212,8 +260,8 @@ function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k))
 let G=null, phase='intro', phaseT=0, aimX=0, powT=0, flight=null, settleQuiet=0, lastHit=0;
 let floaters=[],parts=[],shake=0,cheerT=0,toastTimer=null;
 function newGame(mode,seed){
-  const day=makeDay(seed);
-  G={mode,seed,day,fi:0,bags:[],left:4,shot:'slide',dbl:false,frames:[],throws:[],highlights:[],nextId:1,done:false};
+  const day=mode==='daily'?dayFor(TODAY):makeDay(seed);
+  G={mode,seed,day,fi:0,bags:[],left:4,shot:'slide',dbl:false,frames:[],throws:[],highlights:[],nextId:1,done:false,pending:null};
   startFrame(true);
 }
 function startFrame(silent){
@@ -221,12 +269,13 @@ function startFrame(silent){
   if(G.throws.length>G.fi+1)G.throws.length=G.fi+1;
   setPhase('aim');updateHUD();
   const bl=f.blockers.length;
-  toast(`Frame ${G.fi+1}`,`${bl?bl+' '+G.day.opp.n+' bag'+(bl>1?'s':'')+' on the board · ':''}${windTxt(f.wind)}`);
+  toast(`Frame ${G.fi+1}`,`${bl?bl+' '+G.day.opp.n+' bag'+(bl>1?'s':'')+' on the board · ':''}${windTxt(curWind())}${f.winds?' · gusty':''}`);
 }
+function curWind(){return G?windAt(G.day.frames[Math.min(G.fi,2)],4-G.left):0}
 function windTxt(w){return w===0?'calm':`wind ${w<0?'← ':''}${Math.abs(w)} mph${w>0?' →':''}`}
 function setPhase(p){phase=p;phaseT=0;updateControls()}
-function save(){if(!G||G.mode!=='daily')return;ls('fb-'+TODAY,{fi:G.fi,bags:G.bags,left:G.left,shot:G.shot,frames:G.frames,throws:G.throws,highlights:G.highlights,nextId:G.nextId,done:G.done})}
-function restore(s){Object.assign(G,s);updateHUD()}
+function save(){if(!G||G.mode!=='daily')return;ls('fb-'+TODAY,{v:2,fi:G.fi,bags:G.bags,left:G.left,shot:G.shot,frames:G.frames,throws:G.throws,highlights:G.highlights,nextId:G.nextId,done:G.done,pending:G.pending||null})}
+function restore(s){Object.assign(G,s);if(!Array.isArray(G.throws))G.throws=[];while(G.throws.length<=G.fi)G.throws.push([]);if(!Array.isArray(G.highlights))G.highlights=[];if(!Array.isArray(G.frames))G.frames=[];updateHUD()}
 
 /* ---------- input ---------- */
 function tri(t,period){const x=(t/period)%1;return x<.5?x*2:2-x*2}
@@ -244,13 +293,14 @@ document.getElementById('helpBtn').onclick=()=>showIntro(true);
 
 function throwBag(){
   const f=G.day.frames[G.fi];
-  const spec={aimX:+aimX.toFixed(3),t:+powT.toFixed(4),shot:G.shot,dbl:G.dbl};
-  const lp=landPoint(spec,f.wind),S=SHOTS[spec.shot];
+  const spec={aimX:+aimX.toFixed(3),t:+powT.toFixed(4),shot:G.shot,dbl:G.dbl,id:G.nextId,w:curWind()};
+  G.pending=spec;save();   // the throw counts the moment it leaves your hand, even if you reload
+  const lp=landPoint(spec,spec.w),S=SHOTS[spec.shot];
   flight={spec,lp,S,t:0,spin:0};sfx.whoosh();setPhase('flight');
 }
 function finishFlight(){
-  const f=G.day.frames[G.fi],spec=flight.spec;const id=G.nextId++;
-  const ev=landBag(G.bags,spec,f.wind,id);
+  const spec=flight.spec;const id=spec.id;G.nextId=id+1;
+  const ev=landBag(G.bags,spec,spec.w,id);
   G.cur={id,spec};flight=null;handleEvents(ev);settleQuiet=0;setPhase('settle');
 }
 function bagScreen(b){return proj(b.x,hAt(b),DIST+b.y)}
@@ -258,13 +308,14 @@ function handleEvents(ev){
   for(const e of ev){const p=bagScreen(e.b);
     switch(e.t){
       case'land':sfx.thud();sfx.slide();dust(p,e.b.dbl?14:8,'#d9b98a');if(e.b.dbl)shake=5;break;
-      case'grass':sfx.grass();dust(p,6,'#7fb069');float(p,e.b.dbl?'Lost both bags':(e.b.how==='short'?'Short':e.b.how==='long'?'Long':'Wide'),'#f5ecd7');if(e.b.dbl)sfx.ooh();break;
+      case'grass':sfx.grass();dust(p,6,'#7fb069');float(p,e.b.dbl?'Lost both bags −2':(e.b.how==='short'?'Short':e.b.how==='long'?'Long':'Wide'),'#f5ecd7');if(e.b.dbl)sfx.ooh();break;
       case'airmail':sfx.hole();cheer(p,'AIRMAIL!'+(e.b.dbl?' ×2':''));hl('Airmail'+(e.b.dbl?' (double)':''));break;
       case'slider':sfx.hole();cheer(p,(e.b.dbl?'DOUBLE DUNK':'Slider!'));hl(e.b.dbl?'Double dunk':'Slider');break;
       case'jumper':sfx.hole();cheer(p,'Jumper! Pushed in');hl('Jumper');break;
       case'oppHole':sfx.hole();sfx.ooh();float(p,"Oops, that's theirs −3",'#ffb4a8');hl('Dunked their bag');break;
       case'cleared':sfx.knock();float(p,'Clean-out +1','#f0b43c');hl('Clean-out');break;
-      case'off':sfx.knock();sfx.ooh();float(p,e.b.dbl?'Double knocked off':'Knocked off','#f5ecd7');break;
+      case'over':float(p,'Too hot, rode over','#f5ecd7');break;
+      case'off':sfx.knock();sfx.ooh();float(p,e.b.dbl?'Double knocked off −2':'Knocked off','#f5ecd7');break;
       case'hit':{const t=performance.now();if(t-lastHit>90&&e.j>4){sfx.knock();lastHit=t}break}
     }
   }
@@ -274,17 +325,34 @@ function afterSettle(){
   const b=G.bags.find(x=>x.id===G.cur.id);
   if(b&&b.status==='board'&&Math.hypot(b.x-HOLE.x,b.y-HOLE.y)<HOLE.r+1.6){float(bagScreen(b),'Hanger','#f0b43c');hl('Hanger')}
   G.throws[G.fi].push({id:G.cur.id,dbl:G.cur.spec.dbl});
-  G.left-=G.cur.spec.dbl?2:1;G.dbl=false;G.cur=null;
-  updateHUD();
-  if(G.left<=0){setPhase('frameEnd');setTimeout(endFrame,900)}else{setPhase('aim')}
-  save();
+  const w0=curWind();
+  G.left-=G.cur.spec.dbl?2:1;G.dbl=false;G.cur=null;G.pending=null;
+  if(G.left<=0)recordFrame();
+  save();updateHUD();
+  if(G.left<=0){setPhase('frameEnd');setTimeout(endFrame,900)}else{setPhase('aim');const w1=curWind();if(w1!==w0)toast('Gust!',`Wind now ${windTxt(w1)}`)}
 }
-function throwEmoji(b){const e=b.status==='hole'?'🎯':b.status==='board'?'🟫':'⬜';return b.dbl?'['+e+e+']':e}
-function endFrame(){
+// replays a throw that was in the air when the page was closed, so it counts exactly as thrown
+function commitPending(){
+  const sp=G.pending;if(!sp||G.left<=0||G.frames[G.fi]){G.pending=null;return null}
+  const ev=landBag(G.bags,sp,sp.w,sp.id);settle(G.bags,G.day.surface.mu,ev);
+  G.nextId=Math.max(G.nextId,sp.id+1);G.throws[G.fi].push({id:sp.id,dbl:!!sp.dbl});
+  const b=G.bags.find(x=>x.id===sp.id);
+  if(b&&b.status==='hole')hl(b.how==='airmail'?'Airmail':b.bumped?'Jumper':'Slider');
+  G.left-=sp.dbl?2:1;G.dbl=false;G.pending=null;
+  if(G.left<=0)recordFrame();
+  save();return b
+}
+function recordFrame(){
+  if(G.frames[G.fi])return G.frames[G.fi];
   const sc=frameScore(G.bags);
   const rows=G.throws[G.fi].map(t=>{const b=G.bags.find(x=>x.id===t.id);return{e:throwEmoji(b),p:bagPts(b),txt:(b.dbl?'Stacked double · ':'')+(b.status==='hole'?(b.how==='airmail'?'airmail':'in the hole'):b.status==='board'?'zone '+zoneOf(b.y):'off the board')}});
   G.frames[G.fi]={...sc,rows};
   if(sc.four)hl('Four-bagger');
+  return G.frames[G.fi];
+}
+function throwEmoji(b){const e=b.status==='hole'?'🎯':b.status==='board'?'🟫':'⬜';return b.dbl?'['+e+e+']':e}
+function endFrame(){
+  const sc=recordFrame(),rows=sc.rows;
   save();updateHUD();
   const last=G.fi===2;
   let h=`<div class="kick">Frame ${G.fi+1} of 3</div><h2>${sc.total} point${sc.total===1?'':'s'}</h2><table>`;
@@ -294,19 +362,20 @@ function endFrame(){
   if(sc.four)h+=`<tr><td>🌽 Four-bagger bonus</td><td>+3</td></tr>`;
   h+=`</table><div class="muted">Running total: <b>${total()}</b> · target ${G.day.target}</div>`;
   h+=`<button class="btn" id="nextBtn">${last?'See today\'s result':'Next frame →'}</button>`;
-  showCard(h);
+  showCard(h,true);
   document.getElementById('nextBtn').onclick=()=>{hideCard();if(last){G.done=true;save();finishDay()}else{G.fi++;startFrame();save()}};
 }
 function total(){return G.frames.reduce((s,f)=>s+(f?f.total:0),0)}
 
 /* ---------- HUD / controls ---------- */
 function updateHUD(){
-  if(!G)return;const f=G.day.frames[Math.min(G.fi,2)];
+  if(!G)return;const f=G.day.frames[Math.min(G.fi,2)],w=curWind();
   document.getElementById('num').textContent=G.mode==='daily'?`#${PNUM}`:'Practice';
   document.getElementById('hFrame').textContent=`Frame ${G.fi+1} / 3`;
-  document.getElementById('hWind').textContent=f.wind===0?'Calm':`${f.wind<0?'← ':''}${Math.abs(f.wind)} mph${f.wind>0?' →':''}`;
+  document.getElementById('hWind').innerHTML=(w===0?'Calm':`${w<0?'← ':''}${Math.abs(w)} mph${w>0?' →':''}`)+(f.winds?'<small>gusty</small>':'');
   document.getElementById('hTarget').textContent=G.day.target;
-  document.getElementById('hScore').textContent=total()+(phase!=='intro'&&!G.frames[G.fi]?' + '+frameScore(G.bags).total:'');
+  const live=!G.frames[G.fi]&&G.throws[G.fi]&&G.throws[G.fi].length?frameScore(G.bags).total:null;
+  document.getElementById('hScore').innerHTML=(live!==null?`<small>${live>=0?'+':''}${live} this frame</small>`:'')+(total()+(live||0));
   let r='';const used=4-G.left;for(let i=0;i<4;i++){const u=i<used;const pick=!u&&G.dbl&&i<used+2||(!u&&!G.dbl&&i===used&&phase==='aim');r+=`<i class="${u?'used':''} ${pick?'pick':''}"></i>`}
   document.getElementById('rack').innerHTML=r;
 }
@@ -315,7 +384,9 @@ function updateControls(){
   document.querySelectorAll('#shotSeg button').forEach(b=>{b.classList.toggle('on',G&&b.dataset.shot===G.shot);b.disabled=!can});
   const d=document.getElementById('dblBtn');d.classList.toggle('on',!!(G&&G.dbl));d.disabled=!can||G.left<2;
   const hint=document.getElementById('hint');
-  hint.innerHTML=phase==='aim'?'<b>Tap</b> to lock your aim':phase==='power'?'<b>Tap</b> to set distance and throw':phase==='flight'||phase==='settle'?'&nbsp;':'';
+  const w=G?curWind():0,dr=G?Math.abs(w*SHOTS[G.shot].drift):0,side=w>0?'left':'right';
+  const adv=!G||w===0?'':` · wind ${w>0?'→':'←'}, aim ${dr<1.5?'a hair':dr<4?'a bit':dr<8?'well':'way'} ${side}`;
+  hint.innerHTML=phase==='aim'?'<b>Tap</b> to lock your aim'+adv:phase==='power'?(G.shot==='slide'?'<b>Tap</b> to set distance · end the gold tail on the hole':'<b>Tap</b> to set distance · drop it on the hole'):phase==='flight'||phase==='settle'?'&nbsp;':'';
   updateHUD();
 }
 function toast(t,s){const el=document.getElementById('toast');el.innerHTML=`<b>${t}</b>${s}`;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2300)}
@@ -342,7 +413,7 @@ function drawScene(time){
   for(const [y0,sag,ph] of [[14,26,0],[38,18,1.3]]){ctx.strokeStyle='rgba(20,14,8,.8)';ctx.lineWidth=1.2;ctx.beginPath();for(let x=0;x<=CW;x+=10){const y=y0+sag*Math.sin(Math.PI*x/CW)+Math.sin(time*1.1+ph)*1.2;x?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();
     for(let x=14;x<CW;x+=34){const y=y0+sag*Math.sin(Math.PI*x/CW)+Math.sin(time*1.1+ph)*1.2+4;const fl=.75+.25*Math.sin(time*3+x);const gr=ctx.createRadialGradient(x,y,0,x,y,14);gr.addColorStop(0,`rgba(255,214,130,${.55*fl})`);gr.addColorStop(1,'rgba(255,214,130,0)');ctx.fillStyle=gr;ctx.fillRect(x-14,y-14,28,28);ctx.fillStyle=`rgba(255,236,190,${fl})`;ctx.beginPath();ctx.arc(x,y,2.6,0,7);ctx.fill()}}
   // wind flag
-  if(G){const w=G.day.frames[Math.min(G.fi,2)].wind;const px=392,top=110;ctx.strokeStyle='#cfc4ad';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px,top);ctx.lineTo(px,fenceB-6);ctx.stroke();
+  if(G){const w=curWind();const px=374,top=110;ctx.strokeStyle='#cfc4ad';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px,top);ctx.lineTo(px,fenceB-6);ctx.stroke();
     const L=Math.abs(w)<.5?6:10+Math.abs(w)*3.2,dir=w>=0?1:-1,droop=Math.abs(w)<.5?18:Math.max(2,10-Math.abs(w));ctx.fillStyle='#e8553f';ctx.beginPath();ctx.moveTo(px,top);
     for(let i=0;i<=8;i++){const u=i/8;ctx.lineTo(px+dir*L*u,top+droop*u*0.6+Math.sin(time*7+u*5)*2*u)}ctx.lineTo(px,top+12);ctx.closePath();ctx.fill();
     ctx.fillStyle='#f5ecd7';ctx.font="700 11px 'DM Sans',sans-serif";ctx.textAlign='center';ctx.fillText(w===0?'calm':Math.abs(w)+' mph',px+(w<0?-14:0),top-6)}
@@ -434,28 +505,27 @@ function loop(ts){
 }
 
 /* ---------- cards ---------- */
-function showCard(h){document.getElementById('card').innerHTML=h;document.getElementById('overlay').classList.add('show')}
+function showCard(h,sheet){document.getElementById('card').innerHTML=h;const o=document.getElementById('overlay');o.classList.toggle('sheet',!!sheet);o.classList.add('show');document.getElementById('card').scrollTop=0}
 function hideCard(){document.getElementById('overlay').classList.remove('show')}
 function introHTML(again){
   const d=G.day,dt=new Date();const fr=d.frames;
   return `<div class="kick">${G.mode==='daily'?`Four Bagger #${PNUM} · ${dt.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}`:'Practice board'}</div>
   <h2>Three frames. Four bags each.</h2>
   <div class="match"><div class="sw" style="background:${OWN}"></div><span class="vs">VS</span><div class="sw" style="background:${d.opp.c}"></div><div class="t"><b>${d.opp.n}</b><br>${d.venue}</div></div>
-  <div class="chips"><span class="chip">🪵 ${d.surface.name}: ${d.surface.desc}</span>${fr.map((f,i)=>`<span class="chip">F${i+1}: ${windTxt(f.wind)}${f.blockers.length?` · ${f.blockers.length} blocker${f.blockers.length>1?'s':''}`:''}</span>`).join('')}<span class="chip">🎯 Target ${d.target}</span></div>
+  <div class="chips">${d.twist?`<span class="chip tw">⚡ Today: ${d.twist.name} · ${d.twist.desc}</span>`:''}<span class="chip">🪵 ${d.surface.name}: ${d.surface.desc}</span>${fr.map((f,i)=>`<span class="chip">F${i+1}: ${f.winds?'gusts '+f.winds.map(x=>Math.abs(x)).join('/')+' mph':windTxt(f.wind)}${f.blockers.length?` · ${f.blockers.length} blocker${f.blockers.length>1?'s':''}`:''}</span>`).join('')}<span class="chip">🎯 Target ${d.target}</span></div>
   <div class="legend"><div class="mini" style="background:linear-gradient(#965a32 0 33.3%,#cd955a 33.3% 66.6%,#e6c48e 66.6%)"><div style="top:0;height:33%">3</div><div style="top:33%;height:33%">2</div><div style="top:66%;height:34%">1</div><div class="h">5</div></div>
-  <ul style="margin:0"><li><b>Tap</b> to lock your aim, <b>tap</b> again to set distance.</li><li><b>Slide</b> lands short and slides. The gold dotted tail shows how far it slides (wind not included).</li><li><b>Lob</b> barely slides and can drop straight in (airmail). Wind pushes it more.</li></ul></div>
-  <ul><li>Bags score where they <b>end up</b> after the frame: zone 1, 2 or 3, or <b>5</b> in the hole. Your own bags can push each other in, or off.</li>
-  <li><b>Stack 2</b>: throw two bags as one for <b>double points</b> (12 in the hole). If it ends up off the board, you lose both.</li>
-  <li>Their bags are in the way. Knock one off: <b>+1</b>. Push one in: <b>−3</b>.</li>
-  <li>All four of your bags in the hole in a frame: <b>+3</b> four-bagger bonus.</li></ul>
-  <button class="btn" id="startBtn">${again?'Back to the board':G.fi>0||G.throws.length>1||(G.throws[0]&&G.throws[0].length)?`Resume frame ${G.fi+1}`:'Start throwing'}</button>`;
+  <ul style="margin:0"><li><b>Tap</b> to lock your aim, <b>tap</b> again to set distance.</li><li><b>Slide</b> lands short and runs along the gold tail. Too hot and it <b>rides over</b> the hole.</li><li><b>Lob</b> sticks where it lands and can drop straight in, but wind pushes it about 3× more.</li></ul></div>
+  <ul><li>Bags score where they <b>end up</b>: zone 1, 2 or 3, <b>5</b> in the hole, <b>+3</b> if all four go in.</li>
+  <li><b>Stack 2</b>: two bags as one for <b>double points</b> (12 in the hole). Wider, so it needs a truer line. Off the board: <b>−2</b>.</li>
+  <li>Their bags: knock one off <b>+1</b>, push one in <b>−3</b>.</li></ul>
+  <div class="stick"><button class="btn" id="startBtn">${again?'Back to the board':G.fi>0||G.throws.length>1||(G.throws[0]&&G.throws[0].length)?`Resume frame ${G.fi+1}`:'Start throwing'}</button></div>`;
 }
 function showIntro(again){if(!G)return;showCard(introHTML(again));document.getElementById('startBtn').onclick=()=>{ac();hideCard();if(!again&&phase==='intro'){setPhase('aim');startFrameToast()}}}
-function startFrameToast(){const f=G.day.frames[G.fi];toast(`Frame ${G.fi+1}`,windTxt(f.wind))}
-function rank(s,t){return s>=t+10?'Backyard legend':s>=t?'Four-bagger material':s>=t-6?'Solid on the wood':s>=t-14?'Tailgate regular':'Grass collector'}
+function startFrameToast(){const f=G.day.frames[G.fi];toast(`Frame ${G.fi+1}`,windTxt(curWind())+(f.winds?' · gusty':''))}
+function rank(s,t){return s>=t+25?'Cornhole Hall of Fame':s>=t+12?'Backyard legend':s>=t?'Four-bagger material':s>=t-7?'Solid on the wood':s>=t-15?'Tailgate regular':'Grass collector'}
 function shareText(){
   const t=total(),d=G.day.target,diff=t-d;
-  let s=`Four Bagger #${PNUM} 🌽 ${t} pts (target ${d}, ${diff>=0?'+':''}${diff})\n`;
+  let s=`Four Bagger #${PNUM} 🌽 ${t} pts (target ${d}, ${diff>=0?'+':''}${diff})${G.day.twist?' ⚡'+G.day.twist.name:''}\n`;
   G.frames.forEach((f,i)=>{s+=`F${i+1} ${f.rows.map(r=>r.e).join('')} ${f.total}${f.cleared?' 🧹'+f.cleared:''}${f.oops?' 😬'+f.oops:''}\n`});
   return s.trim();
 }
@@ -475,7 +545,8 @@ function finishDay(){
   h+=`<button class="btn alt" id="pracBtn">Practice board</button>`;
   if(G.mode!=='daily')h+=`<button class="btn alt" id="dailyBtn">Back to today's game</button>`;
   showCard(h);
-  document.getElementById('copyBtn').onclick=async e=>{try{await navigator.clipboard.writeText(shareText());e.target.textContent='Copied ✓'}catch(_){e.target.textContent='Select the text above to copy'}};
+  document.getElementById('copyBtn').onclick=async e=>{const txt=shareText();let ok=false;try{await navigator.clipboard.writeText(txt);ok=true}catch(_){try{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(__){}}
+    if(ok)e.target.textContent='Copied ✓';else{e.target.textContent='Select the text above to copy';const r=document.createRange();r.selectNodeContents(document.getElementById('share'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r)}};
   document.getElementById('pracBtn').onclick=()=>{hideCard();newGame('practice',(Math.random()*1e9)|0);phase='intro';showIntro(false)};
   const db=document.getElementById('dailyBtn');if(db)db.onclick=()=>{hideCard();boot()};
   tickCD();
@@ -486,8 +557,16 @@ function tickCD(){const el=document.getElementById('cd');if(!el)return;const n=n
 function boot(){
   newGame('daily',hashStr('fourbagger-'+TODAY));phase='intro';updateControls();
   const s=ls('fb-'+TODAY);
-  if(s){restore(s);if(s.done){finishDay();return}if(G.frames[G.fi]){G.fi++;if(G.fi>2){G.done=true;finishDay();return}G.bags=makeBlockers(G.day.frames[G.fi]);G.left=4;G.throws[G.fi]=[]}}
+  let replayed=null;
+  const valid=s&&typeof s==='object'&&(s.done===true||(Array.isArray(s.bags)&&Number.isInteger(s.fi)&&s.fi>=0&&s.fi<=2&&typeof s.left==='number'&&Array.isArray(s.frames)));
+  if(valid){try{restore(s);if(s.done){finishDay();return}
+    if(G.pending)replayed=commitPending();
+    if(!G.frames[G.fi]&&G.left<=0)recordFrame();
+    if(G.frames[G.fi]){G.fi++;if(G.fi>2){G.done=true;save();finishDay();return}G.bags=makeBlockers(G.day.frames[G.fi]);G.left=4;G.throws[G.fi]=[];save()}
+  }catch(e){newGame('daily',0);phase='intro'}}
+  else if(s)ls('fb-'+TODAY+'-bad',s);
   showIntro(false);
+  if(replayed)toast('Your last throw counted',replayed.status==='hole'?'It went in 🎯':replayed.status==='board'?'It stayed on the board':'It missed the board');
 }
 fit();boot();requestAnimationFrame(loop);
 </script>

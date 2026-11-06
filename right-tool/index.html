@@ -1,0 +1,2422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Right Tool — today's jobsite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#26231f;--muted:#6f675c;--paper:#f6f1e7;--card:#fffdf8;--line:#e4dccd;--accent:#ef7d1a;--accentD:#c9600a;--yellow:#f2b705;--good:#2a9d55;--bad:#d6312b;--warn:#c98a00;--blue:#1d4f91}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Archivo,system-ui,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default}
+header{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:2px solid var(--ink);background:var(--yellow);background-image:repeating-linear-gradient(-45deg,rgba(0,0,0,.0) 0 18px,rgba(0,0,0,.06) 18px 36px)}
+.logo{font-family:'Archivo Black',Archivo,sans-serif;font-size:22px;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
+.logo svg{width:30px;height:30px}
+.hmeta{font-size:13px;font-weight:600;opacity:.8}
+header .sp{flex:1}
+.hbtn{border:2px solid var(--ink);background:var(--card);border-radius:999px;padding:5px 12px;font-weight:700;font-size:13px}
+main{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:18px;padding:16px 18px 40px;max-width:1240px;margin:0 auto}
+@media (max-width:900px){main{grid-template-columns:1fr;padding:12px;gap:12px}}
+.yardCol{position:sticky;top:10px;align-self:start}
+@media (max-width:900px){.yardCol{position:static}
+  main{display:flex;flex-direction:column}
+  main > .panel{display:contents}
+  .panel > .jobcard{order:-2}.panel > #doneBanner{order:-3}
+  main > .yardCol{order:-1;align-self:stretch}
+}
+@media (max-width:560px){
+  header{padding:8px 12px;gap:8px;flex-wrap:wrap}
+  .logo{font-size:18px}.logo svg{width:24px;height:24px}
+  .hmeta{font-size:12px;flex-basis:100%;order:3;margin-top:-4px}
+  .hbtn{padding:4px 10px;font-size:12px;white-space:nowrap}
+  .box{padding:10px 12px}
+  .jobcard h2{font-size:20px}
+  .eq .ico{width:44px;height:44px}
+  .statsGrid b{font-size:19px}
+  .sheet{padding:14px 14px}
+  .sheet h2{font-size:20px}
+  #playbar{position:sticky;top:0;z-index:5}
+}
+.toolbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
+.tool{border:2px solid var(--ink);background:var(--card);border-radius:8px;padding:6px 10px;font-weight:700;font-size:13px}
+.tool.on{background:var(--ink);color:#fff}
+.tool.ghost{border-color:var(--line)}
+#hint{font-size:13px;color:var(--muted);margin:2px 0 8px;min-height:18px}
+#yardWrap{position:relative;width:100%;display:flex;justify-content:center}
+#yard{border:2px solid var(--ink);border-radius:10px;touch-action:none;background:#9ccc6b;box-shadow:0 6px 0 rgba(38,35,31,.12)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin-top:8px;justify-content:center}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-2px;margin-right:4px}
+.panel{display:flex;flex-direction:column;gap:12px}
+.box{background:var(--card);border:2px solid var(--ink);border-radius:12px;padding:12px 14px}
+.jobcard{background:#fff;position:relative;box-shadow:0 5px 0 rgba(38,35,31,.12)}
+.jobcard .tag{display:inline-block;background:var(--ink);color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px}
+.jobcard h2{margin:6px 0 2px;font-family:'Archivo Black',Archivo,sans-serif;font-size:22px;letter-spacing:-.3px}
+.jobcard p{margin:4px 0 8px;font-size:14px;line-height:1.4}
+#blurb{color:var(--muted);font-size:13px}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;border-top:1px dashed var(--line);padding-top:8px;font-size:13px}
+.specs div span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.specs b{font-size:15px}
+.specs b.sm{font-size:13px}
+.specs .wide{grid-column:1/-1}
+.specs [hidden]{display:none}
+.step h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.step h3 .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px}
+.eqlist{display:flex;flex-direction:column;gap:6px}
+.eq{display:flex;gap:10px;align-items:center;text-align:left;border:2px solid var(--line);background:#fff;border-radius:10px;padding:6px 8px;transition:border-color .15s, transform .1s}
+.eq:hover:not(:disabled){border-color:#bfb4a2}
+.eq.sel{border-color:var(--ink);background:#fff8e6;box-shadow:inset 4px 0 0 var(--accent)}
+.eq .ico{width:52px;height:52px;border-radius:8px;flex:none}
+.eqt{flex:1;min-width:0}
+.eqn{font-weight:800;font-size:14px;display:flex;justify-content:space-between;gap:6px}
+.price{font-weight:700;color:var(--muted);font-size:12px;white-space:nowrap}
+.eqs{font-size:12px;color:var(--ink);opacity:.8;margin-top:1px}
+.eqpc{font-size:11.5px;margin-top:2px;display:flex;flex-direction:column}
+.pro{color:#2a7a44}.con{color:#a2432d}
+.crew{display:flex;gap:6px}
+.crew button{flex:1;border:2px solid var(--line);background:#fff;border-radius:10px;padding:8px 4px;font-weight:800}
+.crew button.on{border-color:var(--ink);background:#fff8e6;box-shadow:inset 0 -4px 0 var(--accent)}
+.crew small{display:block;font-weight:600;color:var(--muted);font-size:11px}
+.toggle{display:flex;gap:10px;align-items:flex-start;padding:6px 2px;font-size:13.5px;cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--accent);margin-top:2px}
+.toggle small{display:block;color:var(--muted);font-size:12px}
+#checks{list-style:none;margin:0;padding:0;font-size:13px;display:flex;flex-direction:column;gap:5px}
+#checks li{display:flex;gap:8px;align-items:flex-start;line-height:1.35}
+#checks .dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:4px;background:#bbb}
+#checks .ok .dot{background:var(--good)}#checks .bad .dot{background:var(--bad)}#checks .warn .dot{background:var(--yellow)}#checks .info .dot{background:var(--blue)}#checks .todo{color:var(--muted)}
+#checks .bad{color:#9c241f;font-weight:600}
+.startRow{display:flex;align-items:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.startRow .money{flex:1;font-size:13px}
+.startRow .money b{font-size:17px}
+.startRow .money small{display:block;color:var(--muted)}
+#start{border:2px solid var(--ink);background:var(--accent);color:#fff;border-radius:10px;padding:12px 18px;font-weight:800;font-size:16px;box-shadow:0 4px 0 var(--ink);transition:transform .05s}
+#start:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+#start.arm{background:var(--bad)}
+#start:disabled{background:#d8cfbf;color:#8a8070;box-shadow:0 4px 0 #b9ae9b;border-color:#b9ae9b}
+.running .eq,.running .crew,.running .toggle{pointer-events:none;opacity:.6}
+#playbar{display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;border-radius:10px;padding:8px 12px;margin-bottom:8px;flex-wrap:wrap}
+#playbar[hidden],#planUI[hidden],#hint[hidden],.box[hidden]{display:none}
+.spots{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.spot{text-align:left;border:2px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.spot.on{border-color:var(--ink);background:#fff8e6;box-shadow:inset 0 -4px 0 var(--accent)}
+.spot b{font-size:14px}.spot small{font-size:12px;color:var(--muted)}
+.spot:only-child{grid-column:1/-1}
+#clock{font-family:'Archivo Black',Archivo,sans-serif;font-size:20px;min-width:92px}
+#clock.late{color:#ff8a7a}
+#phase{flex:1;font-size:13px;font-weight:600;min-width:140px}
+#hudSoil{font-size:12px;opacity:.8}
+#playbar button{background:transparent;border:1.5px solid rgba(255,255,255,.5);color:#fff;border-radius:6px;padding:3px 8px;font-weight:700;font-size:12px}
+#playbar button.on{background:#fff;color:var(--ink)}
+#timebar{position:relative;height:6px;background:rgba(255,255,255,.2);border-radius:3px;width:100%}
+#timebar i{position:absolute;left:0;top:0;bottom:0;background:var(--yellow);border-radius:3px}
+#timebar b{position:absolute;top:-4px;width:2px;height:14px;background:#ff8a7a}
+#toasts{position:fixed;left:50%;top:70px;transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;z-index:40;pointer-events:none;width:min(92vw,460px)}
+.toast{background:var(--ink);color:#fff;padding:9px 14px;border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:opacity .5s, transform .5s;border-left:5px solid var(--bad)}
+.toast.out{opacity:0;transform:translateY(-8px)}
+.modal{position:fixed;inset:0;background:rgba(38,35,31,.55);display:grid;place-items:center;z-index:50;padding:14px;overflow:auto}
+.modal[hidden]{display:none}
+.sheet{background:var(--card);border:2px solid var(--ink);border-radius:14px;max-width:520px;width:100%;padding:18px 20px;box-shadow:0 10px 0 rgba(0,0,0,.2);max-height:calc(100vh - 28px);overflow:auto}
+.sheet h2{margin:0;font-family:'Archivo Black',Archivo,sans-serif;font-size:24px;letter-spacing:-.4px}
+#rRank{color:var(--accentD);font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:2px 0 4px}
+#rSetup{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+.part{margin:6px 0}
+.pl{display:flex;justify-content:space-between;font-size:13px;font-weight:600}
+.pl small{color:var(--muted);font-weight:500}
+.pb{height:8px;background:#ece5d8;border-radius:4px;overflow:hidden;margin-top:3px}
+.pb i{display:block;height:100%;background:var(--accent)}
+#rPar{margin:10px 0 0;padding:8px 10px;background:#fff8e6;border:1.5px dashed var(--accent);border-radius:8px;font-size:13.5px}
+#rPar[hidden],#rParPlan[hidden],.linkbtn[hidden]{display:none}
+#rParPlan{margin-top:4px;font-weight:700}
+.linkbtn{border:0;background:none;padding:0;color:var(--accentD);font-weight:800;text-decoration:underline;font-size:13px}
+#rLines{margin:12px 0;padding-left:18px;font-size:14px;line-height:1.45}
+#rLines li{margin:3px 0}
+details{font-size:13px;margin:6px 0 10px}
+summary{cursor:pointer;font-weight:700}
+#rCost{width:100%;border-collapse:collapse;margin-top:6px}
+#rCost td{padding:3px 0;border-bottom:1px dotted var(--line)}
+#rCost td:last-child{text-align:right}
+#rCost .tot td{font-weight:800;border-bottom:none}
+.statsGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;margin:10px 0}
+.statsGrid b{display:block;font-family:'Archivo Black',Archivo,sans-serif;font-size:22px}
+.statsGrid span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{border:2px solid var(--ink);background:#fff;border-radius:10px;padding:9px 14px;font-weight:800}
+.btn.primary{background:var(--accent);color:#fff}
+.next{font-size:12.5px;color:var(--muted);margin-top:10px}
+#shareOut{width:100%;height:110px;margin-top:8px;font-family:ui-monospace,monospace;font-size:12px}
+#practiceBar{display:flex;gap:8px;align-items:center;background:#fff8e6;border:2px dashed var(--accent);border-radius:10px;padding:7px 10px;font-size:13px;font-weight:600;margin-bottom:8px;flex-wrap:wrap}
+#practiceBar[hidden]{display:none}
+#practiceBar select{font:inherit;padding:3px 6px;border-radius:6px;border:1.5px solid var(--ink)}
+#doneBanner{background:#eaf6ee;border:2px solid var(--good);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#doneBanner[hidden]{display:none}
+#doneBanner button{border:1.5px solid var(--ink);background:#fff;border-radius:6px;padding:3px 8px;font-weight:700;font-size:12px}
+.help ol{padding-left:20px;font-size:14px;line-height:1.5}
+.help li{margin:4px 0}
+.help .note{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><svg viewBox="0 0 32 32"><rect x="3" y="20" width="18" height="7" rx="2" fill="#26231f"/><rect x="7" y="12" width="11" height="9" rx="2" fill="#fff8e6" stroke="#26231f" stroke-width="2"/><path d="M17 14 L25 7 L29 13" stroke="#26231f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M26 13 h5 l-2 5 h-4z" fill="#26231f"/></svg>Right Tool</div>
+  <div class="hmeta"><span id="dayNo"></span> · <span id="dateLine"></span></div>
+  <div class="sp"></div>
+  <button class="hbtn" id="helpBtn">How to play</button>
+  <button class="hbtn" id="statsBtn">Stats</button>
+</header>
+<main>
+  <section class="yardCol">
+    <div id="practiceBar" hidden>Practice — not scored. Site: <select id="sitePick"></select><button class="tool ghost" id="backToday">Back to today</button></div>
+    <div id="playbar" hidden>
+      <span id="clock">7:00 am</span><span id="phase"></span><span id="hudSoil"></span>
+      <button data-speed="1" class="on">1×</button><button data-speed="3">3×</button><button id="skip">Skip ⏭</button>
+      <div id="timebar"><i></i><b title="Deadline"></b></div>
+    </div>
+    <div id="planUI"></div>
+    <div id="hint"></div>
+    <div id="yardWrap"><canvas id="yard"></canvas></div>
+    <div class="legend"><span><i style="background:rgba(40,110,220,.35)"></i>Reach</span><span><i style="background:rgba(240,140,20,.55)"></i>Rear swing</span><span><i style="background:rgba(255,255,255,.9);border:1px solid #bbb"></i>Route width</span><span><i style="background:#d6312b"></i>Conflict</span></div>
+  </section>
+  <section class="panel">
+    <div id="doneBanner" hidden>✅ Today's job scored <b id="doneScore"></b>/100. Next site in <span class="countdown"></span>. <button id="practiceLink">Practise</button></div>
+    <div class="box jobcard">
+      <span class="tag">Job card</span>
+      <h2 id="siteName"></h2>
+      <p id="jobText"></p>
+      <p id="blurb"></p>
+      <div class="specs">
+        <div><span>Excavate</span><b id="jVol"></b> <small id="jDims"></small></div>
+        <div><span>Deadline</span><b id="jDeadline"></b> <small>(start 7:00 am)</small></div>
+        <div><span>Budget</span><b id="jBudget"></b></div>
+        <div><span>Lawn</span><b id="jLawn" class="sm"></b></div>
+        <div><span>Soil</span><b id="jSoil" class="sm"></b></div>
+        <div><span>Haul route</span><b id="jRoute" class="sm"></b></div>
+        <div class="wide" id="jWarnBox" hidden><span>Marked on site</span><b id="jWarn" class="sm"></b></div>
+      </div>
+    </div>
+    <div class="box step"><h3><span class="n">1</span>Dig with</h3><div class="eqlist" id="digList"></div></div>
+    <div class="box step"><h3><span class="n">2</span>Move the soil with</h3><div class="eqlist" id="haulList"></div></div>
+    <div class="box step"><h3><span class="n">3</span>Crew</h3>
+      <div class="crew"><button data-n="1">1<small>worker</small></button><button data-n="2">2<small>workers</small></button><button data-n="3">3<small>workers</small></button></div>
+      <p style="font-size:12px;color:var(--muted);margin:8px 0 0">One person runs one thing at a time: the excavator, the dumper, a wheelbarrow or a shovel.</p>
+    </div>
+    <div class="box step" id="spotStep" hidden><h3><span class="n">4</span>Where to set the machine</h3><div class="spots" id="spotList"></div></div>
+    <div class="box step"><h3><span class="n">5</span>Prep</h3>
+      <label class="toggle"><input type="checkbox" id="mats"><span>Ground protection mats<small>Cover the lawn along your route. $120 + $1.50/ft, plus time to lay and lift.</small></span></label>
+      <label class="toggle" id="panelRow"><input type="checkbox" id="panel"><span>Remove a fence panel beside the gate<small>Widens the opening. $60 and about 1½ crew-hours to take down and re-hang.</small></span></label>
+    </div>
+    <div class="box step"><h3><span class="n">6</span>Plan check</h3>
+      <ul id="checks"></ul>
+      <div class="startRow"><div class="money">Equipment &amp; prep <b id="rent">$0</b><small id="crewRate"></small></div><button id="start" disabled>Start job</button></div>
+    </div>
+    <p style="font-size:11.5px;color:var(--muted);margin:0 4px">Illustrative game values — not real equipment specifications or job estimates.</p>
+  </section>
+</main>
+<div id="toasts"></div>
+
+<div class="modal" id="result" hidden><div class="sheet">
+  <div id="rRank"></div>
+  <h2 id="rTitle"></h2>
+  <div id="rSetup"></div>
+  <div id="rParts"></div>
+  <div id="rPar" hidden><span id="rParTxt"></span> <button class="linkbtn" id="rParBtn">Show the best plan</button><div id="rParPlan" hidden></div></div>
+  <ul id="rLines"></ul>
+  <details><summary>Cost breakdown</summary><table id="rCost"></table></details>
+  <div class="statsGrid"></div>
+  <div class="btns"><button class="btn primary" id="shareBtn">Copy result</button><button class="btn" id="again">Try another plan</button><button class="btn" id="closeResult">View site</button></div>
+  <textarea id="shareOut" hidden readonly></textarea>
+  <div class="next">Next jobsite in <span class="countdown"></span></div>
+</div></div>
+
+<div class="modal" id="statsOnly" hidden><div class="sheet"><h2>Stats</h2><div class="statsGrid"></div><p class="next">Finish today's job to see its breakdown here. Next jobsite in <span class="countdown"></span>.</p><div class="btns"><button class="btn" id="statsClose">Close</button></div></div></div>
+
+<div class="modal help" id="help" hidden><div class="sheet">
+  <h2>Solve today's jobsite</h2>
+  <ol>
+    <li><b>Read the job card.</b> How much soil, the deadline, the budget, how fussy the lawn is, the soil type, and any marked utility lines.</li>
+    <li><b>Pick your setup:</b> something to dig with, something to move the soil, and a crew of 1–3.</li>
+    <li><b>Choose where the machine sits</b> if there's a choice. The blue ring is its reach; the orange ring is its rear swing — anything inside it gets hit.</li>
+    <li><b>Check the yard.</b> The crew's route from the trailer is drawn for you; red means a machine won't fit through. Painted lines are buried utilities: machines stay 2 ft off them, so that strip is dug by shovel. Hatched ground is a slope.</li>
+    <li><b>Start the job</b> and watch it play out. You get one scored run a day; practise as much as you like afterwards.</li>
+  </ol>
+  <p style="font-size:13.5px">Score: completion 40 · site protection 25 · schedule 20 (−1 for every 5 min late) · cost 15 (full marks on budget, zero at 20% over). Finishing early or under budget earns nothing extra.</p>
+  <p class="note">Everyone gets the same site. Each day has one best plan — after your run you'll see the best possible score.</p>
+  <div class="btns"><button class="btn primary" id="helpClose">Let's dig</button></div>
+</div></div>
+
+<script>// Right Tool — game engine (pure, no DOM). Units: feet, minutes, cubic yards, dollars.
+// All values are illustrative game values, not real equipment specs or estimates.
+(function (root) {
+  'use strict';
+
+  // ---------------- Catalog ----------------
+  const DIGGERS = {
+    large:   { id: 'large',   name: 'Large excavator',      short: 'Large exc.',   kind: 'machine', width: 6.5, length: 9.5, tail: 6.6, reach: 17,   rate: 5.2, cost: 670, wear: 6.0, speed: 80,
+               pro: 'Fastest digging, longest reach', con: 'Too wide for most gates; big rear swing' },
+    compact: { id: 'compact', name: 'Compact excavator',    short: 'Compact exc.', kind: 'machine', width: 3.6, length: 5.8, tail: 4.5, reach: 12.5, rate: 3.4, cost: 480, wear: 4.0, speed: 85,
+               pro: 'Good digging speed, fits a 4 ft gate', con: 'Rear swing overhangs the tracks' },
+    zts:     { id: 'zts',     name: 'Zero-tail mini excavator', short: 'Zero-tail mini', kind: 'machine', width: 3.2, length: 5.2, tail: 1.9, reach: 11.5, rate: 2.3, cost: 560, wear: 3.0, speed: 85,
+               pro: 'Swing stays inside its tracks', con: 'Slower, shorter reach, pricier per yard' },
+    hand:    { id: 'hand',    name: 'Hand digging',         short: 'Shovels',      kind: 'hand', width: 1.5, tail: 0, reach: 0, rate: 0.4, cost: 0, wear: 0,
+               pro: 'Fits anywhere, precise, no rental', con: 'About 0.4 yd³ per worker-hour' }
+  };
+  const HAULERS = {
+    barrow: { id: 'barrow', name: 'Wheelbarrows', short: 'Wheelbarrows', width: 2.2, cap: 0.1, load: 1.6, dump: 0.5, speed: 170, slope: 0.4, cost: 15, wear: 0.06, perWorker: true,
+              pro: 'Cheap; one per worker; narrow', con: 'Carries only 0.1 yd³ a trip' },
+    dumper: { id: 'dumper', name: 'Mini tracked dumper', short: 'Tracked dumper', width: 2.9, cap: 0.5, load: 1.4, dump: 0.8, speed: 230, slope: 0.85, cost: 220, wear: 1.1, perWorker: false, tracked: true,
+              pro: 'Moves 0.5 yd³ a trip, quickly', con: 'One machine, one driver; wears a route' }
+  };
+  const RATES = {
+    worker: 52,            // $/h, min 4 h, billed per half hour, 1.5x after 8 h
+    overtimeAfter: 480,
+    minPaid: 240,
+    pileCap: 1.2,          // yd³ of spoil that fits beside the work spot
+    resumeFrac: 0.55,
+    switchMin: 1.0,
+    matsBase: 120, matsPerFt: 1.5,
+    panelCost: 60, panelRemoveWM: 40, panelRestoreWM: 50,
+    dayMax: 660,           // 7:00 -> 6:00 pm, then it's dark
+    startClock: 7 * 60,
+    fitMargin: 0.17,       // a machine needs ~2 in of clearance beyond its width
+    tolZone: 2,            // ft either side of a marked utility: hand-dig only
+    lateMinPerPt: 5,       // schedule: -1 point per 5 min late
+    overBudgetZero: 0.2,   // cost: 0 points at 20% over budget
+    slopeBarrowLoad: 0.6,
+    lawnRecover: 600,      // wear a lawn of delicacy d bounces back from: 600 x (1.2 - d)  // wheelbarrows go up a slope ~60% full
+  };
+  // Soil changes how fast machines and shovels dig, and how easily the lawn ruts.
+  const SOIL = {
+    loam:  { id: 'loam',  name: 'Garden loam',      mach: 1.0,  hand: 1.0,  wear: 1.0,  note: 'Easy digging.' },
+    clay:  { id: 'clay',  name: 'Heavy clay',       mach: 0.85, hand: 0.6,  wear: 1.25, note: 'Shovels struggle; machines slow a little.' },
+    sandy: { id: 'sandy', name: 'Sandy',            mach: 1.1,  hand: 1.35, wear: 0.8,  note: 'Shovels fly; the lawn shrugs off traffic.' },
+    rocky: { id: 'rocky', name: 'Rocky cobble',     mach: 0.75, hand: 0.45, wear: 1.0,  note: 'Hand digging crawls; machines slow too.' },
+    wet:   { id: 'wet',   name: 'Wet after rain',   mach: 0.9,  hand: 0.85, wear: 2.0,  note: 'Every pass over the lawn ruts twice as deep.' }
+  };
+  // Marked utility lines (APWA paint colours). Machines may not dig within RATES.tolZone of one.
+  const UTIL = {
+    gas:        { name: 'gas line',        color: '#f2c200' },
+    electric:   { name: 'power line',      color: '#e03a2f' },
+    water:      { name: 'water line',      color: '#2f7fd6' },
+    irrigation: { name: 'irrigation main', color: '#8e4fc4' },
+    comms:      { name: 'fibre line',      color: '#f07c1c' },
+    sewer:      { name: 'sewer line',      color: '#2f9b4a' }
+  };
+  function soilOf(site) { return SOIL[site.soil || 'loam']; }
+
+  // ---------------- Geometry ----------------
+  function distSeg(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const L2 = dx * dx + dy * dy;
+    let t = L2 ? ((px - x1) * dx + (py - y1) * dy) / L2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    const cx = x1 + t * dx, cy = y1 + t * dy;
+    return Math.hypot(px - cx, py - cy);
+  }
+  function nearestOnSeg(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const L2 = dx * dx + dy * dy;
+    let t = L2 ? ((px - x1) * dx + (py - y1) * dy) / L2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    return [x1 + t * dx, y1 + t * dy];
+  }
+  function distRect(px, py, r) {
+    const dx = Math.max(r.x - px, 0, px - (r.x + r.w));
+    const dy = Math.max(r.y - py, 0, py - (r.y + r.h));
+    if (dx === 0 && dy === 0) return -Math.min(px - r.x, r.x + r.w - px, py - r.y, r.y + r.h - py);
+    return Math.hypot(dx, dy);
+  }
+  function nearestOnRect(px, py, r) {
+    return [Math.max(r.x, Math.min(px, r.x + r.w)), Math.max(r.y, Math.min(py, r.y + r.h))];
+  }
+  function inRect(px, py, r) { return px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h; }
+
+  // Build the obstacle list for a site given prep (panel removed or not).
+  function obstacles(site, panelRemoved) {
+    const obs = [];
+    for (const f of site.fences) {
+      if (f.panel && panelRemoved) continue;
+      obs.push({ kind: 'seg', name: f.name || 'fence', cat: 'fence', x1: f.x1, y1: f.y1, x2: f.x2, y2: f.y2 });
+    }
+    for (const r of site.rects) obs.push({ kind: 'rect', name: r.name, cat: r.cat, x: r.x, y: r.y, w: r.w, h: r.h });
+    for (const t of site.trees) obs.push({ kind: 'circ', name: t.name || 'tree', cat: 'tree', x: t.x, y: t.y, r: t.r });
+    obs.push({ kind: 'rect', name: 'the excavation', cat: 'bed', x: site.bed.x, y: site.bed.y, w: site.bed.w, h: site.bed.h });
+    return obs;
+  }
+  function obsDist(o, x, y) {
+    if (o.kind === 'seg') return distSeg(x, y, o.x1, o.y1, o.x2, o.y2);
+    if (o.kind === 'rect') return distRect(x, y, o);
+    return Math.hypot(x - o.x, y - o.y) - o.r;
+  }
+  function obsNearest(o, x, y) {
+    if (o.kind === 'seg') return nearestOnSeg(x, y, o.x1, o.y1, o.x2, o.y2);
+    if (o.kind === 'rect') return nearestOnRect(x, y, o);
+    const d = Math.hypot(x - o.x, y - o.y) || 1;
+    return [o.x + (x - o.x) / d * o.r, o.y + (y - o.y) / d * o.r];
+  }
+  function clearance(obs, x, y, site, skipBed) {
+    let best = Infinity, who = null;
+    for (const o of obs) {
+      if (skipBed && o.cat === 'bed') continue;
+      const d = obsDist(o, x, y);
+      if (d < best) { best = d; who = o; }
+    }
+    // lot edges (street side is open)
+    const edges = [x, site.W - x, y];
+    for (const e of edges) if (e < best) { best = e; who = { name: 'the property line', cat: 'edge' }; }
+    return { d: best, who };
+  }
+
+  // ---------------- Route analysis ----------------
+  // route: array of points from drop-off to work spot (inclusive).
+  function routeLength(pts) {
+    let L = 0;
+    for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    return L;
+  }
+  function surfaceAt(site, x, y) {
+    for (const p of site.paved) if (inRect(x, y, p)) return 'paved';
+    for (const g of (site.gravel || [])) if (inRect(x, y, g)) return 'gravel';
+    return 'lawn';
+  }
+  function onSlope(site, x, y) { for (const s of (site.slopes || [])) if (inRect(x, y, s)) return true; return false; }
+  function inTolZone(site, x, y) {
+    for (const u of (site.utils || [])) if (distSeg(x, y, u.x1, u.y1, u.x2, u.y2) <= RATES.tolZone) return u;
+    return null;
+  }
+  // Operators centre the machine within ±1.5 ft of the drawn line, so the local usable
+  // width is the best clearance found across that band.
+  const _routeCache = {};
+  function analyzeRoute(site, pts, panelRemoved) {
+    const ck = site.id + '|' + (panelRemoved ? 1 : 0) + '|' + pts.map(p => p[0].toFixed(2) + ',' + p[1].toFixed(2)).join(';');
+    if (_routeCache[ck]) return _routeCache[ck];
+    return (_routeCache[ck] = analyzeRoute0(site, pts, panelRemoved));
+  }
+  function analyzeRoute0(site, pts, panelRemoved) {
+    const obs = obstacles(site, panelRemoved);
+    const samples = [];
+    let lawn = 0, total = 0, slope = 0, lawnSlope = 0;
+    const step = 0.5;
+    for (let i = 1; i < pts.length; i++) {
+      const [x1, y1] = pts[i - 1], [x2, y2] = pts[i];
+      const L = Math.hypot(x2 - x1, y2 - y1);
+      if (L < 1e-6) continue;
+      const nx = -(y2 - y1) / L, ny = (x2 - x1) / L;
+      const n = Math.max(1, Math.ceil(L / step));
+      for (let k = 0; k < n; k++) {
+        const t = (k + 0.5) / n;
+        const x = x1 + (x2 - x1) * t, y = y1 + (y2 - y1) * t;
+        const seg = L / n;
+        total += seg;
+        const isLawn = surfaceAt(site, x, y) === 'lawn', sl = onSlope(site, x, y);
+        if (isLawn) lawn += seg;
+        if (sl) { slope += seg; if (isLawn) lawnSlope += seg; }
+        // last 1.5 ft of the route ends at the spot beside the excavation: ignore the bed there
+        const nearEnd = (i === pts.length - 1) && (1 - t) * L < 1.5;
+        let best = -Infinity, who = null, bx = x, by = y;
+        for (let off = -1.5; off <= 1.5001; off += 0.125) {
+          const qx = x + nx * off, qy = y + ny * off;
+          const c = clearance(obs, qx, qy, site, nearEnd);
+          if (c.d > best) { best = c.d; who = c.who; bx = qx; by = qy; }
+        }
+        samples.push({ x, y, cx: bx, cy: by, half: best, who, seg: i - 1 });
+      }
+    }
+    // tightest point
+    let tight = null;
+    for (const s of samples) if (!tight || s.half < tight.half) tight = s;
+    return { samples, lawn, total, slope, lawnSlope, tight, width: tight ? 2 * tight.half : Infinity };
+  }
+  // where along the route a machine of a given width first gets stuck
+  function needs(width) { return width + RATES.fitMargin; }
+  function stuckPoint(an, width) {
+    // the narrowest point of the first pinch the machine can't pass
+    let best = null;
+    for (const s of an.samples) {
+      if (2 * s.half < needs(width)) { if (!best || s.half < best.half) best = s; }
+      else if (best) break;
+    }
+    return best;
+  }
+  function describeTight(site, s) {
+    if (!s) return '';
+    // name it by the nearest named feature
+    if (site.gate && Math.hypot(s.x - site.gate.x, s.y - site.gate.y) < 3) return 'the gate';
+    for (const z of (site.zones || [])) if (inRect(s.x, s.y, z)) return z.name;
+    return 'beside ' + (s.who ? s.who.name : 'an obstacle');
+  }
+
+  // ---------------- Work spot analysis ----------------
+  function bedCells(site) {
+    const cells = [];
+    const b = site.bed;
+    for (let x = b.x + 0.5; x < b.x + b.w; x += 1) for (let y = b.y + 0.5; y < b.y + b.h; y += 1) cells.push([x, y]);
+    return cells;
+  }
+  function analyzeSpot(site, plan) {
+    const d = DIGGERS[plan.digger];
+    const obs = obstacles(site, plan.panel);
+    const [sx, sy] = plan.spot;
+    const res = { ok: true, reasons: [], hits: [], coverage: 0, surface: surfaceAt(site, sx, sy) };
+    if (d.kind === 'hand') {
+      // work spot for a hand crew is just where the spoil pile goes
+      const c = clearance(obs, sx, sy, site, false);
+      if (c.d < 0.4) { res.ok = false; res.reasons.push('The spoil pile can\'t go on ' + c.who.name + '.'); }
+      res.coverage = 0;
+      return res;
+    }
+    // footprint
+    const c = clearance(obs, sx, sy, site, false);
+    if (c.d < d.width / 2) { res.ok = false; res.reasons.push('No room for the machine here — it would sit on ' + c.who.name + '.'); }
+    if (onSlope(site, sx, sy)) { res.ok = false; res.reasons.push('The machine can\'t dig from the slope — it needs level ground.'); }
+    // rear swing: anything (except the bed) inside the tail circle gets hit
+    for (const o of obs) {
+      if (o.cat === 'bed') continue;
+      if (obsDist(o, sx, sy) < d.tail) {
+        const p = obsNearest(o, sx, sy);
+        res.hits.push({ cat: o.cat, name: o.name, x: p[0], y: p[1] });
+      }
+    }
+    // reach
+    const cells = bedCells(site);
+    let inR = 0, tz = 0, inReachRaw = 0;
+    for (const [x, y] of cells) {
+      const r = Math.hypot(x - sx, y - sy) <= d.reach;
+      if (r) inReachRaw++;
+      if (inTolZone(site, x, y)) { tz++; continue; }
+      if (r) inR++;
+    }
+    res.coverage = inR / cells.length;
+    res.tzFrac = tz / cells.length;
+    res.reachFrac = inReachRaw / cells.length;
+    if (res.coverage < 0.05) { res.ok = false; res.reasons.push('The excavation is out of reach from here.'); }
+    return res;
+  }
+
+
+  // ---------------- Auto setup: pathfinding + work-spot choice ----------------
+  const GS = 0.5;
+  const _cache = {};
+  function cgrid(site, panel) {
+    const key = site.id + '|' + (panel ? 1 : 0);
+    if (_cache[key]) return _cache[key];
+    const obs = obstacles(site, panel);
+    const nx = Math.round(site.W / GS) + 1, ny = Math.round(site.H / GS) + 1;
+    const clr = new Float32Array(nx * ny), cost = new Float32Array(nx * ny);
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+      const x = i * GS, y = j * GS;
+      clr[j * nx + i] = clearance(obs, x, y, site, false).d;
+      cost[j * nx + i] = surfaceAt(site, x, y) === 'lawn' ? 1.25 : 1.0;
+    }
+    return (_cache[key] = { nx, ny, clr, cost, obs, dj: {} });
+  }
+  function dijkstra(site, panel, half) {
+    const g = cgrid(site, panel);
+    const key = half.toFixed(3);
+    if (g.dj[key]) return g.dj[key];
+    const { nx, ny, clr, cost } = g;
+    const N = nx * ny, dist = new Float64Array(N).fill(Infinity), prev = new Int32Array(N).fill(-1);
+    const si = Math.round(site.drop.x / GS), sj = Math.round(site.drop.y / GS);
+    const start = sj * nx + si;
+    // binary heap
+    const hk = [], hv = [];
+    const push = (k, v) => { hk.push(k); hv.push(v); let c = hk.length - 1; while (c > 0) { const p = (c - 1) >> 1; if (hv[p] <= hv[c]) break; [hk[p], hk[c]] = [hk[c], hk[p]]; [hv[p], hv[c]] = [hv[c], hv[p]]; c = p; } };
+    const pop = () => { const k = hk[0], v = hv[0]; const lk = hk.pop(), lv = hv.pop(); if (hk.length) { hk[0] = lk; hv[0] = lv; let c = 0; for (;;) { const l = 2 * c + 1, r = l + 1; let m = c; if (l < hk.length && hv[l] < hv[m]) m = l; if (r < hk.length && hv[r] < hv[m]) m = r; if (m === c) break; [hk[m], hk[c]] = [hk[c], hk[m]]; [hv[m], hv[c]] = [hv[c], hv[m]]; c = m; } } return [k, v]; };
+    dist[start] = 0; push(start, 0);
+    const dirs = [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1], [1, 1, Math.SQRT2], [1, -1, Math.SQRT2], [-1, 1, Math.SQRT2], [-1, -1, Math.SQRT2]];
+    while (hk.length) {
+      const [k, v] = pop();
+      if (v > dist[k]) continue;
+      const i = k % nx, j = (k - i) / nx;
+      for (const [di, dj2, w] of dirs) {
+        const a = i + di, b = j + dj2;
+        if (a < 0 || b < 0 || a >= nx || b >= ny) continue;
+        const nk = b * nx + a;
+        if (clr[nk] < half) continue;
+        const nv = v + w * GS * cost[nk];
+        if (nv < dist[nk]) { dist[nk] = nv; prev[nk] = k; push(nk, nv); }
+      }
+    }
+    return (g.dj[key] = { dist, prev, nx, half });
+  }
+  function cellOf(g, x, y) { return Math.round(y / GS) * g.nx + Math.round(x / GS); }
+  function losOK(g, a, b, half) {
+    const L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(L / 0.25));
+    for (let k = 0; k <= n; k++) { const x = a[0] + (b[0] - a[0]) * k / n, y = a[1] + (b[1] - a[1]) * k / n; if (g.clr[cellOf(g, x, y)] < half) return false; }
+    return true;
+  }
+  function pathFrom(site, panel, dj, x, y) {
+    const g = cgrid(site, panel);
+    let k = cellOf(g, x, y);
+    if (!isFinite(dj.dist[k])) return null;
+    const pts = [];
+    while (k >= 0) { const i = k % g.nx; pts.push([i * GS, (k - i) / g.nx * GS]); k = dj.prev[k]; }
+    pts.reverse(); // drop -> spot
+    // string-pull
+    const out = [pts[0]];
+    let i = 0;
+    while (i < pts.length - 1) {
+      let j = pts.length - 1;
+      while (j > i + 1 && !losOK(g, pts[i], pts[j], dj.half)) j--;
+      out.push(pts[j]); i = j;
+    }
+    out[0] = [site.drop.x, site.drop.y];
+    out[out.length - 1] = [x, y];
+    return out;
+  }
+  // Returns the work-spot options and the route for a plan {digger, hauler, panel, spotChoice}.
+  const _setupCache = {};
+  function autoSetup(site, plan) {
+    const k = [site.id, plan.digger, plan.hauler || '', plan.panel && site.gate.panel ? 1 : 0, plan.spotChoice || ''].join('|');
+    if (!_setupCache[k]) _setupCache[k] = autoSetup0(site, plan);
+    const r = _setupCache[k];
+    return Object.assign({}, r, { spot: r.spot && r.spot.slice(), route: r.route && r.route.map(p => p.slice()) });
+  }
+  function autoSetup0(site, plan) {
+    const d = DIGGERS[plan.digger];
+    const hz = HAULERS[plan.hauler || 'barrow'];
+    const panel = !!(plan.panel && site.gate.panel);
+    const g = cgrid(site, panel);
+    const halfB = HAULERS.barrow.width / 2 + 0.05;
+    const djB = dijkstra(site, panel, halfB);
+    const b = site.bed;
+    const reachable = (x, y) => isFinite(djB.dist[cellOf(g, x, y)]);
+    const routeDist = (x, y) => djB.dist[cellOf(g, x, y)];
+    const options = [];
+    if (d.kind === 'machine') {
+      const cands = [];
+      const pad = d.reach;
+      for (let x = Math.max(0.5, b.x - pad); x <= Math.min(site.W - 0.5, b.x + b.w + pad); x += GS)
+        for (let y = Math.max(0.5, b.y - pad); y <= Math.min(site.H - 0.5, b.y + b.h + pad); y += GS) {
+          if (!reachable(x, y)) continue;
+          if (g.clr[cellOf(g, x, y)] < d.width / 2) continue;
+          const sp = analyzeSpot(site, { digger: d.id, spot: [x, y], panel });
+          if (!sp.ok) continue;
+          cands.push({ x, y, sp, rd: routeDist(x, y) });
+        }
+      const better = (a, c) => (a.sp.coverage - c.sp.coverage) > 0.004 || (Math.abs(a.sp.coverage - c.sp.coverage) <= 0.004 && a.rd < c.rd);
+      let close = null, back = null;
+      for (const c of cands) {
+        if (!close || better(c, close)) close = c;
+        if (!c.sp.hits.length && (!back || better(c, back))) back = c;
+      }
+      if (close && back && close !== back && close.sp.hits.length) {
+        options.push({ id: 'close', label: 'Close in', spot: [close.x, close.y], coverage: close.sp.coverage, hits: close.sp.hits });
+        options.push({ id: 'back', label: 'Set back', spot: [back.x, back.y], coverage: back.sp.coverage, hits: [] });
+      } else if (back) options.push({ id: 'best', label: 'Best spot', spot: [back.x, back.y], coverage: back.sp.coverage, hits: [] });
+      else if (close) options.push({ id: 'close', label: 'Only spot', spot: [close.x, close.y], coverage: close.sp.coverage, hits: close.sp.hits });
+    } else {
+      let best = null;
+      for (let x = Math.max(0.5, b.x - 3); x <= Math.min(site.W - 0.5, b.x + b.w + 3); x += GS)
+        for (let y = Math.max(0.5, b.y - 3); y <= Math.min(site.H - 0.5, b.y + b.h + 3); y += GS) {
+          const c = g.clr[cellOf(g, x, y)];
+          if (c < 1.0 || !reachable(x, y) || onSlope(site, x, y)) continue;
+          const db = distRect(x, y, b);
+          if (db < 1.0 || db > 2.5) continue;
+          const rd = routeDist(x, y);
+          if (!best || rd < best.rd) best = { x, y, rd };
+        }
+      if (best) options.push({ id: 'pile', label: 'Spoil pile', spot: [best.x, best.y], coverage: 0, hits: [] });
+    }
+    if (!options.length) return { options, spot: null, route: null };
+    const opt = options.find(o => o.id === plan.spotChoice) || options[0];
+    const widest = Math.max(d.kind === 'machine' ? d.width : 0, plan.hauler ? hz.width : HAULERS.barrow.width);
+    const djW = dijkstra(site, panel, widest / 2 + RATES.fitMargin / 2 + 0.01);
+    let route = pathFrom(site, panel, djW, opt.spot[0], opt.spot[1]);
+    let squeezed = false;
+    if (!route) { route = pathFrom(site, panel, djB, opt.spot[0], opt.spot[1]); squeezed = true; }
+    return { options, chosen: opt.id, spot: opt.spot, route, squeezed };
+  }
+
+  function bedVolume(site) { return site.bed.w * site.bed.h * site.bed.depth / 27; }
+
+  // ---------------- Simulation ----------------
+  function simulate(site, plan) {
+    const d = DIGGERS[plan.digger];
+    let hauler = HAULERS[plan.hauler];
+    const W = plan.workers;
+    const route = plan.route; // drop -> ... -> spot
+    const an = analyzeRoute(site, route, plan.panel);
+    const spot = analyzeSpot(site, plan);
+    const L = an.total;
+    const V = bedVolume(site);
+    const soil = soilOf(site);
+    const events = [];   // {t, type, text}
+    const notes = [];
+    const phases = [];
+    let t = 0;
+
+    // impossibility checks
+    let diggerStuck = null, haulerStuck = null;
+    if (d.kind === 'machine') diggerStuck = stuckPoint(an, d.width);
+    const origHauler = hauler;
+    if (hauler.id === 'dumper') {
+      haulerStuck = stuckPoint(an, hauler.width);
+    }
+    const barrowStuck = stuckPoint(an, HAULERS.barrow.width);
+
+    function phase(name, dur, extra) {
+      const p = Object.assign({ name, t0: t, t1: t + dur }, extra || {});
+      phases.push(p); t += dur; return p;
+    }
+    const wmPhase = (name, wm, minDur, extra) => phase(name, Math.max(minDur, wm / W), extra);
+
+    // prep
+    if (plan.panel) wmPhase('Removing a fence panel', RATES.panelRemoveWM, 20, { kind: 'panel' });
+    const matLen = plan.mats ? an.lawn + (spot.surface === 'lawn' ? 8 : 0) : 0;
+    if (plan.mats) wmPhase('Laying ground protection mats', 15 + matLen / 2.5, 10, { kind: 'mats' });
+
+    // machines walk in
+    const machines = [];
+    if (d.kind === 'machine') machines.push({ id: d.id, speed: d.speed, stuck: diggerStuck });
+    if (hauler.id === 'dumper') machines.push({ id: 'dumper', speed: 120, stuck: haulerStuck });
+    let walkIn = 0;
+    for (const m of machines) {
+      const dist = m.stuck ? an.samples.indexOf(m.stuck) * 0.5 : L; // approx
+      m.walk = 8 + (m.stuck ? 2 * dist : dist) / m.speed + (m.stuck ? 8 : 0) + (m.stuck ? 0 : an.slope / m.speed);
+    }
+    if (machines.length) {
+      const sorted = machines.map(m => m.walk).sort((a, b) => b - a);
+      // workers walk machines in parallel
+      const lanes = new Array(Math.min(W, machines.length)).fill(0);
+      for (const w of sorted) { lanes.sort((a, b) => a - b); lanes[0] += w; }
+      walkIn = Math.max(...lanes);
+      phase('Unloading and walking machines in', walkIn, { kind: 'walkin', machines: machines.map(m => ({ id: m.id, stuck: m.stuck ? { x: m.stuck.x, y: m.stuck.y } : null })) });
+    }
+    let digMachine = d.kind === 'machine' && !diggerStuck;
+    if (d.kind === 'machine' && diggerStuck) {
+      notes.push({ type: 'impossible', short: `${d.name} won't fit ${describeTight(site, diggerStuck)} — the crew digs by hand`, text: `${d.name} couldn't fit ${describeTight(site, diggerStuck)}: ${ftIn(2 * diggerStuck.half)} clear, it needs ${ftIn(needs(d.width), true)}. The rental sat on the trailer and the crew dug by hand.`, x: diggerStuck.x, y: diggerStuck.y });
+    }
+    if (haulerStuck) {
+      notes.push({ type: 'impossible', short: `Dumper won't fit ${describeTight(site, haulerStuck)} — switching to wheelbarrows`, text: `Tracked dumper couldn't fit ${describeTight(site, haulerStuck)}: ${ftIn(2 * haulerStuck.half)} clear, it needs ${ftIn(needs(hauler.width), true)}. The crew used wheelbarrows.`, x: haulerStuck.x, y: haulerStuck.y });
+      hauler = HAULERS.barrow;
+    }
+    // Loaded wheelbarrows can't be filled to the brim up a slope.
+    if (hauler.id === 'barrow' && an.slope > 4) hauler = Object.assign({}, hauler, { cap: hauler.cap * RATES.slopeBarrowLoad, halfLoads: true });
+    let barrowsBlocked = false;
+    if (hauler.id === 'barrow' && barrowStuck) barrowsBlocked = true;
+
+    // main production sim
+    const cov = digMachine ? spot.coverage : 0;
+    let groundM = V * cov, groundH = V - groundM, pile = 0, delivered = 0;
+    const dt = 0.5;
+    const tStart = t;
+    const workers = [];
+    for (let i = 0; i < W; i++) workers.push({ i, task: 'idle', busyUntil: 0, last: 'idle', log: [] });
+    let operator = -1, diggerPaused = false;
+    let dumperBusy = false;
+    const trips = [];
+    let diggerWait = 0, diggerIdleNoOp = 0, workerIdle = 0, handMin = 0;
+    const tripTime = (h) => h.load + h.dump + 2 * ((L - an.slope) / h.speed + an.slope / (h.speed * h.slope));
+    const finishEstimate = () => Math.max(15, 30 / W) + walkIn + (plan.mats ? Math.max(8, (10 + matLen / 5) / W) : 0) + (plan.panel ? Math.max(25, RATES.panelRestoreWM / W) : 0);
+    const timeline = [];
+    let lastSnap = -99;
+    let incomplete = false;
+    while (true) {
+      // finish trips
+      for (const w of workers) {
+        if (w.task === 'haul' && w.busyUntil <= t) {
+          delivered += w.trip.vol; w.trip = null; w.task = 'idle';
+          if (hauler.id === 'dumper') dumperBusy = false;
+        }
+        if (w.task === 'switch' && w.busyUntil <= t) { w.task = w.next; w.next = null; }
+      }
+      const done = groundM + groundH + pile < 1e-6;
+      const busyTrips = workers.some(w => w.task === 'haul');
+      if (done && !busyTrips) break;
+      if (t + finishEstimate() > RATES.dayMax) { incomplete = true; break; }
+      // operator leaves if pile full and a hauler is free, or ground done
+      if (operator >= 0) {
+        const w = workers[operator];
+        if (groundM <= 1e-9) { w.task = 'idle'; operator = -1; }
+        else if (pile >= RATES.pileCap - 1e-9) {
+          diggerPaused = true;
+          const otherCanHaul = workers.some(o => o.i !== operator && (o.task === 'idle' || o.task === 'hand') && (hauler.perWorker || !dumperBusy));
+          if ((hauler.perWorker || !dumperBusy) && !otherCanHaul && !barrowsBlocked) { w.task = 'idle'; operator = -1; w.last = 'dig'; }
+        }
+      }
+      if (pile < RATES.pileCap * RATES.resumeFrac) diggerPaused = false;
+      // dispatch free workers
+      for (const w of workers) {
+        if (w.task === 'haul' || w.task === 'switch' || w.task === 'dig') continue;
+        // a. operate the digger
+        if (digMachine && operator < 0 && groundM > 1e-9 && !diggerPaused && pile < RATES.pileCap) {
+          assign(w, 'dig'); operator = w.i; continue;
+        }
+        // b. haul
+        const remainingGround = groundM + groundH;
+        const loadAvail = Math.min(hauler.cap, pile);
+        const fullLoad = pile >= hauler.cap - 1e-9 || (remainingGround < 1e-9 && pile > 1e-9) || (hauler.cap > 0.2 && pile >= hauler.cap * 0.999);
+        if (fullLoad && !barrowsBlocked && (hauler.perWorker || !dumperBusy)) {
+          const tt = tripTime(hauler);
+          const vol = loadAvail;
+          pile -= vol;
+          if (!hauler.perWorker) dumperBusy = true;
+          const sw = (w.last === 'dig') ? RATES.switchMin : 0;
+          w.task = 'haul'; w.busyUntil = t + sw + tt; w.trip = { vol, t0: t + sw, t1: t + sw + tt, h: hauler.id, w: w.i };
+          trips.push(w.trip); w.last = 'haul';
+          continue;
+        }
+        // c. hand dig
+        if (groundH > 1e-9 && pile < RATES.pileCap * 1.5) { w.task = 'hand'; w.last = 'hand'; continue; }
+        // hand dig the machine area if no digger operator possible (shouldn't happen)
+        w.task = 'idle';
+      }
+      // work
+      const op = operator >= 0 ? workers[operator] : null;
+      if (op && op.task === 'dig') {
+        if (pile < RATES.pileCap && groundM > 0 && !diggerPaused) {
+          const v = Math.min(groundM, d.rate * soil.mach * dt / 60);
+          groundM -= v; pile += v;
+        } else diggerWait += dt;
+      } else if (digMachine && groundM > 1e-9) {
+        diggerIdleNoOp += dt;
+      }
+      for (const w of workers) {
+        if (w.task === 'hand') {
+          const v = Math.min(groundH, DIGGERS.hand.rate * soil.hand * dt / 60);
+          groundH -= v; pile += v; handMin += dt;
+          if (groundH <= 1e-9) w.task = 'idle';
+        } else if (w.task === 'idle') workerIdle += dt;
+      }
+      if (t - lastSnap >= 2) {
+        timeline.push({ t, gM: groundM, gH: groundH, pile, delivered, op: operator, tasks: workers.map(w => w.task) });
+        lastSnap = t;
+      }
+      t += dt;
+    }
+    timeline.push({ t, gM: groundM, gH: groundH, pile, delivered, op: -1, tasks: workers.map(w => 'idle') });
+    const mainPhase = { name: 'Digging and hauling', t0: tStart, t1: t, kind: 'main' };
+    phases.push(mainPhase);
+
+    function assign(w, task) {
+      if (w.last === 'haul' && task === 'dig') { w.task = 'switch'; w.next = 'dig'; w.busyUntil = t + RATES.switchMin; }
+      else w.task = task;
+      w.last = task;
+    }
+
+    // finishing
+    if (!incomplete) {
+      wmPhase('Grading and cleaning up', 30, 15, { kind: 'finish' });
+      if (machines.length) phase('Walking machines out and loading up', walkIn, { kind: 'walkout' });
+      if (plan.mats) wmPhase('Lifting the mats', 10 + matLen / 5, 8, { kind: 'mats' });
+      if (plan.panel) wmPhase('Re-hanging the fence panel', RATES.panelRestoreWM, 25, { kind: 'panel' });
+    }
+    const total = t;
+    const removed = delivered + (incomplete ? 0 : 0);
+    const frac = Math.min(1, removed / V);
+
+    // ---------- damage ----------
+    const damage = [];
+    if (digMachine) {
+      for (const h of spot.hits) {
+        if (h.cat === 'bed') continue;
+        if (damage.some(x => x.cat === h.cat && x.name === h.name)) continue;
+        damage.push({ cat: h.cat, name: h.name, x: h.x, y: h.y, why: 'rear swing' });
+      }
+    }
+    // lawn wear
+    const unprot = plan.mats ? 0 : (an.lawn + 0.5 * an.lawnSlope) * soil.wear;
+    let wear = 0;
+    const wearBits = [];
+    if (d.kind === 'machine') {
+      const passes = diggerStuck ? 0 : 2;
+      const w1 = passes * d.wear * unprot + (diggerStuck ? 0 : (spot.surface === 'lawn' && !plan.mats ? d.wear * 14 * soil.wear : 0));
+      wear += w1; if (w1 > 0) wearBits.push({ who: d.short, w: w1 });
+    }
+    const dumperTrips = trips.filter(x => x.h === 'dumper').length;
+    const barrowTrips = trips.filter(x => x.h === 'barrow').length;
+    if (dumperTrips) { const w2 = (2 + 2 * dumperTrips) * HAULERS.dumper.wear * unprot; wear += w2; if (w2 > 0) wearBits.push({ who: 'the dumper', w: w2, trips: dumperTrips }); }
+    if (barrowTrips) { const w3 = 2 * barrowTrips * HAULERS.barrow.wear * unprot; wear += w3; if (w3 > 0) wearBits.push({ who: 'wheelbarrows', w: w3, trips: barrowTrips }); }
+    // a tough, established lawn shrugs off a little traffic; new sod shows everything
+    const recover = Math.max(0, RATES.lawnRecover * (1.2 - site.delicacy));
+    const lawnPts = Math.min(15, Math.round(15 * site.delicacy * (1 - Math.exp(-Math.max(0, wear - recover) / 1100))));
+
+    // ---------- cost ----------
+    const paidMin = Math.max(RATES.minPaid, Math.ceil(total / 30) * 30);
+    const regular = Math.min(paidMin, RATES.overtimeAfter), ot = Math.max(0, paidMin - RATES.overtimeAfter);
+    const labor = W * RATES.worker * (regular + 1.5 * ot) / 60;
+    const costItems = [{ name: `Crew: ${W} × ${(paidMin / 60).toFixed(1)} h`, cost: labor }];
+    if (d.kind === 'machine') costItems.push({ name: d.name + ' (day + delivery)', cost: d.cost });
+    if (origHauler.id === 'dumper') costItems.push({ name: 'Mini tracked dumper (day)', cost: origHauler.cost });
+    if (hauler.id === 'barrow' || origHauler.id === 'barrow') costItems.push({ name: `Wheelbarrows × ${W}`, cost: HAULERS.barrow.cost * W });
+    if (plan.mats) costItems.push({ name: `Ground mats (${Math.round(matLen)} ft)`, cost: RATES.matsBase + RATES.matsPerFt * matLen });
+    if (plan.panel) costItems.push({ name: 'Fence panel removal & re-hang', cost: RATES.panelCost });
+    const cost = costItems.reduce((a, c) => a + c.cost, 0);
+
+    // ---------- score ----------
+    const complete = !incomplete && frac > 0.999;
+    let sComp = complete ? 40 : Math.round(40 * frac * 0.7);
+    let prot = 25;
+    const dmgPts = { fence: 10, house: 20, tree: 10, shed: 10, ac: 10, structure: 10 };
+    for (const dm of damage) { dm.pts = dmgPts[dm.cat] || 8; prot -= dm.pts; }
+    prot -= lawnPts; prot = Math.max(0, prot);
+    const late = Math.max(0, total - site.deadline);
+    let sSched = complete ? Math.max(0, Math.round(20 - late / RATES.lateMinPerPt)) : 0;
+    const over = Math.max(0, cost - site.budget);
+    let sCost = Math.max(0, Math.round(15 * (1 - over / (RATES.overBudgetZero * site.budget))));
+    if (!complete) sCost = Math.round(sCost * frac);
+    let score = sComp + prot + sSched + sCost;
+    if (!complete) score = Math.min(39, score);
+
+    // ---------- explanation lines ----------
+    const lines = [];
+    if (complete) lines.push(late <= 0 ? `Finished at ${clock(total)}, ${fmtDur(site.deadline - total)} ahead of the ${clock(site.deadline)} deadline.` : `Finished at ${clock(total)} — ${fmtDur(late)} past the ${clock(site.deadline)} deadline.`);
+    else lines.push(`Ran out of daylight with ${Math.round((1 - frac) * 100)}% of the soil still on site.`);
+    lines.push(over > 0 ? `${money(cost)} — ${money(over)} over the ${money(site.budget)} budget.` : `${money(cost)} — within the ${money(site.budget)} budget.`);
+    for (const n of notes) lines.push(n.text);
+    const waitM = Math.round(diggerWait + (digMachine ? diggerIdleNoOp : 0));
+    if (digMachine && waitM >= 10) lines.push(`Hauling delayed excavation by ${fmtDur(waitM)} — the spoil pile was full and the excavator sat waiting.`);
+    if (digMachine && spot.coverage < 0.999) {
+      const tzP = Math.round((spot.tzFrac || 0) * 100), outP = Math.max(0, Math.round((1 - spot.coverage) * 100) - tzP);
+      if (tzP && outP) lines.push(`${tzP}% of the bed was inside the utility's hand-dig zone and ${outP}% was out of the excavator's reach — all dug by hand.`);
+      else if (tzP) lines.push(`${tzP}% of the bed was inside the utility's ${RATES.tolZone} ft hand-dig zone and was dug by shovel.`);
+      else lines.push(`${outP}% of the bed was out of the excavator's reach and was dug by hand.`);
+    }
+    if (handMin > 0 && soil.hand < 0.9 && (1 - cov) >= 0.15) lines.push(`${soil.name} slowed the shovels to ${Math.round(soil.hand * 100)}% speed.`);
+    if (an.slope > 4 && trips.length) lines.push(`Every trip crossed ${Math.round(an.slope)} ft of slope${hauler.halfLoads ? ' — the wheelbarrows could only go about 60% full' : ''}.`);
+    for (const dm of damage) lines.push(`${cap(dm.name.replace(/^the /, ''))} damaged where the ${d.name.toLowerCase()}'s rear swing crossed it (−${dm.pts}).`);
+    if (lawnPts > 0) {
+      const top = wearBits.sort((a, b) => b.w - a.w)[0];
+      lines.push(`Lawn rutted along the route${top ? ` (mostly ${top.who}${top.trips ? `, ${top.trips} trips` : ''})` : ''} (−${lawnPts}).`);
+    } else if (plan.mats) lines.push('Mats kept the lawn clean.');
+    const idlePerWorker = workerIdle / W;
+    if (idlePerWorker >= 20) lines.push(`The crew stood waiting about ${fmtDur(Math.round(idlePerWorker))} each.`);
+    if (barrowsBlocked) lines.push('Even a wheelbarrow could not get through that route.');
+
+    return {
+      plan, site: site.id, V, an, spot, phases, timeline, trips, total, complete, frac, incomplete,
+      damage, lawnPts, wear, cost, costItems, score, parts: { completion: sComp, protection: prot, schedule: sSched, cost: sCost },
+      lines, notes, soil: soil.id, diggerWait: waitM, dumperTrips, barrowTrips, hauledWith: hauler.id, digMachine, mainPhase
+    };
+  }
+
+  function clock(min) { const m = RATES.startClock + Math.round(min); let h = Math.floor(m / 60), mm = m % 60; const ap = h >= 12 ? 'pm' : 'am'; h = h % 12 || 12; return `${h}:${String(mm).padStart(2, '0')} ${ap}`; }
+  function fmtDur(min) { min = Math.round(min); if (min < 60) return `${min} min`; const h = Math.floor(min / 60), m = min % 60; return m ? `${h} h ${m} min` : `${h} h`; }
+  function money(v) { return '$' + Math.round(v).toLocaleString('en-US'); }
+  function ftIn(v, up) { const ti = up ? Math.ceil(v * 12 - 1e-6) : Math.floor(v * 12 + 1e-6), ft = Math.floor(ti / 12), inch = ti % 12; return inch ? `${ft}′${inch}″` : `${ft} ft`; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // ---------------- Sites ----------------
+  // Lot: 60 ft wide (x), 90 ft deep (y). Back fence at y=0, street at y=90.
+  function F(x1, y1, x2, y2, name, panel) { return { x1, y1, x2, y2, name: name || 'the fence', panel: !!panel }; }
+  function lotFences(houseTop, extra) {
+    return [F(0, 0, 60, 0, 'the back fence'), F(0, 0, 0, houseTop, 'the side fence'), F(60, 0, 60, houseTop, 'the side fence')].concat(extra || []);
+  }
+
+  const SITES = [
+    {
+      id: 'narrow-gate', name: 'Narrow Gate', blurb: 'A 4 ft side gate, a garden fence right beside the bed, and a lawn the owners love.',
+      job: 'Dig out a new planting bed along the back fence and haul the soil to the trailer in the driveway.',
+      W: 60, H: 90, delicacy: 1.0, deadline: 480, budget: 1450,
+      bed: { x: 8, y: 2, w: 20, h: 6, depth: 2 },
+      house: { x: 6, y: 46, w: 36, h: 34 },
+      fences: lotFences(46, [
+        F(0, 46, 6, 46, 'the side fence'),
+        F(0, 14, 34, 14, 'the garden fence'),
+        F(42, 52, 46, 52, 'the gate fence'), F(50, 52, 54, 52, 'the gate fence', true), F(54, 52, 60, 52, 'the gate fence'),
+        F(60, 46, 60, 52, 'the side fence'), F(42, 46, 42, 52, 'the gate fence')
+      ]),
+      gate: { x: 48, y: 52, x1: 46, x2: 50, panel: [50, 54] },
+      rects: [
+        { name: 'the house', cat: 'house', x: 6, y: 46, w: 36, h: 34 },
+        { name: 'the sunroom', cat: 'house', x: 30, y: 38, w: 12, h: 8 },
+        { name: 'the shrub border', cat: 'shrub', x: 55, y: 20, w: 5, h: 32 },
+        { name: 'the vegetable garden', cat: 'shrub', x: 3, y: 17, w: 26, h: 10 }
+      ],
+      trees: [{ name: 'the maple', x: 44, y: 22, r: 1.2, canopy: 9 }],
+      paved: [{ x: 12, y: 38, w: 18, h: 8, name: 'patio' }, { x: 42, y: 52, w: 18, h: 38, name: 'driveway' }],
+      gravel: [],
+      drop: { x: 51, y: 78, name: 'trailer' },
+      zones: [{ x: 42, y: 30, w: 13, h: 16, name: 'around the sunroom corner' }]
+    },
+    {
+      id: 'open-yard', name: 'Open Yard', blurb: 'A double gate, a big open lawn and nothing in the way. Don\'t overspend.',
+      job: 'Dig out an island bed in the middle of the lawn and haul the soil to the trailer in the driveway.',
+      W: 60, H: 90, delicacy: 0.8, deadline: 480, budget: 1100,
+      bed: { x: 18, y: 13, w: 16, h: 10, depth: 1.5 },
+      house: { x: 12, y: 48, w: 40, h: 32 },
+      fences: lotFences(48, [
+        F(0, 48, 1, 48, 'the gate fence'), F(11, 48, 12, 48, 'the gate fence'),
+        F(52, 48, 60, 48, 'the side fence')
+      ]),
+      gate: { x: 6, y: 48, x1: 1, x2: 11 },
+      rects: [
+        { name: 'the house', cat: 'house', x: 12, y: 48, w: 40, h: 32 },
+        { name: 'the shed', cat: 'shed', x: 48, y: 4, w: 9, h: 8 }
+      ],
+      trees: [{ name: 'the oak', x: 44, y: 30, r: 1.4, canopy: 10 }],
+      paved: [{ x: 0, y: 48, w: 12, h: 42, name: 'driveway' }, { x: 22, y: 40, w: 16, h: 8, name: 'patio' }],
+      gravel: [],
+      drop: { x: 6, y: 78, name: 'trailer' },
+      zones: []
+    },
+    {
+      id: 'tight-corner', name: 'Tight Corner', blurb: 'The bed runs along the side fence, with the shed and the hot tub close by.',
+      job: 'Dig out a long bed along the side fence and haul the soil to the trailer in the driveway.',
+      W: 60, H: 90, delicacy: 1.0, deadline: 480, budget: 1300,
+      bed: { x: 52, y: 4, w: 6, h: 22, depth: 2 },
+      house: { x: 8, y: 44, w: 38, h: 36 },
+      fences: lotFences(44, [
+        F(0, 44, 8, 44, 'the side fence'),
+        F(46, 44, 49, 44, 'the gate fence'), F(53, 44, 56, 44, 'the gate fence', true), F(56, 44, 60, 44, 'the gate fence')
+      ]),
+      gate: { x: 51, y: 44, x1: 49, x2: 53, panel: [53, 56] },
+      rects: [
+        { name: 'the house', cat: 'house', x: 8, y: 44, w: 38, h: 36 },
+        { name: 'the shed', cat: 'shed', x: 39, y: 8, w: 7.5, h: 9 },
+        { name: 'the hot tub', cat: 'structure', x: 36, y: 27, w: 8, h: 8 }
+      ],
+      trees: [{ name: 'the aspen', x: 20, y: 18, r: 0.8, canopy: 6 }],
+      paved: [{ x: 46, y: 44, w: 14, h: 46, name: 'driveway' }, { x: 14, y: 36, w: 20, h: 8, name: 'patio' }],
+      gravel: [],
+      drop: { x: 53, y: 76, name: 'trailer' },
+      zones: []
+    },
+    {
+      id: 'long-haul', name: 'Long Haul', blurb: 'The trailer has to stay on the street, a long way from the back corner.',
+      job: 'Dig out a bed in the far back corner and haul the soil all the way to the trailer at the curb.',
+      W: 60, H: 90, delicacy: 0.9, deadline: 390, budget: 1450,
+      bed: { x: 36, y: 3, w: 20, h: 8, depth: 2 },
+      house: { x: 10, y: 44, w: 44, h: 36 },
+      fences: lotFences(44, [
+        F(0, 44, 3, 44, 'the gate fence'), F(7, 44, 10, 44, 'the gate fence'), F(54, 44, 60, 44, 'the side fence')
+      ]),
+      gate: { x: 5, y: 44, x1: 3, x2: 7 },
+      rects: [
+        { name: 'the house', cat: 'house', x: 10, y: 44, w: 44, h: 36 },
+        { name: 'the play set', cat: 'structure', x: 6, y: 8, w: 10, h: 8 }
+      ],
+      trees: [{ name: 'the spruce', x: 30, y: 24, r: 1.3, canopy: 7 }],
+      paved: [{ x: 18, y: 36, w: 20, h: 8, name: 'patio' }, { x: 0, y: 86, w: 60, h: 4, name: 'sidewalk' }],
+      gravel: [{ x: 0, y: 44, w: 10, h: 42, name: 'side path' }],
+      drop: { x: 30, y: 88, name: 'trailer at the curb' },
+      zones: []
+    },
+    {
+      id: 'new-sod', name: 'New Sod', blurb: 'The lawn was sodded last week. Every rut will show.',
+      job: 'Dig out a bed beside the patio and haul the soil to the trailer in the driveway — without wrecking the new lawn.',
+      W: 60, H: 90, delicacy: 1.8, deadline: 480, budget: 1300,
+      bed: { x: 4, y: 20, w: 16, h: 9, depth: 1.75 },
+      house: { x: 4, y: 44, w: 42, h: 36 },
+      fences: lotFences(44, [
+        F(0, 44, 4, 44, 'the side fence'),
+        F(46, 44, 49, 44, 'the gate fence'), F(54, 44, 60, 44, 'the gate fence')
+      ]),
+      gate: { x: 51.5, y: 44, x1: 49, x2: 54 },
+      rects: [
+        { name: 'the house', cat: 'house', x: 4, y: 44, w: 42, h: 36 },
+        { name: 'the fire pit wall', cat: 'structure', x: 30, y: 8, w: 8, h: 8 }
+      ],
+      trees: [{ name: 'the birch', x: 46, y: 18, r: 0.9, canopy: 6 }],
+      paved: [{ x: 20, y: 32, w: 18, h: 12, name: 'patio' }, { x: 46, y: 44, w: 14, h: 46, name: 'driveway' }],
+      gravel: [],
+      drop: { x: 52, y: 76, name: 'trailer' },
+      zones: []
+    },
+    {
+      id: 'tight-budget', name: 'Tight Budget', blurb: 'A small job and a smaller budget. Do you even need a machine?',
+      job: 'Dig out a small bed by the back fence and haul the soil to the trailer in the driveway.',
+      W: 60, H: 90, delicacy: 1.0, deadline: 480, budget: 700,
+      bed: { x: 21, y: 2, w: 12, h: 6, depth: 1.5 },
+      house: { x: 8, y: 46, w: 40, h: 34 },
+      fences: lotFences(46, [
+        F(0, 46, 8, 46, 'the side fence'),
+        F(48, 46, 50, 46, 'the gate fence'), F(54, 46, 60, 46, 'the gate fence')
+      ]),
+      gate: { x: 52, y: 46, x1: 50, x2: 54 },
+      rects: [
+        { name: 'the house', cat: 'house', x: 8, y: 46, w: 40, h: 34 }
+      ],
+      trees: [{ name: 'the crabapple', x: 14, y: 20, r: 0.9, canopy: 6 }],
+      paved: [{ x: 18, y: 38, w: 16, h: 8, name: 'patio' }, { x: 48, y: 46, w: 12, h: 44, name: 'driveway' }],
+      gravel: [],
+      drop: { x: 54, y: 76, name: 'trailer' },
+      zones: []
+    }
+  ];
+
+  // ---------------- v2 sites: builder ----------------
+  // o.house {x,y,w,h}; o.gate {side:'R'|'L', x1, x2, y?, panel?: width}; o.curb: trailer at the street instead of a driveway.
+  function mk(o) {
+    const W = o.W || 60, H = o.H || 90, hs = o.house, top = hs.y, hx2 = hs.x + hs.w;
+    const g = o.gate, right = g.side !== 'L', gy = g.y || top, p = g.panel || 0;
+    const fences = [F(0, 0, W, 0, 'the back fence'), F(0, 0, 0, gy > top && !right ? gy : top, 'the side fence'), F(W, 0, W, gy > top && right ? gy : top, 'the side fence')];
+    const seg = (a, b, y, name, panel) => { if (b - a > 0.01) fences.push(F(a, y, b, y, name, panel)); };
+    if (right) {
+      seg(hx2, g.x1, gy, 'the gate fence');
+      seg(g.x2, g.x2 + p, gy, 'the gate fence', true);
+      seg(g.x2 + p, W, gy, 'the gate fence');
+      seg(0, hs.x, top, 'the side fence');
+      if (gy > top) fences.push(F(hx2, top, hx2, gy, 'the house wall'));
+    } else {
+      seg(0, g.x1 - p, gy, 'the gate fence');
+      seg(g.x1 - p, g.x1, gy, 'the gate fence', true);
+      seg(g.x2, hs.x, gy, 'the gate fence');
+      seg(hx2, W, top, 'the side fence');
+      if (gy > top) fences.push(F(hs.x, top, hs.x, gy, 'the house wall'));
+    }
+    for (const f of (o.fences || [])) fences.push(F(f[0], f[1], f[2], f[3], f[4] || 'the fence'));
+    const site = {
+      id: o.id, name: o.name, blurb: o.blurb, job: o.job, W, H,
+      delicacy: o.delicacy == null ? 1 : o.delicacy, deadline: o.deadline || 480, budget: o.budget || 1200,
+      soil: o.soil || 'loam', bed: o.bed, house: hs, fences,
+      gate: { x: (g.x1 + g.x2) / 2, y: gy, x1: g.x1, x2: g.x2, panel: p ? (right ? [g.x2, g.x2 + p] : [g.x1 - p, g.x1]) : undefined },
+      rects: [{ name: 'the house', cat: 'house', x: hs.x, y: hs.y, w: hs.w, h: hs.h }].concat(o.rects || []),
+      trees: o.trees || [], paved: [], gravel: o.gravel || [], slopes: o.slopes || [], utils: o.utils || [], zones: o.zones || []
+    };
+    const sx = right ? hx2 : 0, sw = right ? W - hx2 : hs.x;
+    if (o.curb) {
+      site.gravel.push({ x: sx, y: gy, w: sw, h: H - 4 - gy, name: 'side path' });
+      site.paved.push({ x: 0, y: H - 4, w: W, h: 4, name: 'sidewalk' });
+      site.drop = { x: o.dropX != null ? o.dropX : W / 2, y: H - 2, name: 'trailer at the curb' };
+    } else {
+      site.paved.push({ x: sx, y: gy, w: sw, h: H - gy, name: 'driveway' });
+      site.drop = { x: sx + sw / 2, y: H - 12, name: 'trailer' };
+    }
+    for (const q of (o.paved || [])) site.paved.push(q);
+    return site;
+  }
+  const T = (name, x, y, r, canopy) => ({ name, x, y, r, canopy });
+  const U = (kind, x1, y1, x2, y2) => ({ kind, name: 'the ' + UTIL[kind].name, x1, y1, x2, y2 });
+  const R = (name, cat, x, y, w, h) => ({ name, cat, x, y, w, h });
+  const patio = (x, y, w, h) => ({ x, y, w, h, name: 'patio' });
+
+  SITES.push(
+    mk({ id: 'gas-line', name: 'Gas Line', soil: 'loam',
+      blurb: 'A gas line to the fire pit runs right under the new bed. Machines must stay 2 ft off it.',
+      job: 'Dig out a bed across the back of the yard. The gas line is marked in yellow paint.',
+      house: { x: 6, y: 46, w: 38, h: 34 }, gate: { side: 'R', x1: 48, x2: 53 },
+      bed: { x: 8, y: 4, w: 22, h: 8, depth: 1.5 },
+      rects: [R('the fire pit', 'structure', 34, 3, 7, 7)], trees: [T('the linden', 50, 20, 1.1, 8)],
+      utils: [U('gas', 24, 46, 24, 6.5), U('gas', 24, 6.5, 34, 6.5)], paved: [patio(14, 38, 18, 8)] }),
+    mk({ id: 'big-dig', name: 'Big Dig', soil: 'loam', delicacy: 0.7,
+      blurb: 'A whole patio base to dig out, a 12 ft double gate and nothing in the way.',
+      job: 'Excavate the base for a large new patio behind the house and haul everything to the trailer.',
+      house: { x: 4, y: 48, w: 38, h: 32 }, gate: { side: 'R', x1: 45, x2: 57 },
+      bed: { x: 10, y: 22, w: 26, h: 16, depth: 1 },
+      trees: [T('the ash', 50, 10, 1.3, 9)] }),
+    mk({ id: 'cobble', name: 'Cobble Ground', soil: 'rocky', delicacy: 0.7,
+      blurb: 'Old river cobble a few inches down. Shovels will hit rock on every scoop.',
+      job: 'Dig out a small bed by the side fence and haul the rock and soil to the trailer.',
+      house: { x: 8, y: 46, w: 38, h: 34 }, gate: { side: 'R', x1: 50, x2: 54.5 },
+      bed: { x: 4, y: 14, w: 6, h: 14, depth: 1.5 },
+      trees: [T('the pine', 30, 16, 1.2, 7)], paved: [patio(16, 38, 18, 8)] }),
+    mk({ id: 'sand-lot', name: 'Sand Lot', soil: 'sandy', delicacy: 0.8,
+      blurb: 'Sandy soil that falls off the shovel — and a gate barely 3 ft wide.',
+      job: 'Dig out a bed along the back fence and wheel the sand out to the trailer.',
+      house: { x: 4, y: 46, w: 42, h: 34 }, gate: { side: 'R', x1: 50, x2: 53 },
+      bed: { x: 20, y: 2, w: 14, h: 6, depth: 1.5 },
+      trees: [T('the cottonwood', 12, 22, 1.4, 10)] }),
+    mk({ id: 'up-the-bank', name: 'Up the Bank', soil: 'loam',
+      blurb: 'The back yard sits up a steep bank from the driveway. Every load climbs it.',
+      job: 'Dig out a bed at the top of the yard and haul the soil down the bank to the trailer.',
+      house: { x: 6, y: 50, w: 38, h: 30 }, gate: { side: 'R', x1: 48, x2: 54 },
+      bed: { x: 10, y: 3, w: 18, h: 8, depth: 1.5 },
+      slopes: [{ x: 0, y: 26, w: 60, h: 18, name: 'the bank' }],
+      trees: [T('the spruce', 40, 12, 1.2, 7)] }),
+    mk({ id: 'after-rain', name: 'After the Rain', soil: 'wet', delicacy: 1.2,
+      blurb: 'Two days of rain. The lawn is soft and every wheel or track will sink.',
+      job: 'Dig out a bed along the back fence and haul the soil to the trailer without trashing the soggy lawn.',
+      house: { x: 4, y: 46, w: 40, h: 34 }, gate: { side: 'R', x1: 48, x2: 54 },
+      bed: { x: 14, y: 2, w: 20, h: 7, depth: 1.5 },
+      trees: [T('the maple', 46, 22, 1.2, 9)], paved: [patio(16, 38, 18, 8)] }),
+    mk({ id: 'house-wall', name: 'Against the House', soil: 'loam',
+      blurb: 'The bed hugs the back wall of the house, with the AC unit at one end.',
+      job: 'Dig out a foundation planting bed along the back of the house.',
+      house: { x: 4, y: 46, w: 40, h: 34 }, gate: { side: 'R', x1: 48, x2: 53 },
+      bed: { x: 6, y: 40, w: 28, h: 5, depth: 1.5 },
+      fences: [[0, 34.5, 40, 34.5, 'the garden wall']],
+      rects: [R('the AC unit', 'ac', 35, 41.5, 3.5, 3.5)], trees: [T('the plum', 20, 14, 1, 7)] }),
+    mk({ id: 'side-squeeze', name: 'Side Squeeze', soil: 'loam',
+      blurb: 'The side yard is pinched by the AC unit. Measure before you rent.',
+      job: 'Dig out a bed in the back corner and bring the soil out through the narrow side yard.',
+      house: { x: 6, y: 40, w: 46, h: 40 }, gate: { side: 'R', x1: 52, x2: 60, y: 62 },
+      bed: { x: 34, y: 3, w: 18, h: 8, depth: 1.75 },
+      rects: [R('the AC unit', 'ac', 52, 50, 4.4, 3)], trees: [T('the dogwood', 14, 18, 0.9, 6)],
+      zones: [{ x: 52, y: 40, w: 8, h: 22, name: 'past the AC unit' }] }),
+    mk({ id: 'panel-pays', name: 'Panel Pays', soil: 'clay', delicacy: 0.8,
+      blurb: 'A big bed in heavy clay, a 4 ft gate — and a fence panel that lifts out beside it.',
+      job: 'Dig out a large bed in the middle of the yard and haul the clay to the trailer.',
+      house: { x: 4, y: 46, w: 40, h: 34 }, gate: { side: 'R', x1: 46, x2: 50, panel: 4 },
+      bed: { x: 12, y: 8, w: 20, h: 12, depth: 1.5 },
+      trees: [T('the elm', 48, 20, 1.3, 9)] }),
+    mk({ id: 'corner-lot', name: 'Corner Lot', W: 80, soil: 'loam', delicacy: 0.9,
+      blurb: 'A wide corner lot. The gate is on the far side from the bed.',
+      job: 'Dig out a bed in the far back corner and haul it across the yard to the trailer.',
+      house: { x: 20, y: 48, w: 46, h: 32 }, gate: { side: 'L', x1: 6, x2: 14 },
+      bed: { x: 58, y: 3, w: 18, h: 9, depth: 1.5 },
+      trees: [T('the oak', 36, 20, 1.5, 11), T('the birch', 60, 30, 0.8, 6)] }),
+    mk({ id: 'trench', name: 'The Trench', soil: 'loam',
+      blurb: 'A long, skinny trench for a drain along the side fence.',
+      job: 'Dig a 2 ft wide drain trench along the side fence and haul the spoil to the trailer.',
+      house: { x: 4, y: 48, w: 42, h: 32 }, gate: { side: 'R', x1: 48, x2: 54 },
+      bed: { x: 56, y: 2, w: 2, h: 40, depth: 2 },
+      trees: [T('the apple', 26, 20, 1, 8)], paved: [patio(14, 40, 20, 8)] }),
+    mk({ id: 'irrigation', name: 'Sprinkler Main', soil: 'loam', delicacy: 1.1,
+      blurb: 'The irrigation main runs along the back fence, right through the new bed.',
+      job: 'Dig out a bed along the back fence. The sprinkler main is marked in purple.',
+      house: { x: 6, y: 46, w: 40, h: 34 }, gate: { side: 'R', x1: 49, x2: 54 },
+      bed: { x: 8, y: 2, w: 28, h: 7, depth: 1.5 },
+      utils: [U('irrigation', 0, 5, 60, 5)], trees: [T('the crabapple', 44, 24, 1, 7)] }),
+    mk({ id: 'curbside', name: 'Curbside', soil: 'loam', curb: true, dropX: 14,
+      blurb: 'No driveway — the trailer stays at the curb and everything goes up the side path.',
+      job: 'Dig out a bed in the back yard and haul it down the side path to the trailer at the curb.',
+      house: { x: 12, y: 44, w: 44, h: 36 }, gate: { side: 'L', x1: 3, x2: 9 },
+      bed: { x: 30, y: 4, w: 18, h: 8, depth: 1.5 },
+      trees: [T('the walnut', 12, 18, 1.4, 10)] }),
+    mk({ id: 'noon', name: 'Party Day', soil: 'sandy',
+      blurb: 'The owners are hosting a party this afternoon. Crew and gear must be gone before the guests arrive.',
+      job: 'Dig out a bed by the patio and have everything cleaned up before the party.',
+      house: { x: 6, y: 46, w: 40, h: 34 }, gate: { side: 'R', x1: 49, x2: 55 },
+      bed: { x: 12, y: 26, w: 16, h: 6, depth: 1.5 },
+      paved: [patio(12, 36, 22, 10)], trees: [T('the magnolia', 44, 14, 1.1, 8)] }),
+    mk({ id: 'fresh-sod', name: 'Fresh Sod, Long Walk', soil: 'loam', delicacy: 1.8,
+      blurb: 'Brand-new sod the whole way back, and the bed is at the far end.',
+      job: 'Dig out a bed at the back of the yard across the new sod.',
+      house: { x: 4, y: 48, w: 40, h: 32 }, gate: { side: 'R', x1: 48, x2: 53 },
+      bed: { x: 8, y: 2, w: 16, h: 7, depth: 1.5 },
+      trees: [T('the aspen', 40, 16, 0.8, 6)] }),
+    mk({ id: 'old-oak', name: 'Old Oak', soil: 'loam',
+      blurb: 'A 100-year-old oak right beside the bed. Don\'t touch the trunk.',
+      job: 'Dig out a bed next to the big oak and haul the soil to the trailer.',
+      house: { x: 4, y: 48, w: 40, h: 32 }, gate: { side: 'R', x1: 46, x2: 54 },
+      bed: { x: 18, y: 6, w: 16, h: 10, depth: 1.5 },
+      trees: [T('the oak', 38, 12, 2, 13)] }),
+    mk({ id: 'clay-pan', name: 'Clay Pan', soil: 'clay', delicacy: 0.7,
+      blurb: 'Heavy clay, a deep bed and a decent gate. Shovels alone will be a long day.',
+      job: 'Dig out a deep bed for new trees and haul the clay to the trailer.',
+      house: { x: 6, y: 46, w: 38, h: 34 }, gate: { side: 'R', x1: 48, x2: 53 },
+      bed: { x: 14, y: 6, w: 14, h: 8, depth: 2.25 },
+      trees: [T('the locust', 46, 18, 1, 8)], paved: [patio(14, 38, 18, 8)] }),
+    mk({ id: 'pond', name: 'Pond Hole', soil: 'loam', delicacy: 0.8,
+      blurb: 'A small pond: deep, square, and the client is counting every dollar.',
+      job: 'Dig the hole for a backyard pond and haul the soil to the trailer.',
+      house: { x: 6, y: 46, w: 38, h: 34 }, gate: { side: 'R', x1: 48, x2: 52.5 },
+      bed: { x: 20, y: 12, w: 10, h: 10, depth: 2.5 },
+      trees: [T('the willow', 8, 8, 1.2, 9)], paved: [patio(14, 38, 18, 8)] }),
+    mk({ id: 'townhouse', name: 'Townhouse', W: 40, H: 70, soil: 'loam',
+      blurb: 'A tiny townhouse yard with a 3 ft gate. Nothing big gets in here.',
+      job: 'Dig out a small bed along the back fence of the townhouse yard.',
+      house: { x: 4, y: 32, w: 26, h: 28 }, gate: { side: 'R', x1: 33, x2: 36 },
+      bed: { x: 6, y: 2, w: 12, h: 4, depth: 1.5 },
+      paved: [patio(8, 26, 16, 6)] }),
+    mk({ id: 'ranch', name: 'Ranch Lot', W: 80, H: 110, soil: 'loam', delicacy: 0.8,
+      blurb: 'A big lot with a long walk back and a 10 ft gate.',
+      job: 'Dig out a big bed at the very back of the lot and haul it out to the trailer.',
+      house: { x: 8, y: 62, w: 52, h: 36 }, gate: { side: 'R', x1: 64, x2: 74 },
+      bed: { x: 8, y: 4, w: 24, h: 10, depth: 1.5 },
+      trees: [T('the cottonwood', 50, 26, 1.6, 12)] }),
+    mk({ id: 'power-line', name: 'Buried Power', soil: 'loam',
+      blurb: 'A buried power line feeds the garage. It cuts through the middle of the bed.',
+      job: 'Dig out a bed beside the garage. The power line is marked in red paint.',
+      house: { x: 6, y: 46, w: 38, h: 34 }, gate: { side: 'R', x1: 48, x2: 54 },
+      bed: { x: 18, y: 4, w: 16, h: 10, depth: 1.5 },
+      rects: [R('the garage', 'shed', 38, 2, 16, 14)],
+      utils: [U('electric', 44, 46, 44, 16), U('electric', 0, 9, 38, 9)] }),
+    mk({ id: 'shed-pad', name: 'Shed Pad', soil: 'loam',
+      blurb: 'The bed wraps the front of the garden shed. Watch the swing.',
+      job: 'Dig out a bed in front of the shed and haul the soil to the trailer.',
+      house: { x: 6, y: 46, w: 38, h: 34 }, gate: { side: 'R', x1: 48, x2: 53 },
+      bed: { x: 6, y: 13, w: 20, h: 5, depth: 1.5 },
+      rects: [R('the shed', 'shed', 8, 3, 12, 9), R('the raised beds', 'shrub', 0, 24, 30, 6)], trees: [T('the cherry', 40, 18, 1, 7)] }),
+    mk({ id: 'wide-open', name: 'Wide Open', soil: 'loam', delicacy: 0.6,
+      blurb: 'A double gate, a tough old lawn and a big job. Bring the right horsepower.',
+      job: 'Dig out a large bed for a new orchard row and haul the soil to the trailer.',
+      house: { x: 4, y: 48, w: 40, h: 32 }, gate: { side: 'R', x1: 46, x2: 56 },
+      bed: { x: 6, y: 4, w: 30, h: 10, depth: 1.5 } }),
+    mk({ id: 'pocket', name: 'Pocket Garden', soil: 'loam',
+      blurb: 'A tiny herb bed by the back door. It hardly needs a crew.',
+      job: 'Dig out a small herb bed beside the patio.',
+      house: { x: 6, y: 46, w: 38, h: 34 }, gate: { side: 'R', x1: 48, x2: 53 },
+      bed: { x: 34, y: 38, w: 7, h: 5, depth: 1 },
+      paved: [patio(14, 38, 18, 8)], trees: [T('the maple', 20, 16, 1.2, 9)] }),
+    mk({ id: 'water-main', name: 'Water Service', soil: 'clay',
+      blurb: 'The water service to the back hose bib runs right down the length of the bed.',
+      job: 'Dig out a bed along the side fence. The water line is marked in blue.',
+      house: { x: 4, y: 46, w: 40, h: 34 }, gate: { side: 'R', x1: 48, x2: 54 },
+      bed: { x: 6, y: 6, w: 8, h: 22, depth: 1.5 },
+      utils: [U('water', 10, 46, 10, 2)], trees: [T('the linden', 34, 18, 1.2, 8)] }),
+    mk({ id: 'thaw', name: 'Spring Thaw', soil: 'wet', delicacy: 1.1,
+      blurb: 'Snowmelt has the bank soaked. The lawn will rut and the climb is slick.',
+      job: 'Dig out a bed above the bank and bring the soil down to the trailer.',
+      house: { x: 6, y: 50, w: 38, h: 30 }, gate: { side: 'R', x1: 47, x2: 53 },
+      bed: { x: 24, y: 3, w: 16, h: 7, depth: 1.5 },
+      slopes: [{ x: 0, y: 30, w: 60, h: 14, name: 'the bank' }] }),
+    mk({ id: 'fibre', name: 'Fibre Run', soil: 'sandy',
+      blurb: 'A fibre line crosses the corner of the bed. Sandy soil, at least.',
+      job: 'Dig out a corner bed. The fibre line is marked in orange.',
+      house: { x: 6, y: 46, w: 38, h: 34 }, gate: { side: 'L', x1: 0.5, x2: 5 },
+      bed: { x: 36, y: 4, w: 18, h: 12, depth: 1.25 },
+      utils: [U('comms', 60, 13, 47, 0)], trees: [T('the pear', 16, 20, 1, 7)] }),
+    mk({ id: 'play-yard', name: 'Play Yard', soil: 'loam', delicacy: 1.2,
+      blurb: 'Swing set, trampoline and sandbox. The kids want them all back in one piece.',
+      job: 'Dig out a bed between the play things and haul the soil to the trailer.',
+      house: { x: 4, y: 48, w: 40, h: 32 }, gate: { side: 'R', x1: 47, x2: 53 },
+      bed: { x: 24, y: 6, w: 12, h: 8, depth: 1.5 },
+      rects: [R('the swing set', 'structure', 6, 4, 12, 7), R('the trampoline', 'structure', 40, 4, 12, 12), R('the sandbox', 'structure', 22, 19, 7, 7)] }),
+    mk({ id: 'hilltop', name: 'Hilltop Haul', soil: 'clay', curb: true, dropX: 50,
+      blurb: 'Clay, a slope down the side path and the trailer at the curb.',
+      job: 'Dig out a bed at the back and haul the clay down the side path to the curb.',
+      house: { x: 4, y: 44, w: 44, h: 36 }, gate: { side: 'R', x1: 51, x2: 57 },
+      bed: { x: 8, y: 4, w: 18, h: 7, depth: 1.5 },
+      slopes: [{ x: 48, y: 54, w: 12, h: 22, name: 'the side path slope' }],
+      trees: [T('the maple', 34, 18, 1.3, 9)] }),
+    mk({ id: 'courtyard', name: 'Courtyard', soil: 'loam', delicacy: 1.4,
+      blurb: 'A walled courtyard of fussy lawn, reached through a 3½ ft gate.',
+      job: 'Dig out a bed in the middle of the courtyard lawn.',
+      house: { x: 8, y: 46, w: 40, h: 34 }, gate: { side: 'R', x1: 51, x2: 54.5 },
+      bed: { x: 18, y: 18, w: 14, h: 8, depth: 1.5 },
+      fences: [[0, 30, 14, 30, 'the courtyard wall'], [36, 30, 60, 30, 'the courtyard wall']],
+      trees: [T('the japanese maple', 10, 10, 0.8, 5)] })
+  );
+
+  // Deadline (min after 7:00 am) and budget per site, picked with the exhaustive solver so each day has one clear best plan.
+  const TUNE = {
+    'sand-lot': [330, 900],
+    'up-the-bank': [630, 1250],
+    'after-rain': [300, 1250],
+    'house-wall': [360, 1310],
+    'side-squeeze': [315, 1525],
+    'panel-pays': [405, 1675],
+    'corner-lot': [240, 1350],
+    'trench': [450, 1100],
+    'irrigation': [570, 2150],
+    'curbside': [240, 1320],
+    'noon': [375, 775],
+    'fresh-sod': [390, 1135],
+    'old-oak': [240, 1305],
+    'clay-pan': [270, 1225],
+    'pond': [495, 1050],
+    'townhouse': [495, 625],
+    'ranch': [255, 1600],
+    'power-line': [510, 1475],
+    'narrow-gate': [300, 1525],
+    'open-yard': [540, 1030],
+    'tight-corner': [240, 1500],
+    'long-haul': [315, 1475],
+    'new-sod': [525, 1205],
+    'tight-budget': [360, 800],
+    'gas-line': [345, 1605],
+    'big-dig': [435, 2275],
+    'cobble': [315, 950],
+    'shed-pad': [315, 1050],
+    'wide-open': [315, 1660],
+    'pocket': [630, 400],
+    'water-main': [615, 2600],
+    'thaw': [600, 1155],
+    'fibre': [315, 1430],
+    'play-yard': [240, 1125],
+    'hilltop': [405, 1250],
+    'courtyard': [345, 1200]
+  };
+  for (const s of SITES) if (TUNE[s.id]) { s.deadline = TUNE[s.id][0]; s.budget = TUNE[s.id][1]; }
+
+  // Best possible score per site, from the exhaustive solver (playtest/bots). Regenerate if rules or sites change.
+  const PAR = {
+    'curbside': { score: 100, key: 'compact/dumper/2w/mats/best' },
+    'noon': { score: 100, key: 'hand/barrow/3w/pile' },
+    'fresh-sod': { score: 100, key: 'compact/barrow/2w/mats/best' },
+    'old-oak': { score: 100, key: 'compact/dumper/2w/mats/best' },
+    'clay-pan': { score: 95, key: 'compact/barrow/3w/best' },
+    'pond': { score: 96, key: 'compact/barrow/2w/best' },
+    'townhouse': { score: 100, key: 'hand/barrow/2w/pile' },
+    'ranch': { score: 100, key: 'large/dumper/2w/mats/best' },
+    'power-line': { score: 93, key: 'compact/barrow/3w/best' },
+    'narrow-gate': { score: 100, key: 'zts/dumper/2w/mats/best' },
+    'open-yard': { score: 97, key: 'compact/barrow/2w/best' },
+    'tight-corner': { score: 100, key: 'compact/dumper/3w/mats/back' },
+    'long-haul': { score: 100, key: 'compact/dumper/2w/mats/best' },
+    'new-sod': { score: 100, key: 'compact/dumper/1w/mats/best' },
+    'tight-budget': { score: 99, key: 'hand/barrow/3w/pile' },
+    'gas-line': { score: 100, key: 'compact/dumper/3w/mats/best' },
+    'big-dig': { score: 100, key: 'large/dumper/3w/mats/back' },
+    'cobble': { score: 97, key: 'compact/barrow/2w/best' },
+    'sand-lot': { score: 100, key: 'hand/barrow/3w/pile' },
+    'up-the-bank': { score: 100, key: 'compact/dumper/1w/mats/best' },
+    'after-rain': { score: 100, key: 'compact/barrow/2w/mats/best' },
+    'house-wall': { score: 96, key: 'zts/barrow/3w/best' },
+    'side-squeeze': { score: 100, key: 'zts/dumper/2w/mats/best' },
+    'panel-pays': { score: 100, key: 'large/dumper/2w/mats/panel/best' },
+    'corner-lot': { score: 100, key: 'compact/dumper/2w/mats/best' },
+    'trench': { score: 100, key: 'hand/barrow/3w/pile' },
+    'irrigation': { score: 100, key: 'compact/dumper/3w/mats/best' },
+    'shed-pad': { score: 95, key: 'zts/barrow/2w/best' },
+    'wide-open': { score: 100, key: 'large/dumper/2w/mats/best' },
+    'pocket': { score: 100, key: 'hand/barrow/1w/pile' },
+    'water-main': { score: 100, key: 'compact/dumper/3w/mats/best' },
+    'thaw': { score: 100, key: 'compact/dumper/1w/mats/best' },
+    'fibre': { score: 100, key: 'compact/dumper/2w/mats/best' },
+    'play-yard': { score: 100, key: 'compact/barrow/2w/mats/back' },
+    'hilltop': { score: 100, key: 'compact/dumper/1w/mats/best' },
+    'courtyard': { score: 100, key: 'zts/barrow/2w/mats/best' }
+  };
+  // Day order: no site repeats within SITES.length days. Days 1–2 keep the original launch sites.
+  const ORDER = ['narrow-gate', 'open-yard', 'old-oak', 'noon', 'panel-pays', 'hilltop', 'power-line', 'courtyard', 'irrigation', 'pond', 'trench', 'curbside', 'wide-open', 'after-rain', 'up-the-bank', 'side-squeeze', 'tight-corner', 'clay-pan', 'fibre', 'sand-lot', 'shed-pad', 'thaw', 'big-dig', 'cobble', 'gas-line', 'pocket', 'fresh-sod', 'corner-lot', 'tight-budget', 'house-wall', 'new-sod', 'ranch', 'townhouse', 'water-main', 'play-yard', 'long-haul'];
+
+  const EPOCH = Date.UTC(2026, 10, 5); // #1 = Nov 5, 2026
+  function dayNumber(date) {
+    const d = date || new Date();
+    const local = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+    return Math.floor((local - EPOCH) / 86400000) + 1;
+  }
+  const BY_ID = Object.fromEntries(SITES.map(s => [s.id, s]));
+  function siteForDay(n) { return BY_ID[ORDER[((n - 1) % ORDER.length + ORDER.length) % ORDER.length]]; }
+  function siteById(id) { return BY_ID[id]; }
+
+  const API = { PAR, autoSetup, DIGGERS, HAULERS, RATES, SOIL, UTIL, ORDER, siteById, needs, ftIn, onSlope, inTolZone, soilOf, SITES, simulate, analyzeRoute, analyzeSpot, obstacles, clearance, bedVolume, bedCells, stuckPoint, describeTight, routeLength, surfaceAt, clock, fmtDur, money, dayNumber, siteForDay };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.RT = API;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>// Right Tool — UI, rendering, playback
+(function () {
+  'use strict';
+  const { DIGGERS, HAULERS, RATES, SITES } = RT;
+  const $ = (s, el) => (el || document).querySelector(s);
+  const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+
+  // ---------------- storage ----------------
+  const STORE = 'righttool-v1';
+  let store = { days: {}, seenHelp: false };
+  try { const raw = localStorage.getItem(STORE); if (raw) store = Object.assign(store, JSON.parse(raw)); } catch (e) {}
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(store)); } catch (e) {} }
+
+  const today = RT.dayNumber(new Date());
+  let practice = false;
+  let site = RT.siteForDay(today);
+  let plan = freshPlan();
+  let mode = 'spot';
+  let result = null;   // last sim result
+  let play = null;     // playback state
+  let drag = null;
+
+  function freshPlan() { return { digger: null, hauler: null, workers: 2, mats: false, panel: false, spotChoice: null, spot: null, wps: [] }; }
+  let setup = null;
+  function recompute() {
+    setup = null; plan.spot = null; plan.wps = [];
+    if (!plan.digger) return;
+    setup = RT.autoSetup(site, plan);
+    if (setup.spot && setup.route) { plan.spot = setup.spot; plan.wps = setup.route.slice(1, -1); plan.spotChoice = setup.chosen; }
+  }
+  function fullPlan() {
+    return { digger: plan.digger, hauler: plan.hauler, workers: plan.workers, mats: plan.mats, panel: plan.panel && !!site.gate.panel, spotChoice: plan.spotChoice, spot: plan.spot,
+      route: [[site.drop.x, site.drop.y]].concat(plan.wps).concat(plan.spot ? [plan.spot] : []) };
+  }
+
+  // ---------------- canvas ----------------
+  const cv = $('#yard'); let ctx = cv.getContext('2d');
+  let K = 8, dpr = 1;
+  function resize() {
+    const wrap = $('#yardWrap');
+    const w = wrap.clientWidth;
+    const maxH = window.innerWidth > 900 ? window.innerHeight - 150 : 99999;
+    let cw = w, ch = w * site.H / site.W;
+    if (ch > maxH) { ch = maxH; cw = ch * site.W / site.H; }
+    dpr = window.devicePixelRatio || 1;
+    cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+    cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr);
+    K = cw / site.W;
+    draw();
+  }
+  window.addEventListener('resize', resize);
+
+  const P = (v) => v * K;
+  // seeded noise for textures
+  function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+  const C = {
+    grass1: '#9ccc6b', grass2: '#93c464', grassDark: '#7fb052', soil: '#c8a27a', soilDark: '#9b7350', soilDug: '#7a5638',
+    paver: '#e6dccb', paverLine: '#d2c5ae', concrete: '#dcd8cf', concreteLine: '#c9c4b8', gravel: '#cfc6b4',
+    fence: '#8a5a33', fenceLight: '#b07a4a', house: '#d9c9b6', roof: '#a8573f', roofLight: '#bf6a50', shadow: 'rgba(40,50,30,0.18)',
+    shed: '#8c6b4f', water: '#7cc6e0', shrub: '#5c9443', shrub2: '#6fa652', tree: 'rgba(52,104,52,0.55)', trunk: '#6b4a2e',
+    yellow: '#f2b705', yellowDark: '#c98f00', orange: '#ef7d1a', track: '#34312d', barrow: '#2e8b57', ink: '#26231f',
+    reach: 'rgba(40,110,220,0.10)', reachLine: 'rgba(40,110,220,0.65)', tail: 'rgba(240,140,20,0.18)', tailLine: 'rgba(230,120,10,0.9)', bad: '#d6312b', good: '#2a9d55'
+  };
+
+  function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+  function drawGround(state) {
+    // lawn with mowing stripes
+    ctx.fillStyle = C.grass1; ctx.fillRect(0, 0, P(site.W), P(site.H));
+    ctx.fillStyle = C.grass2;
+    for (let x = 0; x < site.W; x += 6) ctx.fillRect(P(x), 0, P(3), P(site.H));
+    // speckles
+    const r = rng(7);
+    ctx.fillStyle = 'rgba(70,120,40,0.18)';
+    for (let i = 0; i < 900; i++) { const x = r() * site.W, y = r() * site.H; ctx.fillRect(P(x), P(y), Math.max(1, P(0.18)), Math.max(1, P(0.45))); }
+    // gravel
+    for (const g of (site.gravel || [])) {
+      ctx.fillStyle = C.gravel; ctx.fillRect(P(g.x), P(g.y), P(g.w), P(g.h));
+      const rg = rng(11); ctx.fillStyle = 'rgba(120,105,80,0.35)';
+      for (let i = 0; i < g.w * g.h * 3; i++) ctx.fillRect(P(g.x + rg() * g.w), P(g.y + rg() * g.h), Math.max(1, P(0.25)), Math.max(1, P(0.25)));
+    }
+    // paved
+    for (const p of site.paved) {
+      const drive = /drive|sidewalk/.test(p.name);
+      ctx.fillStyle = drive ? C.concrete : C.paver; ctx.fillRect(P(p.x), P(p.y), P(p.w), P(p.h));
+      ctx.strokeStyle = drive ? C.concreteLine : C.paverLine; ctx.lineWidth = 1;
+      const step = drive ? 10 : 2;
+      ctx.beginPath();
+      for (let x = p.x + step; x < p.x + p.w; x += step) { ctx.moveTo(P(x), P(p.y)); ctx.lineTo(P(x), P(p.y + p.h)); }
+      for (let y = p.y + step; y < p.y + p.h; y += step) { ctx.moveTo(P(p.x), P(y)); ctx.lineTo(P(p.x + p.w), P(y)); }
+      ctx.stroke();
+    }
+    // slopes: contour hatching
+    for (const sl of (site.slopes || [])) {
+      ctx.save(); ctx.beginPath(); ctx.rect(P(sl.x), P(sl.y), P(sl.w), P(sl.h)); ctx.clip();
+      ctx.fillStyle = 'rgba(60,90,30,0.16)'; ctx.fillRect(P(sl.x), P(sl.y), P(sl.w), P(sl.h));
+      ctx.strokeStyle = 'rgba(50,80,25,0.35)'; ctx.lineWidth = Math.max(1, P(0.12));
+      for (let y = sl.y + 1.5; y < sl.y + sl.h; y += 2.5) { ctx.beginPath(); for (let x = sl.x; x <= sl.x + sl.w + 1; x += 1) { const yy = y + Math.sin(x * 0.35 + y) * 0.35; x === sl.x ? ctx.moveTo(P(x), P(yy)) : ctx.lineTo(P(x), P(yy)); } ctx.stroke(); }
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(50,80,25,0.5)'; ctx.setLineDash([P(0.6), P(0.4)]); ctx.lineWidth = Math.max(1, P(0.12)); ctx.strokeRect(P(sl.x), P(sl.y), P(sl.w), P(sl.h)); ctx.setLineDash([]);
+    }
+    // street + curb
+    ctx.fillStyle = '#5b5b5f'; ctx.fillRect(0, P(site.H - 1.2), P(site.W), P(1.2));
+    ctx.fillStyle = '#cfcac0'; ctx.fillRect(0, P(site.H - 1.6), P(site.W), P(0.4));
+    // mats
+    if (state.mats) drawMats(state.route, state.matsAlpha == null ? 1 : state.matsAlpha);
+    // ruts
+    if (state.ruts && state.ruts > 0) drawRuts(state.route, state.ruts);
+  }
+  function eachLawnPiece(route, fn) {
+    for (let i = 1; i < route.length; i++) {
+      const [x1, y1] = route[i - 1], [x2, y2] = route[i];
+      const L = Math.hypot(x2 - x1, y2 - y1), n = Math.max(1, Math.ceil(L / 0.5));
+      for (let k = 0; k < n; k++) {
+        const ax = x1 + (x2 - x1) * k / n, ay = y1 + (y2 - y1) * k / n, bx = x1 + (x2 - x1) * (k + 1) / n, by = y1 + (y2 - y1) * (k + 1) / n;
+        if (RT.surfaceAt(site, (ax + bx) / 2, (ay + by) / 2) === 'lawn') fn(ax, ay, bx, by);
+      }
+    }
+  }
+  function drawMats(route, a) {
+    if (!route || route.length < 2) return;
+    ctx.save(); ctx.globalAlpha = a; ctx.lineCap = 'butt';
+    ctx.strokeStyle = '#3f4a52'; ctx.lineWidth = P(4.2);
+    eachLawnPiece(route, (ax, ay, bx, by) => { ctx.beginPath(); ctx.moveTo(P(ax), P(ay)); ctx.lineTo(P(bx), P(by)); ctx.stroke(); });
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = P(0.25); ctx.setLineDash([P(0.6), P(0.6)]);
+    eachLawnPiece(route, (ax, ay, bx, by) => { ctx.beginPath(); ctx.moveTo(P(ax), P(ay)); ctx.lineTo(P(bx), P(by)); ctx.stroke(); });
+    ctx.setLineDash([]);
+    if (plan.spot && RT.surfaceAt(site, plan.spot[0], plan.spot[1]) === 'lawn') { ctx.fillStyle = '#3f4a52'; ctx.fillRect(P(plan.spot[0] - 3.5), P(plan.spot[1] - 3.5), P(7), P(7)); }
+    ctx.restore();
+  }
+  function drawRuts(route, amt) {
+    ctx.save(); ctx.lineCap = 'round';
+    ctx.strokeStyle = `rgba(120,85,50,${Math.min(0.75, 0.15 + amt * 0.6)})`;
+    ctx.lineWidth = P(1.0 + 2.2 * amt);
+    eachLawnPiece(route, (ax, ay, bx, by) => { ctx.beginPath(); ctx.moveTo(P(ax), P(ay)); ctx.lineTo(P(bx), P(by)); ctx.stroke(); });
+    ctx.restore();
+  }
+
+  function drawUtils() {
+    for (const u of (site.utils || [])) {
+      const col = RT.UTIL[u.kind].color;
+      ctx.save(); ctx.lineCap = 'round';
+      ctx.strokeStyle = col + '30'; ctx.lineWidth = P(RT.RATES.tolZone * 2);
+      ctx.beginPath(); ctx.moveTo(P(u.x1), P(u.y1)); ctx.lineTo(P(u.x2), P(u.y2)); ctx.stroke();
+      ctx.strokeStyle = col; ctx.lineWidth = Math.max(2, P(0.3)); ctx.setLineDash([P(1.1), P(0.7)]);
+      ctx.beginPath(); ctx.moveTo(P(u.x1), P(u.y1)); ctx.lineTo(P(u.x2), P(u.y2)); ctx.stroke();
+      ctx.restore();
+    }
+  }
+  function utilLabels() {
+    const seen = new Set();
+    for (const u of (site.utils || [])) {
+      if (seen.has(u.kind)) continue; seen.add(u.kind);
+      const L = Math.hypot(u.x2 - u.x1, u.y2 - u.y1); if (L < 6) continue;
+      const mx = (u.x1 + u.x2) / 2, my = (u.y1 + u.y2) / 2;
+      label(RT.UTIL[u.kind].name, mx + (Math.abs(u.x2 - u.x1) < 2 ? 3.6 : 0), my + (Math.abs(u.y2 - u.y1) < 2 ? 2.2 : 0), '#fff', 0.9, RT.UTIL[u.kind].color === '#f2c200' ? 'rgba(150,118,0,0.92)' : RT.UTIL[u.kind].color);
+    }
+    for (const sl of (site.slopes || [])) label('↕ slope', sl.x + Math.min(6, sl.w / 2), sl.y + sl.h / 2, '#fff', 0.9, 'rgba(60,90,30,0.85)');
+  }
+  function drawBed(state) {
+    const b = site.bed;
+    // planned outline
+    ctx.fillStyle = 'rgba(200,162,122,0.55)';
+    ctx.fillRect(P(b.x), P(b.y), P(b.w), P(b.h));
+    // dug cells
+    if (state.dugCells) {
+      for (const c of state.dugCells) {
+        ctx.fillStyle = c.done ? C.soilDug : C.soilDark;
+        ctx.fillRect(P(c.x - 0.5), P(c.y - 0.5), P(1) + 0.6, P(1) + 0.6);
+      }
+    }
+    if (state.finished) {
+      ctx.fillStyle = '#5b3f2a'; ctx.fillRect(P(b.x), P(b.y), P(b.w), P(b.h));
+      ctx.strokeStyle = 'rgba(255,240,220,0.18)'; ctx.lineWidth = 1;
+      for (let x = b.x + 0.7; x < b.x + b.w; x += 0.7) { ctx.beginPath(); ctx.moveTo(P(x), P(b.y + 0.2)); ctx.lineTo(P(x), P(b.y + b.h - 0.2)); ctx.stroke(); }
+    }
+    // string line & stakes
+    ctx.strokeStyle = state.finished ? 'rgba(255,255,255,0.0)' : 'rgba(255,255,255,0.9)'; ctx.lineWidth = Math.max(1, P(0.12)); ctx.setLineDash([P(0.7), P(0.4)]);
+    ctx.strokeRect(P(b.x), P(b.y), P(b.w), P(b.h)); ctx.setLineDash([]);
+    ctx.fillStyle = '#e0422f';
+    for (const [x, y] of [[b.x, b.y], [b.x + b.w, b.y], [b.x, b.y + b.h], [b.x + b.w, b.y + b.h]]) { ctx.beginPath(); ctx.arc(P(x), P(y), Math.max(2, P(0.35)), 0, 7); ctx.fill(); }
+  }
+
+  function drawStructures(state) {
+    for (const r of site.rects) {
+      ctx.fillStyle = C.shadow; rr(P(r.x + 0.6), P(r.y + 0.8), P(r.w), P(r.h), P(0.3)); ctx.fill();
+      if (r.cat === 'house') {
+        ctx.fillStyle = C.roof; ctx.fillRect(P(r.x), P(r.y), P(r.w), P(r.h));
+        ctx.fillStyle = C.roofLight;
+        if (r.w >= r.h) ctx.fillRect(P(r.x), P(r.y), P(r.w), P(r.h / 2)); else ctx.fillRect(P(r.x), P(r.y), P(r.w / 2), P(r.h));
+        ctx.strokeStyle = 'rgba(80,30,20,0.45)'; ctx.lineWidth = Math.max(1, P(0.15));
+        ctx.beginPath();
+        if (r.w >= r.h) { ctx.moveTo(P(r.x), P(r.y + r.h / 2)); ctx.lineTo(P(r.x + r.w), P(r.y + r.h / 2)); }
+        else { ctx.moveTo(P(r.x + r.w / 2), P(r.y)); ctx.lineTo(P(r.x + r.w / 2), P(r.y + r.h)); }
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(70,25,15,0.7)'; ctx.strokeRect(P(r.x), P(r.y), P(r.w), P(r.h));
+        if (r === site.rects[0]) { ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = `600 ${Math.max(10, P(1.6))}px Archivo, sans-serif`; ctx.textAlign = 'center'; ctx.fillText('HOUSE', P(r.x + r.w / 2), P(r.y + r.h * 0.75)); }
+      } else if (r.cat === 'shrub') {
+        const rs = rng(Math.round(r.x * 7 + r.y));
+        ctx.fillStyle = '#7a5a3b'; rr(P(r.x), P(r.y), P(r.w), P(r.h), P(0.6)); ctx.fill();
+        for (let i = 0; i < r.w * r.h / 3; i++) {
+          const x = r.x + 0.8 + rs() * (r.w - 1.6), y = r.y + 0.8 + rs() * (r.h - 1.6), rad = 0.8 + rs() * 0.9;
+          ctx.fillStyle = rs() > 0.5 ? C.shrub : C.shrub2; ctx.beginPath(); ctx.arc(P(x), P(y), P(rad), 0, 7); ctx.fill();
+          if (rs() > 0.8) { ctx.fillStyle = ['#f2c14e', '#e86a5c', '#f6f0e8'][Math.floor(rs() * 3)]; ctx.beginPath(); ctx.arc(P(x + 0.3), P(y - 0.2), P(0.25), 0, 7); ctx.fill(); }
+        }
+      } else if (r.cat === 'shed') {
+        ctx.fillStyle = C.shed; ctx.fillRect(P(r.x), P(r.y), P(r.w), P(r.h));
+        ctx.fillStyle = '#a3825f'; ctx.fillRect(P(r.x), P(r.y), P(r.w / 2), P(r.h));
+        ctx.strokeStyle = 'rgba(50,30,15,0.6)'; ctx.strokeRect(P(r.x), P(r.y), P(r.w), P(r.h));
+        label(r.name.replace('the ', ''), r.x + r.w / 2, r.y + r.h / 2, '#fff');
+      } else if (r.name === 'the hot tub') {
+        ctx.fillStyle = '#8b6f57'; rr(P(r.x), P(r.y), P(r.w), P(r.h), P(0.8)); ctx.fill();
+        ctx.fillStyle = C.water; rr(P(r.x + 0.8), P(r.y + 0.8), P(r.w - 1.6), P(r.h - 1.6), P(0.8)); ctx.fill();
+      } else {
+        ctx.fillStyle = '#b9b2a6'; rr(P(r.x), P(r.y), P(r.w), P(r.h), P(0.4)); ctx.fill();
+        ctx.strokeStyle = 'rgba(60,55,50,0.5)'; ctx.stroke();
+        if (/fire/.test(r.name)) { ctx.fillStyle = '#4a4440'; ctx.beginPath(); ctx.arc(P(r.x + r.w / 2), P(r.y + r.h / 2), P(r.w / 3), 0, 7); ctx.fill(); }
+        if (/play/.test(r.name)) { ctx.fillStyle = '#d9b27c'; ctx.fillRect(P(r.x), P(r.y), P(r.w), P(r.h)); ctx.fillStyle = '#e05a47'; ctx.fillRect(P(r.x + 1), P(r.y + 1), P(3), P(3)); ctx.strokeStyle = '#6b4a2e'; ctx.strokeRect(P(r.x), P(r.y), P(r.w), P(r.h)); }
+        label(r.name.replace('the ', ''), r.x + r.w / 2, r.y + r.h + 1.2, C.ink);
+      }
+    }
+  }
+  function label(t, x, y, col, size, bg) {
+    ctx.font = `600 ${Math.max(9, P(size || 1.15))}px Archivo, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if (bg) { const w = ctx.measureText(t).width + 8; ctx.fillStyle = bg; rr(P(x) - w / 2, P(y) - Math.max(8, P(0.9)), w, Math.max(16, P(1.8)), 4); ctx.fill(); }
+    ctx.fillStyle = col; ctx.fillText(t, P(x), P(y));
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  function drawFences(state) {
+    const removed = state.panelRemoved;
+    for (const f of site.fences) {
+      if (f.panel && removed) {
+        ctx.save(); ctx.strokeStyle = 'rgba(138,90,51,0.5)'; ctx.setLineDash([P(0.4), P(0.4)]); ctx.lineWidth = Math.max(1, P(0.18));
+        ctx.beginPath(); ctx.moveTo(P(f.x1), P(f.y1)); ctx.lineTo(P(f.x2), P(f.y2)); ctx.stroke(); ctx.restore();
+        continue;
+      }
+      ctx.strokeStyle = C.fence; ctx.lineWidth = Math.max(2, P(0.45)); ctx.lineCap = 'butt';
+      ctx.beginPath(); ctx.moveTo(P(f.x1), P(f.y1)); ctx.lineTo(P(f.x2), P(f.y2)); ctx.stroke();
+      ctx.strokeStyle = C.fenceLight; ctx.lineWidth = Math.max(1, P(0.16));
+      ctx.beginPath(); ctx.moveTo(P(f.x1), P(f.y1)); ctx.lineTo(P(f.x2), P(f.y2)); ctx.stroke();
+      // posts every 8 ft
+      const L = Math.hypot(f.x2 - f.x1, f.y2 - f.y1);
+      ctx.fillStyle = '#5e3b1f';
+      for (let d = 0; d <= L + 0.01; d += Math.max(2, Math.min(8, L))) {
+        const x = f.x1 + (f.x2 - f.x1) * d / (L || 1), y = f.y1 + (f.y2 - f.y1) * d / (L || 1);
+        ctx.fillRect(P(x) - P(0.3), P(y) - P(0.3), P(0.6), P(0.6));
+      }
+      if (f.panel) { // mark removable panel
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        const mx = (f.x1 + f.x2) / 2, my = (f.y1 + f.y2) / 2;
+        ctx.beginPath(); ctx.arc(P(mx), P(my), Math.max(2, P(0.25)), 0, 7); ctx.fill();
+      }
+    }
+    // damage marks
+    for (const d of (state.damageShown || [])) {
+      ctx.save(); ctx.translate(P(d.x), P(d.y));
+      ctx.strokeStyle = C.bad; ctx.lineWidth = Math.max(2, P(0.3));
+      for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3 + 0.3; ctx.beginPath(); ctx.moveTo(Math.cos(a) * P(0.5), Math.sin(a) * P(0.5)); ctx.lineTo(Math.cos(a) * P(1.6), Math.sin(a) * P(1.6)); ctx.stroke(); }
+      ctx.restore();
+    }
+    if (!state.hideLabels) gateLabel(state.panelRemoved);
+  }
+  function gateLabel(removed) {
+    const g = site.gate;
+    const wide = removed && g.panel ? (Math.max(g.x2, g.panel[1]) - Math.min(g.x1, g.panel[0])) : g.x2 - g.x1;
+    label(`${fmtFt(wide)} gate`, g.x, g.y + 2.2, C.ink, 1.05, 'rgba(255,255,255,0.88)');
+  }
+  function fmtFt(v) { const ti = Math.round(v * 12), ft = Math.floor(ti / 12), inch = ti % 12; return inch ? `${ft}′${inch}″` : `${ft} ft`; }
+
+  function drawTrees() {
+    for (const t of site.trees) {
+      ctx.fillStyle = C.trunk; ctx.beginPath(); ctx.arc(P(t.x), P(t.y), P(t.r), 0, 7); ctx.fill();
+    }
+  }
+  function drawCanopies(alpha) {
+    for (const t of site.trees) {
+      const rs = rng(Math.round(t.x * 13 + t.y));
+      ctx.save(); ctx.globalAlpha = alpha;
+      ctx.fillStyle = C.tree; ctx.beginPath(); ctx.arc(P(t.x + 0.6), P(t.y + 0.7), P(t.canopy), 0, 7); ctx.fillStyle = 'rgba(30,60,30,0.12)'; ctx.fill();
+      for (let i = 0; i < 7; i++) { const a = rs() * 7, d = rs() * t.canopy * 0.5; ctx.fillStyle = i % 2 ? 'rgba(62,120,56,0.42)' : 'rgba(80,140,64,0.38)'; ctx.beginPath(); ctx.arc(P(t.x + Math.cos(a) * d), P(t.y + Math.sin(a) * d), P(t.canopy * (0.45 + rs() * 0.25)), 0, 7); ctx.fill(); }
+      ctx.restore();
+      ctx.fillStyle = C.trunk; ctx.beginPath(); ctx.arc(P(t.x), P(t.y), P(t.r * 0.8), 0, 7); ctx.fill();
+    }
+  }
+
+  function drawTrailer(fill) {
+    const d = site.drop;
+    ctx.save(); ctx.translate(P(d.x), P(d.y));
+    ctx.fillStyle = C.shadow; rr(P(-3.2), P(-5.6), P(7), P(11.5), P(0.4)); ctx.fill();
+    ctx.fillStyle = '#3a6ea5'; rr(P(-3.5), P(-6), P(7), P(11), P(0.4)); ctx.fill();
+    ctx.fillStyle = '#2b5581'; ctx.fillRect(P(-2.9), P(-5.4), P(5.8), P(9.8));
+    ctx.fillStyle = '#26231f'; ctx.fillRect(P(-0.3), P(5), P(0.6), P(2.5));
+    // soil
+    if (fill > 0) {
+      const r = Math.min(1, fill);
+      ctx.fillStyle = C.soilDark; ctx.beginPath(); ctx.ellipse(0, P(-0.5), P(2.6 * Math.sqrt(r)), P(4.4 * Math.sqrt(r)), 0, 0, 7); ctx.fill();
+      ctx.fillStyle = C.soil; ctx.beginPath(); ctx.ellipse(P(-0.4), P(-1), P(1.6 * Math.sqrt(r)), P(3 * Math.sqrt(r)), 0, 0, 7); ctx.fill();
+    }
+    ctx.restore();
+    label('Trailer', d.x, d.y + 9 > site.H - 1 ? d.y - 8 : d.y + 9, C.ink, 1.05, 'rgba(255,255,255,0.85)');
+  }
+
+  // ----- equipment drawings (top-down) -----
+  function drawExcavator(spec, x, y, heading, slew, arm, opts) {
+    opts = opts || {};
+    ctx.save(); ctx.translate(P(x), P(y));
+    // tracks
+    ctx.save(); ctx.rotate(heading);
+    const tl = spec.length * 0.78, tw = spec.width;
+    ctx.fillStyle = 'rgba(30,30,20,0.2)'; ctx.fillRect(P(-tl / 2 + 0.3), P(-tw / 2 + 0.4), P(tl), P(tw));
+    ctx.fillStyle = C.track;
+    ctx.fillRect(P(-tl / 2), P(-tw / 2), P(tl), P(tw * 0.28));
+    ctx.fillRect(P(-tl / 2), P(tw / 2 - tw * 0.28), P(tl), P(tw * 0.28));
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1;
+    for (let i = -tl / 2; i < tl / 2; i += 0.5) { ctx.beginPath(); ctx.moveTo(P(i), P(-tw / 2)); ctx.lineTo(P(i), P(-tw / 2 + tw * 0.28)); ctx.moveTo(P(i), P(tw / 2)); ctx.lineTo(P(i), P(tw / 2 - tw * 0.28)); ctx.stroke(); }
+    ctx.fillStyle = '#55524d'; ctx.fillRect(P(-tl * 0.35), P(-tw * 0.22), P(tl * 0.7), P(tw * 0.44));
+    // blade
+    ctx.fillStyle = C.yellowDark; ctx.fillRect(P(tl / 2), P(-tw / 2), P(0.35), P(tw));
+    ctx.restore();
+    // upper house
+    ctx.save(); ctx.rotate(slew);
+    const houseR = Math.max(spec.width * 0.48, spec.tail * 0.96);
+    // house body: counterweight arc at the rear
+    ctx.fillStyle = 'rgba(30,30,20,0.25)'; ctx.beginPath(); ctx.arc(P(0.3), P(0.4), P(houseR), 0, 7); ctx.fill();
+    ctx.fillStyle = C.yellow; ctx.beginPath(); ctx.arc(0, 0, P(houseR), 0, 7); ctx.fill();
+    ctx.fillStyle = C.yellowDark; ctx.beginPath(); ctx.arc(0, 0, P(houseR), Math.PI * 0.62, Math.PI * 1.38); ctx.lineTo(0, 0); ctx.fill();
+    // cab
+    ctx.fillStyle = '#2f3b44'; rr(P(-houseR * 0.15), P(-houseR * 0.75), P(houseR * 0.85), P(houseR * 0.62), P(0.25)); ctx.fill();
+    ctx.fillStyle = 'rgba(150,200,230,0.7)'; rr(P(houseR * 0.35), P(-houseR * 0.7), P(houseR * 0.3), P(houseR * 0.52), P(0.15)); ctx.fill();
+    // boom & arm
+    const reach = Math.max(2.5, spec.reach * arm);
+    ctx.strokeStyle = C.yellowDark; ctx.lineWidth = P(0.75); ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(P(houseR * 0.2), 0); ctx.lineTo(P(reach * 0.55), P(0.15)); ctx.lineTo(P(reach), 0); ctx.stroke();
+    ctx.strokeStyle = C.yellow; ctx.lineWidth = P(0.5);
+    ctx.beginPath(); ctx.moveTo(P(houseR * 0.2), 0); ctx.lineTo(P(reach * 0.55), P(0.15)); ctx.lineTo(P(reach), 0); ctx.stroke();
+    // bucket
+    ctx.fillStyle = '#3d3a35'; rr(P(reach - 0.3), P(-0.9), P(1.4), P(1.8), P(0.3)); ctx.fill();
+    if (opts.bucketFull) { ctx.fillStyle = C.soilDark; ctx.beginPath(); ctx.arc(P(reach + 0.4), 0, P(0.6), 0, 7); ctx.fill(); }
+    ctx.restore();
+    if (opts.icon) drawIcon(opts.icon, 0, -houseR - 1.6);
+    ctx.restore();
+  }
+  function drawIcon(kind, x, y) {
+    // drawn in already-translated space (feet)
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.beginPath(); ctx.arc(P(x), P(y), Math.max(8, P(1.15)), 0, 7); ctx.fill(); ctx.stroke();
+    const u = Math.max(8, P(1.15)) / 8, cx = P(x), cy = P(y);
+    if (kind === 'wait') { ctx.fillStyle = C.ink; ctx.fillRect(cx - 3 * u, cy - 3.5 * u, 2.2 * u, 7 * u); ctx.fillRect(cx + 0.8 * u, cy - 3.5 * u, 2.2 * u, 7 * u); }
+    else if (kind === 'stuck') { ctx.strokeStyle = C.bad; ctx.lineWidth = 2.2 * u; ctx.beginPath(); ctx.moveTo(cx - 3 * u, cy - 3 * u); ctx.lineTo(cx + 3 * u, cy + 3 * u); ctx.moveTo(cx + 3 * u, cy - 3 * u); ctx.lineTo(cx - 3 * u, cy + 3 * u); ctx.stroke(); }
+    else { ctx.fillStyle = C.ink; for (let i = -1; i <= 1; i++) { ctx.beginPath(); ctx.arc(cx + i * 3 * u, cy, 1.2 * u, 0, 7); ctx.fill(); } }
+    ctx.restore();
+  }
+  function drawDumper(x, y, heading, full) {
+    ctx.save(); ctx.translate(P(x), P(y)); ctx.rotate(heading);
+    const L = 5, Wd = HAULERS.dumper.width;
+    ctx.fillStyle = 'rgba(30,30,20,0.22)'; ctx.fillRect(P(-L / 2 + 0.3), P(-Wd / 2 + 0.4), P(L), P(Wd));
+    ctx.fillStyle = C.track; ctx.fillRect(P(-L / 2), P(-Wd / 2), P(L), P(0.7)); ctx.fillRect(P(-L / 2), P(Wd / 2 - 0.7), P(L), P(0.7));
+    ctx.fillStyle = C.orange; rr(P(-L / 2 + 0.1), P(-Wd / 2 + 0.25), P(L * 0.58), P(Wd - 0.5), P(0.25)); ctx.fill();
+    ctx.fillStyle = '#c25e0b'; ctx.fillRect(P(-L / 2 + 0.5), P(-Wd / 2 + 0.6), P(L * 0.45), P(Wd - 1.2));
+    if (full) { ctx.fillStyle = C.soilDark; ctx.beginPath(); ctx.ellipse(P(-L / 2 + 0.5 + L * 0.22), 0, P(L * 0.2), P(Wd * 0.3), 0, 0, 7); ctx.fill(); }
+    ctx.fillStyle = '#3d3a35'; ctx.fillRect(P(L * 0.12), P(-Wd / 2 + 0.4), P(L * 0.3), P(Wd - 0.8));
+    ctx.restore();
+  }
+  function drawBarrow(x, y, heading, full) {
+    ctx.save(); ctx.translate(P(x), P(y)); ctx.rotate(heading);
+    ctx.fillStyle = 'rgba(30,30,20,0.22)'; ctx.beginPath(); ctx.ellipse(P(0.3), P(0.3), P(1.6), P(1.0), 0, 0, 7); ctx.fill();
+    ctx.fillStyle = C.barrow; ctx.beginPath(); ctx.ellipse(0, 0, P(1.5), P(1.0), 0, 0, 7); ctx.fill();
+    if (full) { ctx.fillStyle = C.soilDark; ctx.beginPath(); ctx.ellipse(0, 0, P(1.0), P(0.65), 0, 0, 7); ctx.fill(); }
+    ctx.fillStyle = '#222'; ctx.fillRect(P(1.4), P(-0.2), P(0.6), P(0.4));
+    ctx.strokeStyle = '#6b4a2e'; ctx.lineWidth = Math.max(1, P(0.18));
+    ctx.beginPath(); ctx.moveTo(P(-1.2), P(-0.6)); ctx.lineTo(P(-2.4), P(-0.6)); ctx.moveTo(P(-1.2), P(0.6)); ctx.lineTo(P(-2.4), P(0.6)); ctx.stroke();
+    ctx.restore();
+  }
+  const HAT = ['#f7d038', '#ff8a2a', '#ffffff'];
+  function drawWorker(x, y, i, icon) {
+    ctx.fillStyle = 'rgba(30,30,20,0.25)'; ctx.beginPath(); ctx.arc(P(x + 0.2), P(y + 0.25), P(0.85), 0, 7); ctx.fill();
+    ctx.fillStyle = '#3b6fb6'; ctx.beginPath(); ctx.arc(P(x), P(y), P(0.85), 0, 7); ctx.fill();
+    ctx.fillStyle = HAT[i % 3]; ctx.beginPath(); ctx.arc(P(x), P(y), P(0.55), 0, 7); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 1; ctx.stroke();
+    if (icon) { ctx.save(); ctx.translate(0, 0); drawIcon(icon, x, y - 1.8); ctx.restore(); }
+  }
+
+  // ---------------- planning overlays ----------------
+  function bedCenter() { return [site.bed.x + site.bed.w / 2, site.bed.y + site.bed.h / 2]; }
+  function headingTo(a, b) { return Math.atan2(b[1] - a[1], b[0] - a[0]); }
+  function pileSpot() {
+    const fp = fullPlan();
+    const r = fp.route;
+    if (!plan.spot) return null;
+    const prev = r.length >= 2 ? r[r.length - 2] : [site.drop.x, site.drop.y];
+    const d = Math.hypot(prev[0] - plan.spot[0], prev[1] - plan.spot[1]) || 1;
+    const off = plan.digger && DIGGERS[plan.digger].kind === 'machine' ? Math.min(3.2, d) : Math.min(1.8, d);
+    return [plan.spot[0] + (prev[0] - plan.spot[0]) / d * off, plan.spot[1] + (prev[1] - plan.spot[1]) / d * off];
+  }
+
+  let analysis = null;
+  function analyze() {
+    const fp = fullPlan();
+    analysis = { route: null, spot: null };
+    if (fp.route.length >= 2 && plan.spot) analysis.route = RT.analyzeRoute(site, fp.route, fp.panel);
+    if (plan.spot && plan.digger) analysis.spot = RT.analyzeSpot(site, fp);
+    return analysis;
+  }
+
+  function drawPlanOverlay() {
+    const fp = fullPlan();
+    const an = analysis;
+    const d = plan.digger ? DIGGERS[plan.digger] : null;
+    // route corridor
+    if (an && an.route) {
+      const widths = [];
+      if (d && d.kind === 'machine') widths.push({ w: d.width, name: d.short });
+      if (plan.hauler) widths.push({ w: HAULERS[plan.hauler].width, name: HAULERS[plan.hauler].short });
+      const widest = widths.length ? Math.max(...widths.map(x => x.w)) : HAULERS.barrow.width;
+      ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      for (const s of an.route.samples) {
+        const fits = 2 * s.half >= widest + 0.1;
+        ctx.fillStyle = fits ? 'rgba(255,255,255,0.22)' : 'rgba(214,49,43,0.32)';
+        ctx.beginPath(); ctx.arc(P(s.cx), P(s.cy), P(widest / 2), 0, 7); ctx.fill();
+      }
+      ctx.restore();
+    }
+    // route line
+    if (fp.route.length >= 2 || plan.wps.length) {
+      const pts = [[site.drop.x, site.drop.y]].concat(plan.wps).concat(plan.spot ? [plan.spot] : []);
+      ctx.save(); ctx.strokeStyle = '#1d4f91'; ctx.lineWidth = Math.max(2, P(0.3)); ctx.setLineDash([P(0.9), P(0.5)]);
+      ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(P(p[0]), P(p[1])) : ctx.moveTo(P(p[0]), P(p[1]))); ctx.stroke(); ctx.setLineDash([]);
+      // arrows
+      for (let i = 1; i < pts.length; i++) {
+        const a = pts[i - 1], b = pts[i], m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], h = headingTo(a, b);
+        ctx.save(); ctx.translate(P(m[0]), P(m[1])); ctx.rotate(h); ctx.fillStyle = '#1d4f91';
+        ctx.beginPath(); ctx.moveTo(P(0.7), 0); ctx.lineTo(P(-0.5), P(-0.55)); ctx.lineTo(P(-0.5), P(0.55)); ctx.fill(); ctx.restore();
+      }
+      ctx.restore();
+    }
+    // tightest label
+    if (an && an.route && an.route.tight && isFinite(an.route.width)) {
+      const t = an.route.tight;
+      label(`${RT.ftIn(Math.max(0, an.route.width))} clear`, t.x + 2.8, t.y - 1.6, '#fff', 0.95, 'rgba(29,79,145,0.92)');
+    }
+    // spot
+    if (plan.spot) {
+      const [sx, sy] = plan.spot;
+      if (d && d.kind === 'machine') {
+        const sp = an && an.spot;
+        // reach
+        ctx.fillStyle = C.reach; ctx.beginPath(); ctx.arc(P(sx), P(sy), P(d.reach), 0, 7); ctx.fill();
+        ctx.strokeStyle = C.reachLine; ctx.lineWidth = Math.max(1.5, P(0.15)); ctx.setLineDash([P(0.8), P(0.5)]); ctx.stroke(); ctx.setLineDash([]);
+        // reachable cells highlight
+        if (sp) {
+          for (const [x, y] of RT.bedCells(site)) {
+            if (RT.inTolZone(site, x, y)) { ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(P(x - 0.5) + 1, P(y - 0.5) + 1, P(1) - 2, P(1) - 2); ctx.strokeStyle = 'rgba(38,35,31,0.5)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(P(x - 0.4), P(y + 0.4)); ctx.lineTo(P(x + 0.4), P(y - 0.4)); ctx.stroke(); }
+            else if (Math.hypot(x - sx, y - sy) > d.reach) { ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.fillRect(P(x - 0.5) + 1, P(y - 0.5) + 1, P(1) - 2, P(1) - 2); }
+          }
+        }
+        drawExcavator(d, sx, sy, headingTo(plan.spot, bedCenter()), headingTo(plan.spot, bedCenter()), 0.45);
+        // tail
+        const hit = sp && sp.hits.length;
+        ctx.fillStyle = hit ? 'rgba(214,49,43,0.2)' : C.tail; ctx.beginPath(); ctx.arc(P(sx), P(sy), P(d.tail), 0, 7); ctx.fill();
+        ctx.strokeStyle = hit ? C.bad : C.tailLine; ctx.lineWidth = Math.max(2, P(0.2)); ctx.stroke();
+        if (sp) for (const h of sp.hits) { ctx.fillStyle = C.bad; ctx.beginPath(); ctx.arc(P(h.x), P(h.y), Math.max(4, P(0.55)), 0, 7); ctx.fill(); }
+        if (sp && !sp.ok) { ctx.strokeStyle = C.bad; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(P(sx - 2), P(sy - 2)); ctx.lineTo(P(sx + 2), P(sy + 2)); ctx.moveTo(P(sx + 2), P(sy - 2)); ctx.lineTo(P(sx - 2), P(sy + 2)); ctx.stroke(); }
+      } else {
+        // spoil spot marker
+        ctx.fillStyle = C.soil; ctx.beginPath(); ctx.arc(P(sx), P(sy), P(1.3), 0, 7); ctx.fill();
+        ctx.strokeStyle = '#1d4f91'; ctx.lineWidth = 2; ctx.stroke();
+        for (let i = 0; i < plan.workers; i++) drawWorker(sx + 2 + i * 2, sy + 1.5, i);
+      }
+    }
+    if (plan.hauler && plan.spot && !(plan.digger && DIGGERS[plan.digger].kind === 'machine')) {
+      // nothing extra
+    }
+  }
+
+  // ---------------- main draw ----------------
+  function draw() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    const fp = fullPlan();
+    if (play) return drawPlay();
+    drawGround({ mats: plan.mats && plan.spot, route: fp.route, matsAlpha: 0.55 });
+    drawBed({});
+    drawUtils();
+    drawStructures({});
+    drawTrees();
+    drawFences({ panelRemoved: fp.panel, hideLabels: true });
+    drawTrailer(0);
+    drawCanopies(0.32);
+    drawPlanOverlay();
+    gateLabel(fp.panel);
+    utilLabels();
+    // hints
+    if (!plan.spot) {
+      const c = bedCenter();
+      label('Excavate here', c[0], c[1], '#fff', 1.2, 'rgba(38,35,31,0.75)');
+    }
+  }
+
+  // ---------------- input ----------------
+  function toFt(ev) {
+    const r = cv.getBoundingClientRect();
+    return [(ev.clientX - r.left) / K, (ev.clientY - r.top) / K];
+  }
+  function snap(p) {
+    const g = site.gate;
+    if (Math.hypot(p[0] - g.x, p[1] - g.y) < 2.6) return [g.x, g.y];
+    return [Math.max(0.5, Math.min(site.W - 0.5, p[0])), Math.max(0.5, Math.min(site.H - 0.5, p[1]))];
+  }
+  function setMode() {}
+  function updateHint() {
+    const h = $('#hint');
+    if (locked()) { h.textContent = 'Today\'s job is done. Practise with another plan from the panel.'; return; }
+    if (!plan.digger || !plan.hauler) h.textContent = 'Pick a setup on the right. The yard shows how the crew will set up.';
+    else h.textContent = 'This is how the crew will set up. Press Start job to watch it play out.';
+  }
+
+  // ---------------- panel ----------------
+  function card(item, group, sel) {
+    const el = document.createElement('button');
+    el.className = 'eq' + (sel ? ' sel' : '');
+    el.dataset.id = item.id; el.dataset.group = group;
+    const stats = [];
+    if (group === 'dig') {
+      if (item.kind === 'machine') stats.push(`${fmtFt(item.width)} wide`, `swing ${fmtFt(item.tail)}`, `reach ${fmtFt(item.reach)}`, `${item.rate} yd³/h`);
+      else stats.push('any gap', `${item.rate} yd³/h each`);
+    } else stats.push(`${fmtFt(item.width)} wide`, `${item.cap} yd³/trip`);
+    const price = group === 'dig' ? (item.cost ? RT.money(item.cost) : 'free') : (item.perWorker ? `${RT.money(item.cost)} each` : RT.money(item.cost));
+    el.innerHTML = `<canvas class="ico" width="64" height="64"></canvas><div class="eqt"><div class="eqn">${item.name}<span class="price">${price}</span></div><div class="eqs">${stats.join(' · ')}</div><div class="eqpc"><span class="pro">+ ${item.pro}</span><span class="con">− ${item.con}</span></div></div>`;
+    el.addEventListener('click', () => {
+      if (locked()) return;
+      if (group === 'dig') { if (plan.digger !== item.id) plan.spotChoice = null; plan.digger = item.id; } else plan.hauler = item.id;
+      changed(); renderPanel();
+    });
+    requestAnimationFrame(() => drawCardIcon(el.querySelector('canvas'), group, item));
+    return el;
+  }
+  function drawCardIcon(c, group, item) {
+    const saveK = K, realCtx = ctx;
+    const ictx = c.getContext('2d');
+    const d2 = 2; c.width = 128; c.height = 128;
+    swapCtx(ictx);
+    ictx.setTransform(d2, 0, 0, d2, 0, 0);
+    ictx.fillStyle = '#eef3e4'; ictx.fillRect(0, 0, 64, 64);
+    if (group === 'dig' && item.kind === 'machine') { K = 64 / (item.reach * 0.75 + item.tail + 2); drawExcavator(item, item.tail + 1, 32 / K, 0, -0.35, 0.6); }
+    else if (group === 'dig') { K = 7; ictx.fillStyle = C.soilDark; ictx.beginPath(); ictx.ellipse(40, 40, 14, 9, 0, 0, 7); ictx.fill(); drawWorker(3, 3.4, 0); ictx.strokeStyle = '#7a5a3b'; ictx.lineWidth = 3; ictx.beginPath(); ictx.moveTo(26, 20); ictx.lineTo(44, 36); ictx.stroke(); ictx.fillStyle = '#777'; ictx.beginPath(); ictx.ellipse(46, 38, 5, 3.5, 0.7, 0, 7); ictx.fill(); }
+    else if (item.id === 'barrow') { K = 9; drawBarrow(3.6, 3.6, 0, true); }
+    else { K = 9; drawDumper(3.6, 3.6, 0, true); }
+    swapCtx(realCtx); K = saveK;
+  }
+  function swapCtx(c) { ctx = c; }
+
+  function renderPanel() {
+    const s = site;
+    $('#siteName').textContent = s.name;
+    $('#dayNo').textContent = practice ? 'Practice' : `#${today}`;
+    $('#jobText').textContent = s.job;
+    $('#blurb').textContent = s.blurb;
+    $('#jVol').textContent = `${RT.bedVolume(s).toFixed(1)} yd³`;
+    $('#jDims').textContent = `${s.bed.w} × ${s.bed.h} ft, ${fmtFt(s.bed.depth)} deep`;
+    $('#jDeadline').textContent = RT.clock(s.deadline);
+    $('#jBudget').textContent = RT.money(s.budget);
+    $('#jLawn').textContent = s.delicacy >= 1.5 ? 'Brand-new sod' : s.delicacy >= 1.1 ? 'Fussy — shows every mark' : s.delicacy >= 1 ? 'Must stay in good shape' : 'Established, forgiving';
+    const soil = RT.soilOf(s);
+    $('#jSoil').textContent = soil.id === 'loam' ? soil.name : `${soil.name} — ${soil.note.replace(/\.$/, '')}`;
+    $('#jRoute').textContent = (s.drop.name.includes('curb') ? 'Trailer at the curb' : 'Trailer in the driveway') + ((s.slopes || []).length ? ', up a slope' : '');
+    const warn = [];
+    const kinds = [...new Set((s.utils || []).map(u => u.kind))];
+    for (const k of kinds) warn.push(`${cap(RT.UTIL[k].name)} — machines stay ${RT.RATES.tolZone} ft away, hand dig there`);
+    if (s.gate.panel) warn.push('A fence panel beside the gate can come out');
+    $('#jWarnBox').hidden = !warn.length; $('#jWarn').innerHTML = warn.join('<br>');
+    const dg = $('#digList'); dg.innerHTML = '';
+    for (const k of Object.keys(DIGGERS)) dg.appendChild(card(DIGGERS[k], 'dig', plan.digger === k));
+    const hl = $('#haulList'); hl.innerHTML = '';
+    for (const k of Object.keys(HAULERS)) hl.appendChild(card(HAULERS[k], 'haul', plan.hauler === k));
+    $$('.crew button').forEach(b => b.classList.toggle('on', +b.dataset.n === plan.workers));
+    renderSpots();
+    $('#mats').checked = plan.mats;
+    $('#panelRow').style.display = s.gate.panel ? '' : 'none';
+    $('#panel').checked = plan.panel;
+    $$('.eq, .crew button, #mats, #panel').forEach(el => { el.disabled = locked(); });
+  }
+  function renderSpots() {
+    const box = $('#spotStep'), list = $('#spotList');
+    const d = plan.digger ? DIGGERS[plan.digger] : null;
+    if (!d || d.kind !== 'machine' || !setup || !setup.options.length) { box.hidden = true; return; }
+    box.hidden = false;
+    list.innerHTML = '';
+    for (const o of setup.options) {
+      const b = document.createElement('button');
+      b.className = 'spot' + (o.id === setup.chosen ? ' on' : '');
+      const cov = o.coverage > 0.999 ? 'Reaches the whole bed' : `Reaches ${Math.round(o.coverage * 100)}% — rest by hand`;
+      const sw = o.hits.length ? `<span class="con">Swing crosses ${uniq(o.hits.map(h => h.name)).join(' & ')}</span>` : '<span class="pro">Swing clear</span>';
+      const desc = o.id === 'close' ? 'Tuck in right beside the bed' : o.id === 'back' ? 'Stay clear of everything' : 'Where it reaches the most without hitting anything';
+      b.innerHTML = `<b>${o.label}</b><small>${desc}</small><small>${cov}</small><small>${sw}</small>`;
+      b.disabled = locked();
+      b.addEventListener('click', () => { if (locked()) return; plan.spotChoice = o.id; changed(); renderPanel(); });
+      list.appendChild(b);
+    }
+  }
+  $$('.crew button').forEach(b => b.addEventListener('click', () => { if (locked()) return; plan.workers = +b.dataset.n; changed(); renderPanel(); }));
+  $('#mats').addEventListener('change', (e) => { plan.mats = e.target.checked; changed(); });
+  $('#panel').addEventListener('change', (e) => { plan.panel = e.target.checked; changed(); renderPanel(); });
+
+  function checks() {
+    const out = [];
+    const d = plan.digger ? DIGGERS[plan.digger] : null, h = plan.hauler ? HAULERS[plan.hauler] : null;
+    const an = analysis;
+    let ready = !!(d && h && plan.spot && setup && setup.route);
+    if (!d) out.push(['todo', 'Choose how to dig']);
+    if (!h) out.push(['todo', 'Choose how to move the soil']);
+    if (an && an.spot) {
+      const sp = an.spot;
+      if (!sp.ok) { out.push(['bad', sp.reasons[0]]); ready = false; }
+      if (d.kind === 'machine') {
+        const tzP = Math.round((sp.tzFrac || 0) * 100);
+        out.push(sp.coverage > 0.999 ? ['ok', 'Reaches the whole bed'] : ['warn', `Machine digs ${Math.round(sp.coverage * 100)}% of the bed — the rest by hand${tzP ? ` (${tzP}% is in the utility hand-dig zone)` : ''}`]);
+        if (sp.hits.length) for (const x of uniq(sp.hits.map(x => x.name))) out.push(['bad', `Rear swing crosses ${x}`]);
+        else out.push(['ok', 'Rear swing is clear']);
+      }
+    }
+    if (an && an.route) {
+      const r = an.route;
+      const tightWhere = RT.describeTight(site, r.tight);
+      const items = [];
+      if (d && d.kind === 'machine') items.push(d); if (h) items.push(h);
+      for (const it of items) {
+        const st = RT.stuckPoint(r, it.width);
+        out.push(st ? ['bad', `${it.short} won't fit ${RT.describeTight(site, st)} — ${RT.ftIn(2 * st.half)} clear, needs ${RT.ftIn(RT.needs(it.width), true)}`] : ['ok', `${it.short} fits — tightest ${RT.ftIn(r.width)} ${tightWhere}`]);
+      }
+      out.push(['info', `Route ${Math.round(r.total)} ft · ${Math.round(r.lawn)} ft over lawn${plan.mats ? ' (matted)' : ''}${r.slope > 4 ? ` · ${Math.round(r.slope)} ft of slope` : ''}`]);
+      if (r.slope > 4 && h && h.id === 'barrow') out.push(['warn', 'Wheelbarrows only go about 60% full up the slope']);
+    }
+    if (d && d.kind === 'hand' && an && RT.soilOf(site).hand < 0.9) out.push(['warn', `${RT.soilOf(site).name}: shovels dig at ${Math.round(RT.soilOf(site).hand * 100)}% speed`]);
+    if (d && h) {
+      const machines = (d.kind === 'machine' ? 1 : 0) + (h.id === 'dumper' ? 1 : 0);
+      if (machines > plan.workers) out.push(['warn', `${plan.workers} worker${plan.workers > 1 ? 's' : ''} for ${machines} machines — they'll take turns`]);
+    }
+    return { out, ready };
+  }
+  function uniq(a) { return [...new Set(a)]; }
+
+  function rentals() {
+    let c = 0; const lines = [];
+    if (plan.digger && DIGGERS[plan.digger].cost) { c += DIGGERS[plan.digger].cost; }
+    if (plan.hauler) c += HAULERS[plan.hauler].perWorker ? HAULERS[plan.hauler].cost * plan.workers : HAULERS[plan.hauler].cost;
+    if (plan.mats && analysis && analysis.route) c += RATES.matsBase + RATES.matsPerFt * (analysis.route.lawn + (plan.spot && RT.surfaceAt(site, plan.spot[0], plan.spot[1]) === 'lawn' ? 8 : 0));
+    if (plan.panel && site.gate.panel) c += RATES.panelCost;
+    return c;
+  }
+
+  function changed(light) {
+    if (!play) recompute();
+    analyze();
+    draw();
+    if (light && drag) { renderChecks(); return; }
+    renderChecks();
+    updateHint();
+  }
+  function renderChecks() {
+    const { out, ready } = checks();
+    $('#checks').innerHTML = out.map(([k, t]) => `<li class="${k}"><span class="dot"></span>${t}</li>`).join('');
+    $('#rent').textContent = RT.money(rentals());
+    $('#crewRate').textContent = `+ crew ${RT.money(RATES.worker)}/h each`;
+    const btn = $('#start');
+    btn.disabled = !ready || !analysis.route;
+    btn.textContent = practice || locked() ? (locked() && !practice ? 'Done for today' : 'Run practice job') : 'Start job';
+  }
+
+  function locked() { return !!play || (!practice && !!store.days[today]); }
+
+  // ---------------- run + playback ----------------
+  $('#start').addEventListener('click', () => {
+    if (locked()) return;
+
+    const fp = fullPlan();
+    const r = RT.simulate(site, fp);
+    result = r;
+    if (!practice) {
+      store.days[today] = { score: r.score, parts: r.parts, complete: r.complete, total: Math.round(r.total), cost: Math.round(r.cost), plan: fp, site: site.id, lines: r.lines };
+      save();
+    }
+    startPlayback(r);
+  });
+
+  function startPlayback(r) {
+    const cellsAll = RT.bedCells(site);
+    const sp = r.spot;
+    const d = DIGGERS[r.plan.digger];
+    const reach = r.digMachine ? d.reach : 0;
+    const mCells = [], hCells = [];
+    const [sx, sy] = r.plan.spot;
+    for (const c of cellsAll) (r.digMachine && Math.hypot(c[0] - sx, c[1] - sy) <= reach && !RT.inTolZone(site, c[0], c[1]) ? mCells : hCells).push(c);
+    // machine digs nearest first; hand starts at far ends
+    mCells.sort((a, b) => Math.hypot(a[0] - sx, a[1] - sy) - Math.hypot(b[0] - sx, b[1] - sy));
+    hCells.sort((a, b) => Math.hypot(b[0] - sx, b[1] - sy) - Math.hypot(a[0] - sx, a[1] - sy));
+    const vM = r.V * (r.digMachine ? sp.coverage : 0), vH = r.V - vM;
+    play = { r, t: 0, speed: 1, last: performance.now(), mCells, hCells, vM, vH, done: false, shownDamage: [], toasts: new Set() };
+    $('#playbar').hidden = false;
+    $('#planUI').hidden = true; $('#hint').hidden = true;
+    $('#planUI').classList.add('running');
+    document.body.classList.add('playing');
+    $('#playbar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    requestAnimationFrame(tick);
+  }
+  $$('#playbar [data-speed]').forEach(b => b.addEventListener('click', () => { if (play) { play.speed = +b.dataset.speed; $$('#playbar [data-speed]').forEach(x => x.classList.toggle('on', x === b)); } }));
+  $('#skip').addEventListener('click', () => { if (play) { play.t = play.r.total; } });
+
+  function tick(now) {
+    if (!play) return;
+    const dtR = Math.min(0.1, (now - play.last) / 1000); play.last = now;
+    const rate = 22 * play.speed; // sim minutes per second
+    play.t = Math.min(play.r.total, play.t + dtR * rate);
+    draw();
+    if (play.t >= play.r.total && !play.done) { play.done = true; setTimeout(showResult, 700); }
+    if (!play.done || true) requestAnimationFrame(tick);
+  }
+
+  function sampleAt(r, t) {
+    const tl = r.timeline;
+    const m = r.mainPhase;
+    if (t <= m.t0) return { gM: tl[0].gM, gH: tl[0].gH, pile: 0, delivered: 0, op: -1, tasks: tl[0].tasks.map(() => 'idle') };
+    if (t >= m.t1) return tl[tl.length - 1];
+    let lo = 0, hi = tl.length - 1;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (tl[mid].t <= t) lo = mid; else hi = mid; }
+    const a = tl[lo], b = tl[hi], f = b.t > a.t ? (t - a.t) / (b.t - a.t) : 0;
+    return { gM: a.gM + (b.gM - a.gM) * f, gH: a.gH + (b.gH - a.gH) * f, pile: a.pile + (b.pile - a.pile) * f, delivered: a.delivered + (b.delivered - a.delivered) * f, op: a.op, tasks: a.tasks };
+  }
+  function pointAlong(route, dist) { // from drop
+    let acc = 0;
+    for (let i = 1; i < route.length; i++) {
+      const a = route[i - 1], b = route[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (acc + L >= dist) { const f = L ? (dist - acc) / L : 0; return { p: [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f], h: Math.atan2(b[1] - a[1], b[0] - a[0]) }; }
+      acc += L;
+    }
+    const n = route.length; return { p: route[n - 1].slice(), h: Math.atan2(route[n - 1][1] - route[n - 2][1], route[n - 1][0] - route[n - 2][0]) };
+  }
+
+  function drawPlay() {
+    const { r, t } = play;
+    const fp = r.plan;
+    const route = fp.route;
+    const L = r.an.total;
+    const d = DIGGERS[fp.digger];
+    const ph = r.phases.find(p => t >= p.t0 && t < p.t1) || r.phases[r.phases.length - 1];
+    const main = r.mainPhase;
+    const s = sampleAt(r, t);
+    const matsPh = r.phases.filter(p => p.kind === 'mats');
+    let matsAlpha = 0;
+    if (fp.mats) {
+      const lay = matsPh[0], lift = matsPh[1];
+      if (t < lay.t0) matsAlpha = 0; else if (t < lay.t1) matsAlpha = (t - lay.t0) / (lay.t1 - lay.t0);
+      else if (lift && t >= lift.t0) matsAlpha = Math.max(0, 1 - (t - lift.t0) / (lift.t1 - lift.t0)); else matsAlpha = 1;
+    }
+    const panelPh = r.phases.filter(p => p.kind === 'panel');
+    let panelRemoved = false;
+    if (fp.panel) { panelRemoved = t >= panelPh[0].t1 && !(panelPh[1] && t >= panelPh[1].t1); }
+    const prog = t >= main.t1 ? 1 : t <= main.t0 ? 0 : (t - main.t0) / (main.t1 - main.t0);
+    drawGround({ mats: fp.mats && matsAlpha > 0, matsAlpha, route, ruts: r.lawnPts > 0 ? (r.lawnPts / 15) * Math.min(1, 0.2 + prog) : 0 });
+    // bed
+    const dugM = play.vM > 0 ? (play.vM - s.gM) / play.vM : 1, dugH = play.vH > 0 ? (play.vH - s.gH) / play.vH : 1;
+    const cells = [];
+    const nm = Math.round(play.mCells.length * Math.max(0, Math.min(1, dugM)));
+    const nh = Math.round(play.hCells.length * Math.max(0, Math.min(1, dugH)));
+    for (let i = 0; i < nm; i++) cells.push({ x: play.mCells[i][0], y: play.mCells[i][1], done: true });
+    for (let i = 0; i < nh; i++) cells.push({ x: play.hCells[i][0], y: play.hCells[i][1], done: true });
+    const finished = r.complete && t >= (r.phases.find(p => p.kind === 'finish') || { t1: Infinity }).t1;
+    drawBed({ dugCells: cells, finished });
+    drawUtils();
+    drawStructures({});
+    drawTrees();
+    // damage appears when the excavator first swings
+    const dmgShow = (r.digMachine && t > main.t0 + 1) ? r.damage.filter(x => x.cat !== 'lawn') : [];
+    drawFences({ panelRemoved, damageShown: dmgShow });
+    drawTrailer(Math.min(1, s.delivered / r.V));
+    // spoil pile
+    const ps = pileSpot2(r);
+    if (s.pile > 0.01) {
+      const rad = 0.9 + 1.6 * Math.sqrt(s.pile / RATES.pileCap);
+      ctx.fillStyle = C.soilDark; ctx.beginPath(); ctx.arc(P(ps[0]), P(ps[1]), P(rad), 0, 7); ctx.fill();
+      ctx.fillStyle = C.soil; ctx.beginPath(); ctx.arc(P(ps[0] - rad * 0.25), P(ps[1] - rad * 0.25), P(rad * 0.55), 0, 7); ctx.fill();
+    }
+    // machines
+    const walkIn = r.phases.find(p => p.kind === 'walkin'), walkOut = r.phases.find(p => p.kind === 'walkout');
+    const machines = [];
+    if (d.kind === 'machine') machines.push({ id: d.id });
+    if (fp.hauler === 'dumper') machines.push({ id: 'dumper' });
+    const stuckInfo = walkIn ? walkIn.machines : [];
+    const machinePos = (id, idx) => {
+      const st = stuckInfo.find(m => m.id === id);
+      const stuck = st && st.stuck;
+      // stuck machines: drive to the stuck point, then back out and leave
+      if (walkIn && t < walkIn.t0) return null;
+      if (walkIn && t < walkIn.t1) {
+        const f = (t - walkIn.t0) / (walkIn.t1 - walkIn.t0);
+        if (stuck) {
+          const stDist = nearestDist(route, stuck);
+          const ff = f < 0.5 ? f * 2 : 2 - f * 2;
+          const pa = pointAlong(route, stDist * ff);
+          return { p: pa.p, h: pa.h, icon: f > 0.35 && f < 0.75 ? 'stuck' : null, stuck: true };
+        }
+        const pa = pointAlong(route, Math.max(0, L * f - idx * 6));
+        return { p: pa.p, h: pa.h };
+      }
+      if (stuck) return null;
+      if (walkOut && t >= walkOut.t0) {
+        const f = Math.min(1, (t - walkOut.t0) / (walkOut.t1 - walkOut.t0));
+        if (f >= 1) return null;
+        const pa = pointAlong(route, Math.max(0, L * (1 - f) - idx * 6));
+        return { p: pa.p, h: pa.h + Math.PI };
+      }
+      return { p: id === 'dumper' ? null : fp.spot.slice(), h: headingTo(fp.spot, bedCenter()), parked: true };
+    };
+    // excavator
+    if (d.kind === 'machine') {
+      const mp = machinePos(d.id, 0);
+      if (mp) {
+        let slew = mp.h, arm = 0.35, full = false, icon = mp.icon || null;
+        if (mp.parked && t >= main.t0 && t < main.t1) {
+          const digging = s.op >= 0 && s.gM > 0.001 && s.pile < RATES.pileCap * 0.99;
+          if (digging) {
+            // cycle: bucket at a bed cell -> swing to pile
+            const cyc = (t * 3.2) % 1;
+            const tgt = play.mCells[Math.min(play.mCells.length - 1, nm)] || play.mCells[0] || bedCenter();
+            const aBed = headingTo(fp.spot, tgt), aPile = headingTo(fp.spot, ps);
+            const dBed = Math.hypot(tgt[0] - fp.spot[0], tgt[1] - fp.spot[1]) / d.reach;
+            const k = cyc < 0.5 ? smooth(cyc * 2) : smooth(2 - cyc * 2);
+            slew = aBed + angDiff(aBed, aPile) * k;
+            arm = dBed + (0.3 - dBed) * k;
+            full = cyc > 0.1 && cyc < 0.6;
+          } else if (s.gM > 0.001) { slew = headingTo(fp.spot, bedCenter()); arm = 0.4; icon = 'wait'; }
+          else { slew = headingTo(fp.spot, bedCenter()); arm = 0.3; }
+        } else if (mp.parked) { slew = headingTo(fp.spot, bedCenter()); arm = 0.35; }
+        drawExcavator(d, mp.p[0], mp.p[1], mp.h, slew, Math.max(0.2, Math.min(1, arm)), { bucketFull: full, icon });
+      }
+    }
+    // workers & haulers
+    const W = fp.workers;
+    const tripsNow = r.trips.filter(tr => t >= tr.t0 && t < tr.t1);
+    const busy = new Set(tripsNow.map(tr => tr.w));
+    const hauler = HAULERS[r.hauledWith];
+    for (const tr of tripsNow) {
+      const h = HAULERS[tr.h];
+      const tt = t - tr.t0;
+      const travel = Math.max(0.01, (tr.t1 - tr.t0 - h.load - h.dump) / 2), spd = L / travel;
+      let dist, full, head;
+      if (tt < h.load) { dist = L; full = tt > h.load * 0.5; }
+      else if (tt < h.load + travel) { dist = L - (tt - h.load) * spd; full = true; }
+      else if (tt < h.load + travel + h.dump) { dist = 0; full = false; }
+      else { dist = Math.min(L, (tt - h.load - travel - h.dump) * spd); full = false; }
+      const outbound = tt >= h.load && tt < h.load + travel;
+      const pa = pointAlong(route, Math.max(0, dist - (tr.h === 'barrow' ? (tr.w % 3) * 0.6 : 0)));
+      head = outbound ? pa.h + Math.PI : pa.h;
+      if (tt < h.load) { const q = ps; pa.p = [q[0] + 1.4, q[1] + 1.4]; }
+      if (tr.h === 'dumper') { drawDumper(pa.p[0], pa.p[1], head, full); drawWorker(pa.p[0] - Math.cos(head) * 1.4, pa.p[1] - Math.sin(head) * 1.4, tr.w); }
+      else { drawBarrow(pa.p[0] + Math.cos(head) * 1.2, pa.p[1] + Math.sin(head) * 1.2, head, full); drawWorker(pa.p[0] - Math.cos(head) * 1.2, pa.p[1] - Math.sin(head) * 1.2, tr.w); }
+    }
+    // parked dumper when not on a trip during main
+    if (fp.hauler === 'dumper' && r.hauledWith === 'dumper' && !tripsNow.some(tr => tr.h === 'dumper')) {
+      const mp = machinePos('dumper', 1);
+      if (mp) {
+        if (mp.parked) { const q = pileSpot2(r); const hh = headingTo(q, route[Math.max(0, route.length - 2)]); const off = d.kind === 'machine' ? d.tail + 3.2 : 3.4; drawDumper(q[0] + Math.cos(hh) * off, q[1] + Math.sin(hh) * off, hh, false); }
+        else drawDumper(mp.p[0], mp.p[1], mp.h, false);
+      }
+    }
+    // workers not hauling
+    const inMain = t >= main.t0 && t < main.t1;
+    for (let i = 0; i < W; i++) {
+      if (busy.has(i)) continue;
+      const task = inMain ? s.tasks[i] : 'other';
+      if (task === 'dig' && d.kind === 'machine') continue; // in the cab
+      if (d.kind === 'machine' && walkIn && t >= walkIn.t0 && t < walkIn.t1 && i < machines.length && !(stuckInfo[i] && stuckInfo[i].stuck)) continue;
+      let p;
+      if (task === 'hand') {
+        const c = play.hCells[Math.min(play.hCells.length - 1, nh + i * 3)] || play.hCells[0] || bedCenter();
+        const wob = Math.sin(t * 6 + i) * 0.25;
+        p = [c[0] + wob, c[1] + 0.6];
+      } else if (!inMain && ph.kind === 'panel') { p = [site.gate.x + 1 + i * 1.6, site.gate.y + 1.2]; }
+      else if (!inMain && ph.kind === 'mats') { const pa = pointAlong(route, L * ((t - ph.t0) / (ph.t1 - ph.t0)) * 0.9 + i * 2); p = [pa.p[0] + 1.2, pa.p[1]]; }
+      else if (!inMain && ph.kind === 'finish') { const b = site.bed; p = [b.x + b.w * (0.2 + 0.3 * i) + Math.sin(t * 2 + i) * 1.5, b.y + b.h + 1.2]; }
+      else { const q = pileSpot2(r); p = [q[0] + 2 + i * 1.8, q[1] + 2.2]; }
+      const idle = inMain && task === 'idle';
+      drawWorker(p[0], p[1], i, idle ? 'idle' : null);
+    }
+    drawCanopies(0.5);
+    utilLabels();
+    // damage burst
+    for (const dm of dmgShow) {
+      const age = t - main.t0 - 1;
+      if (age < 30) { const a = 1 - age / 30; ctx.strokeStyle = `rgba(214,49,43,${a})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(P(dm.x), P(dm.y), P(1 + age * 0.12), 0, 7); ctx.stroke(); }
+      label(`${dm.name.replace('the ', '')} hit`, dm.x, dm.y - 2.4, '#fff', 0.95, 'rgba(214,49,43,0.92)');
+      toastOnce('dmg' + dm.name, `${cap(dm.name)} hit by the rear swing`);
+    }
+    for (const n of r.notes) if (walkIn && t > (walkIn.t0 + walkIn.t1) / 2) { label('Won\'t fit', n.x, n.y - 2.5, '#fff', 0.95, 'rgba(214,49,43,0.92)'); toastOnce('imp' + n.text, n.short); }
+    // HUD
+    $('#clock').textContent = RT.clock(t);
+    $('#phase').textContent = ph.name;
+    $('#hudSoil').textContent = `${s.delivered.toFixed(1)} / ${r.V.toFixed(1)} yd³ hauled`;
+    const late = t > site.deadline;
+    $('#clock').classList.toggle('late', late);
+    $('#timebar i').style.width = Math.min(100, t / Math.max(site.deadline, r.total) * 100) + '%';
+    $('#timebar b').style.left = (site.deadline / Math.max(site.deadline, r.total) * 100) + '%';
+  }
+  function nearestDist(route, pt) { let best = 0, bd = Infinity, acc = 0; for (let i = 1; i < route.length; i++) { const a = route[i - 1], b = route[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]); for (let k = 0; k <= 20; k++) { const f = k / 20, x = a[0] + (b[0] - a[0]) * f, y = a[1] + (b[1] - a[1]) * f, dd = Math.hypot(x - pt.x, y - pt.y); if (dd < bd) { bd = dd; best = acc + L * f; } } acc += L; } return Math.max(0, best - 2); }
+  function pileSpot2(r) { const sv = plan; const sp = plan.spot, w = plan.wps, dg = plan.digger; plan = Object.assign({}, plan, { spot: r.plan.spot, wps: r.plan.route.slice(1, -1), digger: r.plan.digger }); const p = pileSpot(); plan = sv; return p; }
+  function smooth(x) { return x * x * (3 - 2 * x); }
+  function angDiff(a, b) { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function toastOnce(key, text) { if (play.toasts.has(key)) return; play.toasts.add(key); toast(text); }
+  function toast(text) { const el = document.createElement('div'); el.className = 'toast'; el.textContent = text; $('#toasts').appendChild(el); setTimeout(() => el.classList.add('out'), 2600); setTimeout(() => el.remove(), 3200); }
+
+  // ---------------- results ----------------
+  function showResult() {
+    const r = result;
+    const m = $('#result');
+    const title = r.complete ? 'Job completed' : 'Job incomplete';
+    const rank = r.score >= 95 ? 'Site superintendent' : r.score >= 85 ? 'Foreman' : r.score >= 70 ? 'Lead hand' : r.score >= 40 ? 'Labourer' : 'Back to the yard';
+    $('#rTitle').textContent = `${title} — ${r.score}/100`;
+    $('#rRank').textContent = practice ? 'Practice run · not scored' : rank;
+    const parts = [['Completion & quality', r.parts.completion, 40], ['Site protection', r.parts.protection, 25], ['Schedule', r.parts.schedule, 20], ['Cost', r.parts.cost, 15]];
+    $('#rParts').innerHTML = parts.map(([n, v, mx]) => `<div class="part"><div class="pl"><span>${n}</span><b>${v}<small>/${mx}</small></b></div><div class="pb"><i style="width:${v / mx * 100}%"></i></div></div>`).join('');
+    $('#rLines').innerHTML = r.lines.map(l => `<li>${l}</li>`).join('');
+    $('#rCost').innerHTML = r.costItems.map(c => `<tr><td>${c.name}</td><td>${RT.money(c.cost)}</td></tr>`).join('') + `<tr class="tot"><td>Total</td><td>${RT.money(r.cost)}</td></tr>`;
+    const dc = DIGGERS[r.plan.digger];
+    $('#rSetup').textContent = `${dc.name} · ${HAULERS[r.plan.hauler].name} · ${r.plan.workers} worker${r.plan.workers > 1 ? 's' : ''}${r.plan.mats ? ' · mats' : ''}${r.plan.panel ? ' · panel removed' : ''}`;
+    // best possible today (exhaustive solver, precomputed)
+    const par = RT.PAR && RT.PAR[r.site];
+    const canReveal = par && (!practice || r.site !== RT.siteForDay(today).id || store.days[today]);
+    $('#rPar').hidden = !par;
+    if (par) {
+      const diff = par.score - r.score;
+      $('#rParTxt').innerHTML = diff <= 0 ? `<b>Best possible: ${par.score}.</b> You found it.` : `<b>Best possible: ${par.score}</b> — you were ${diff} point${diff > 1 ? 's' : ''} off.`;
+      $('#rParPlan').hidden = true; $('#rParPlan').textContent = 'Best plan: ' + describeKey(par.key);
+      $('#rParBtn').hidden = !canReveal || diff <= 0;
+    }
+    renderStats();
+    m.hidden = false;
+    $('#shareBtn').style.display = practice ? 'none' : '';
+  }
+  function describeKey(k) {
+    const [dg, hl, w, ...rest] = k.split('/');
+    const bits = [DIGGERS[dg].name, HAULERS[hl].name, `${parseInt(w)} worker${parseInt(w) > 1 ? 's' : ''}`];
+    if (rest.includes('mats')) bits.push('mats'); if (rest.includes('panel')) bits.push('fence panel out');
+    const sp = rest[rest.length - 1]; if (sp === 'close') bits.push('set close in'); else if (sp === 'back') bits.push('set back');
+    return bits.join(' · ');
+  }
+  $('#rParBtn').addEventListener('click', () => { $('#rParPlan').hidden = false; $('#rParBtn').hidden = true; });
+  function shareText() {
+    const e = store.days[today]; if (!e) return '';
+    const p = e.parts;
+    const b = (v, mx) => v >= mx ? '🟩' : v >= mx * 0.6 ? '🟨' : v > 0 ? '🟧' : '🟥';
+    const par = RT.PAR && RT.PAR[e.site];
+    return `Right Tool #${today} 🚜 ${e.score}/100${par ? ` (best possible ${par.score})` : ''}\n${b(p.completion, 40)} Job ${e.complete ? 'done' : 'unfinished'}\n${b(p.protection, 25)} Site ${p.protection}/25\n${b(p.schedule, 20)} Time ${p.schedule}/20\n${b(p.cost, 15)} Cost ${p.cost}/15`;
+  }
+  $('#shareBtn').addEventListener('click', async () => {
+    const t = shareText();
+    try { await navigator.clipboard.writeText(t); $('#shareBtn').textContent = 'Copied!'; } catch (e) { $('#shareOut').hidden = false; $('#shareOut').value = t; $('#shareOut').select(); }
+    setTimeout(() => $('#shareBtn').textContent = 'Copy result', 1800);
+  });
+  function renderStats() {
+    const days = Object.keys(store.days).map(Number).sort((a, b) => a - b);
+    let streak = 0; for (let n = today; store.days[n]; n--) streak++;
+    const scores = days.map(n => store.days[n].score);
+    const best = scores.length ? Math.max(...scores) : 0, avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+    const html = `<div><b>${days.length}</b><span>Jobs</span></div><div><b>${streak}</b><span>Streak</span></div><div><b>${avg}</b><span>Average</span></div><div><b>${best}</b><span>Best</span></div>`;
+    $$('.statsGrid').forEach(el => el.innerHTML = html);
+  }
+  $('#again').addEventListener('click', () => { closeResult(); enterPractice(site); });
+  $('#closeResult').addEventListener('click', () => closeResult());
+  function closeResult() {
+    $('#result').hidden = true; play = null; $('#playbar').hidden = true; $('#planUI').hidden = false; $('#hint').hidden = false; $('#planUI').classList.remove('running'); document.body.classList.remove('playing');
+    if (result) { plan.digger = result.plan.digger; }
+    const e = store.days[today];
+    if (e) { $('#doneBanner').hidden = false; $('#doneScore').textContent = e.score; }
+    renderPanel(); changed();
+  }
+  function enterPractice(s) {
+    practice = true; site = s;
+    fillPick(); pick.value = s.id;
+    $('#practiceBar').hidden = false;
+    if (s.id !== (result && result.site)) { plan = freshPlan(); }
+    setMode(plan.spot ? 'route' : 'spot');
+    resize(); renderPanel(); changed();
+  }
+  // practice site picker
+  // Practice only offers sites already played on earlier days (and today's once it's done) — no peeking at future jobs.
+  const pick = $('#sitePick');
+  function practiceSites() {
+    const out = [], seen = new Set();
+    for (let n = today - (store.days[today] ? 0 : 1); n >= Math.max(1, today - RT.ORDER.length + 1); n--) {
+      const s = RT.siteForDay(n); if (seen.has(s.id)) continue; seen.add(s.id); out.push({ s, n });
+    }
+    return out;
+  }
+  function fillPick() {
+    pick.innerHTML = '';
+    for (const { s, n } of practiceSites()) { const o = document.createElement('option'); o.value = s.id; o.textContent = `#${n} ${s.name}`; pick.appendChild(o); }
+  }
+  pick.addEventListener('change', () => { const s = RT.siteById(pick.value); plan = freshPlan(); result = null; enterPractice(s); });
+  $('#backToday').addEventListener('click', () => {
+    practice = false; site = RT.siteForDay(today); $('#practiceBar').hidden = true;
+    const e = store.days[today];
+    plan = freshPlan();
+    if (e && e.plan) { plan.digger = e.plan.digger; plan.hauler = e.plan.hauler; plan.workers = e.plan.workers; plan.mats = e.plan.mats; plan.panel = e.plan.panel; plan.spotChoice = e.plan.spotChoice; }
+    resize(); renderPanel(); changed();
+  });
+  $('#practiceLink').addEventListener('click', () => { enterPractice(site); });
+
+  // help
+  function openHelp() { $('#help').hidden = false; }
+  $('#helpBtn').addEventListener('click', openHelp);
+  $('#helpClose').addEventListener('click', () => { $('#help').hidden = true; store.seenHelp = true; save(); });
+  $('#statsBtn').addEventListener('click', () => {
+    const e = store.days[today];
+    const es = e && RT.siteById(e.site);
+    if (e && es && e.plan && e.plan.route) {
+      const svSite = site; site = es;
+      result = RT.simulate(es, e.plan); result.score = e.score; result.parts = e.parts || result.parts;
+      const sv = practice; practice = false; showResult(true); practice = sv; site = svSite;
+    } else { renderStats(); $('#statsOnly').hidden = false; }
+  });
+  $('#statsClose').addEventListener('click', () => $('#statsOnly').hidden = true);
+
+  // countdown
+  setInterval(() => {
+    const n = new Date(), next = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1);
+    const s = Math.max(0, Math.floor((next - n) / 1000));
+    const txt = `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+    $$('.countdown').forEach(el => el.textContent = txt);
+  }, 1000);
+
+  // ---------------- init ----------------
+  $('#dateLine').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const e0 = store.days[today];
+  if (e0 && e0.plan && e0.site === site.id) {
+    plan.digger = e0.plan.digger; plan.hauler = e0.plan.hauler; plan.workers = e0.plan.workers; plan.mats = e0.plan.mats; plan.panel = e0.plan.panel; plan.spotChoice = e0.plan.spotChoice;
+  }
+  renderPanel();
+  setMode(plan.spot ? 'route' : 'spot');
+  resize();
+  changed();
+  if (!store.seenHelp) openHelp();
+  if (e0) { $('#doneBanner').hidden = false; $('#doneScore').textContent = e0.score; }
+
+  // test hook
+  window.__rt = { get plan() { return plan; }, set plan(p) { plan = p; changed(); renderPanel(); }, get result() { return result; }, get site() { return site; }, changed, skip: () => { if (play) play.t = play.r.total; } };
+})();
+</script>
+</body>
+</html>

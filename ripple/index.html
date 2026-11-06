@@ -8,80 +8,108 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
+  /* miniature science-lab tabletop: matte paper, wooden tray, bright numbered objects */
+  --display:"Space Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --focus:#3a6fd8;
   --bg:#efe9df; --ink:#2b2a33; --muted:#77727a; --card:#fbf8f3; --line:#d9d1c4;
   --red:#e2483d; --blue:#3a6fd8; --yellow:#f2b632; --felt:#5d9b6a; --ice:#bfe3f2; --wall:#8d8a93;
   --accent:#2b2a33;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--display);-webkit-font-smoothing:antialiased}
+button{font-family:var(--display)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 body{min-height:100vh;display:flex;justify-content:center}
 .app{width:100%;max-width:760px;padding:18px 14px 40px}
 header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px}
-h1{margin:0;font-size:30px;letter-spacing:-.5px}
+h1{margin:0;font-size:30px;letter-spacing:-.6px;line-height:1.05}
 h1 span{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--red);margin-left:4px;box-shadow:0 0 0 4px rgba(226,72,61,.18),0 0 0 9px rgba(226,72,61,.08)}
 .tag{color:var(--muted);font-size:14px}
 .hbtns{display:flex;gap:6px}
-.iconbtn{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:6px 10px;font:500 13px "Space Grotesk";cursor:pointer;color:var(--ink)}
-.iconbtn:hover{border-color:var(--ink)}
+.iconbtn{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:0 12px;min-height:36px;font:500 13px var(--display);cursor:pointer;color:var(--ink);white-space:nowrap;transition:border-color .15s,background .15s}
+.iconbtn:hover{border-color:var(--ink);background:#fff}
 .meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted);margin:2px 0 12px}
 .pill{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
 .mode-practice .pill.mode{background:#2b2a33;color:#fff;border-color:#2b2a33}
 .trigger{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;gap:12px;align-items:center}
-.trigger .ico{flex:0 0 44px;height:44px;border-radius:10px;background:#2b2a33;color:#fff;display:grid;place-items:center;font-size:22px}
+.trigger .ico{flex:0 0 auto;min-width:44px;height:44px;padding:0 8px;border-radius:10px;background:#2b2a33;color:#fff;display:grid;place-items:center;font:700 20px var(--mono);letter-spacing:2px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.35)}
 .trigger .lbl{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
 .trigger .txt{font-size:17px;font-weight:500;line-height:1.3}
+.trigger .sub{font-size:13px;color:var(--muted);line-height:1.35;margin-top:4px}
+.trigger .sub:empty{display:none}
 .stage-wrap{perspective:1100px;margin:6px 0 4px}
-.board{position:relative;border-radius:16px;background:#b9946a;padding:12px;box-shadow:0 14px 30px -12px rgba(60,40,20,.45),inset 0 2px 0 rgba(255,255,255,.25);transition:transform .7s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d;touch-action:none;user-select:none}
-.board .inner{position:relative;border-radius:8px;overflow:visible}
+.board{position:relative;border-radius:16px;background:#b9946a;background-image:repeating-linear-gradient(92deg,rgba(255,255,255,.035) 0 3px,rgba(0,0,0,.025) 3px 7px,transparent 7px 13px),linear-gradient(180deg,#c29d72,#b08a5f);padding:12px;box-shadow:0 14px 30px -12px rgba(60,40,20,.45),inset 0 2px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.12);transition:transform .7s cubic-bezier(.3,.7,.3,1),box-shadow .7s;transform-style:preserve-3d;touch-action:none;user-select:none}
+.board.tilting{box-shadow:0 30px 44px -14px rgba(60,40,20,.5),inset 0 2px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.12)}
+.board .inner{position:relative;border-radius:8px;overflow:visible;box-shadow:0 0 0 1px rgba(80,55,30,.35),inset 0 0 0 1px rgba(0,0,0,.05)}
 canvas{display:block;width:100%;border-radius:8px}
 svg.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.marker{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:3px solid;background:#fff;display:grid;place-items:center;font:700 15px "JetBrains Mono";cursor:grab;touch-action:none;box-shadow:0 4px 10px rgba(0,0,0,.25);z-index:5;transition:transform .12s}
+.marker{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:3px solid;background:#fff;display:grid;place-items:center;font:700 15px var(--mono);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 10px rgba(0,0,0,.25),inset 0 -2px 0 rgba(0,0,0,.08);z-index:5;transition:transform .14s cubic-bezier(.3,.7,.3,1.4),box-shadow .14s}
+.marker::before{content:"";position:absolute;inset:-9px;border-radius:50%}
+.marker:hover:not(.locked){transform:scale(1.06)}
+.marker:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.marker.drag{box-shadow:0 12px 22px rgba(0,0,0,.28)}
+.marker.settle{animation:settle .32s cubic-bezier(.3,.7,.3,1.4)}
+@keyframes settle{0%{transform:scale(1.18)}60%{transform:scale(.94)}100%{transform:scale(1)}}
 .marker::after{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:currentColor;bottom:-11px;left:50%;margin-left:-3px;opacity:.0}
 .marker.drag{cursor:grabbing;transform:scale(1.15);z-index:9}
-.marker.locked{cursor:default}
+.marker.locked{cursor:default;box-shadow:0 2px 6px rgba(0,0,0,.22)}
 .marker .pin{position:absolute;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.0}
-.dock{display:flex;gap:10px;align-items:center;justify-content:center;min-height:56px;margin-top:10px;background:var(--card);border:1.5px dashed var(--line);border-radius:14px;padding:8px;font-size:13px;color:var(--muted);position:relative}
-.dock .slot{position:relative;width:40px;height:40px}
-.dock .marker{position:absolute;left:20px;top:20px}
+.dock{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;min-height:60px;transition:border-color .2s,background .2s;margin-top:10px;background:var(--card);border:1.5px dashed var(--line);border-radius:14px;padding:8px;font-size:13px;color:var(--muted);position:relative}
+.dock.full{border-style:solid;background:transparent}
+.dock.full .slot{display:none}
+#dockTxt::after{content:" \2192"}
+.dock.full #dockTxt::after{content:none}
+.dock .slot{position:relative;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,rgba(43,42,51,.07) 0 15px,transparent 16px)}
+.dock .marker{position:absolute;left:22px;top:22px}
 .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:12px 0}
 .leg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:13px;line-height:1.35}
 .leg>b.t{display:flex;align-items:center;gap:7px;font-size:14px;margin-bottom:3px}
-.sw{width:16px;height:16px;flex:0 0 16px;display:inline-grid;place-items:center;font:700 10px "JetBrains Mono";color:#fff}
+.sw{width:16px;height:16px;flex:0 0 16px;display:inline-grid;place-items:center;font:700 10px var(--mono);color:#fff}
 .sw.ball{border-radius:50%;background:var(--red)} .sw.block{border-radius:3px;background:var(--blue)} .sw.puck{border-radius:50%;background:var(--yellow);box-shadow:inset 0 0 0 2px rgba(0,0,0,.15)}
 .sw.felt{border-radius:3px;background:var(--felt)} .sw.ice{border-radius:3px;background:var(--ice);box-shadow:inset 0 0 0 1px #8cc5dc} .sw.wall{border-radius:2px;background:var(--wall)}
 .leg.dim{opacity:.45}
 .actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-.btn{border:none;border-radius:12px;padding:13px 22px;font:700 16px "Space Grotesk";cursor:pointer;background:var(--ink);color:#fff;box-shadow:0 4px 0 #000}
-.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #000}
+.btn{border:none;border-radius:12px;padding:13px 22px;min-height:48px;font:700 16px var(--display);cursor:pointer;background:var(--ink);color:#fff;box-shadow:0 4px 0 #000;transition:transform .08s,box-shadow .08s,background .15s}
+.btn:hover:not(:disabled){background:#3a3944}
+.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 #000}
 .btn:disabled{background:#b8b2ab;box-shadow:0 4px 0 #8f8983;cursor:not-allowed}
 .btn.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--ink);box-shadow:0 4px 0 var(--ink)}
+.btn.ghost:hover{background:#fff}
+.btn.ghost:active{box-shadow:0 2px 0 var(--ink)}
 .hint{text-align:center;font-size:13px;color:var(--muted);margin-top:8px;min-height:18px}
 .results{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
 .results.show{display:block;animation:pop .4s ease}
 @keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
-.big{font:700 44px "JetBrains Mono";text-align:center;line-height:1}
+.big{font:700 52px var(--mono);text-align:center;line-height:1;letter-spacing:-1px;font-variant-numeric:tabular-nums}
 .big small{font-size:18px;color:var(--muted)}
 .verdict{text-align:center;color:var(--muted);margin:4px 0 12px}
 .rows{display:grid;gap:8px}
 .row{display:grid;grid-template-columns:28px 1fr 48px;gap:10px;align-items:center;font-size:14px}
 .bar{height:10px;border-radius:9px;background:#e7e0d5;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:9px;width:0;transition:width 1s ease}
-.row .n{font:700 15px "JetBrains Mono";text-align:right}
+.row .n{font:700 15px var(--mono);text-align:right;font-variant-numeric:tabular-nums}
 .row .why{grid-column:2/4;font-size:12.5px;color:var(--muted);margin-top:-4px}
 .stats{display:flex;justify-content:center;gap:22px;margin:14px 0 6px;font-size:12px;color:var(--muted);text-align:center}
-.stats b{display:block;font:700 20px "JetBrains Mono";color:var(--ink)}
+.stats b{display:block;font:700 20px var(--mono);color:var(--ink)}
+.results .actions .btn{flex:1 1 150px;max-width:220px}
+.sharebox{white-space:pre-wrap;user-select:all;-webkit-user-select:all;background:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font:500 14px var(--mono);margin:10px 0 0}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;transition:transform .3s,opacity .3s;opacity:0;z-index:50}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .modal{position:fixed;inset:0;background:rgba(30,28,35,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:40}
-.modal.show{display:flex}
-.modal .box{background:var(--card);border-radius:18px;max-width:440px;padding:22px;font-size:15px;line-height:1.45;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal.show{display:flex;animation:fade .2s ease}
+.modal.show .box{animation:pop .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal .box{background:var(--card);border-radius:18px;max-width:440px;width:100%;max-height:calc(100% - 8px);overflow:auto;padding:22px;font-size:15px;line-height:1.45;box-shadow:0 20px 50px rgba(0,0,0,.3)}
 .modal h2{margin:0 0 8px}
 .modal ol{padding-left:20px;margin:8px 0 14px}
 .modal li{margin-bottom:6px}
 .phase{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(43,42,51,.85);color:#fff;font-size:13px;padding:5px 12px;border-radius:99px;z-index:8;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
 .phase.show{opacity:1}
 footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
-@media (max-width:520px){h1{font-size:25px}.trigger .txt{font-size:15px}.marker{width:30px;height:30px;margin:-15px 0 0 -15px;font-size:13px}}
+@media (max-width:520px){#dockTxt{flex:1 0 100%;text-align:center}#dockTxt::after{content:none}h1{font-size:25px}.tag{font-size:13px}.trigger .txt{font-size:15px}.iconbtn{padding:0 10px;font-size:12.5px}.board{padding:8px;border-radius:13px}.marker{width:30px;height:30px;margin:-15px 0 0 -15px;font-size:13px}.marker::before{inset:-11px}.legend{grid-template-columns:1fr 1fr}.leg{font-size:12.5px}.btn{padding:12px 18px}}
+@media (max-width:360px){.legend{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -92,7 +120,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
   </header>
   <div class="meta"><span class="pill mode" id="modePill">Daily #1</span><span id="dateLbl"></span></div>
 
-  <div class="trigger"><div class="ico" id="trigIco">↗</div><div><div class="lbl">The event</div><div class="txt" id="trigTxt">…</div></div></div>
+  <div class="trigger"><div class="ico" id="trigIco">↗</div><div><div class="lbl">The event</div><div class="txt" id="trigTxt">…</div><div class="sub" id="trigSub"></div></div></div>
 
   <div class="stage-wrap">
     <div class="board" id="board">
@@ -103,14 +131,12 @@ footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
       </div>
     </div>
   </div>
-  <div class="dock" id="dock"><span id="dockTxt">Drag each numbered marker to where that object will come to rest →</span></div>
+  <div class="dock" id="dock"><span id="dockTxt">Drag each numbered marker to where that object will come to rest</span></div>
 
   <div class="actions">
     <button class="btn" id="goBtn" disabled>Lock predictions &amp; run</button>
   </div>
   <div class="hint" id="hint">Place all three markers. You can move them as much as you like before you lock in.</div>
-
-  <div class="legend" id="legend"></div>
 
   <div class="results" id="results">
     <div class="big" id="bigScore">0<small>/100</small></div>
@@ -119,21 +145,24 @@ footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
     <div class="stats" id="stats"></div>
     <div class="actions"><button class="btn" id="shareBtn">Copy result</button><button class="btn ghost" id="replayBtn">Watch again</button><button class="btn ghost" id="practiceBtn">Practice tray</button></div>
   </div>
+
+  <div class="legend" id="legend"></div>
+
   <footer>Prototype · same tray for everyone each day · physics is precomputed and identical on every device</footer>
 </div>
 
-<div class="modal" id="modal"><div class="box">
-  <h2>How to play</h2>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="box">
+  <h2 id="modalTitle">How to play</h2>
   <ol>
     <li>Read <b>the event</b> — which edge of the tray rises, how steeply, and for how long.</li>
     <li>Check the <b>legend</b>: each object and surface behaves by a few simple, consistent rules.</li>
     <li>Drag markers <b>1, 2, 3</b> to where you think each object will finally stop.</li>
-    <li>Lock in. The tray tilts once, in slow motion. Each guess scores up to 100 by distance; your daily score is the average.</li>
+    <li>Lock in. The tray tilts once, in slow motion. Each guess scores up to 100: land within about a third of a square for a perfect 100; it drops to 0 at 4½ squares away. Your daily score is the average.</li>
   </ol>
   <p style="color:var(--muted);font-size:13px;margin:0 0 14px">No timer — take as long as you want to reason it out. One new tray every day at midnight.</p>
   <button class="btn" id="closeModal" style="width:100%">Got it</button>
 </div></div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function(){
@@ -198,14 +227,14 @@ function genPuzzle(seed){
     if(!ok)continue;
     // event
     const d1=DIRS[ri(0,7)],s1=rnd()<0.55?'steep':'gentle';
-    if(rnd()<0.3){
+    if(rnd()<0.5){
       let d2=DIRS[ri(0,7)];
       if(d2.v[0]*d1.v[0]+d2.v[1]*d1.v[1]>0.1)continue; // second tilt must change direction meaningfully
       const s2=rnd()<0.5?'steep':'gentle';
       const dur=[1.5,2,2.5][ri(0,2)];
       p.stages=[{d:d1,s:s1,dur},{d:d2,s:s2,dur:null}];
     }else p.stages=[{d:d1,s:s1,dur:null}];
-    const sim=simulate(p);
+    let sim=simulate(p,1,true);
     if(!sim.rest)continue;
     // interest checks
     const moved=sim.final.map((f,i)=>Math.hypot(f.x-p.objs[i].x,f.y-p.objs[i].y));
@@ -215,29 +244,48 @@ function genPuzzle(seed){
     // avoid everyone simply piled into the same corner
     let spread=0;for(let i=0;i<3;i++)for(let j=i+1;j<3;j++)spread+=Math.hypot(sim.final[i].x-sim.final[j].x,sim.final[i].y-sim.final[j].y);
     if(spread<4)continue;
+    // reasoning must beat the lazy guess "everything slides to the downhill wall": at least one object has to end well away from it
+    {const v=p.stages[p.stages.length-1].d.v;let tot=0,far=0;
+     p.objs.forEach((o,i)=>{const gx=v[0]>0?W-0.5:v[0]<0?0.5:o.x,gy=v[1]>0?H-0.5:v[1]<0?0.5:o.y;const e=Math.hypot(gx-sim.final[i].x,gy-sim.final[i].y);tot+=e;if(e>=2.5)far++});
+     if(far<1||tot<4.5)continue;}
+    // fairness: every object's resting spot must survive nudges no player could see
+    // (start spots +-0.06 squares, first tilt +-0.12 s, tilt strength +-3%). Chaotic trays are skipped.
+    if(!robust(p,sim))continue;
+    sim=simulate(p); // full run with animation frames (identical physics)
     p.sim=sim;p.moved=moved;
     return p;
   }
   return null;
 }
 
+const NUDGES=[[0.06,0,0,1],[-0.06,0,0,1],[0,0.06,0,1],[0,-0.06,0,1],[0.04,-0.04,0.12,1.03],[-0.04,0.04,-0.12,0.97]];
+function robust(p,sim){
+  for(const [dx,dy,dd,tm] of NUDGES){
+    const q={zones:p.zones,walls:p.walls,objs:p.objs.map((o,i)=>({t:o.t,x:o.x+(i%2?-dx:dx),y:o.y+(i===1?-dy:dy)})),
+      stages:p.stages.map(s=>({d:s.d,s:s.s,dur:s.dur===null?null:s.dur+dd}))};
+    const s2=simulate(q,tm,true,sim.T+2);if(!s2.rest)return false;
+    for(let i=0;i<3;i++)if(Math.hypot(s2.final[i].x-sim.final[i].x,s2.final[i].y-sim.final[i].y)>1)return false;
+  }
+  return true;
+}
 // ---------- deterministic physics ----------
+const PX=new Float64Array(3),PY=new Float64Array(3);
 function zoneAt(p,x,y){for(const z of p.zones){if(x>=z.x0&&x<=z.x1&&y>=z.y0&&y<=z.y1)return z}return null}
-function simulate(p){
-  const os=p.objs.map(o=>({t:o.t,T:TYPES[o.t],x:o.x,y:o.y,vx:0,vy:0,c:[]}));
+function simulate(p,tiltMul,lite,maxT){
+  const os=p.objs.map(o=>({t:o.t,T:TYPES[o.t],x:o.x,y:o.y,vx:0,vy:0,nc:0,cx:new Float64Array(16),cy:new Float64Array(16)}));
   const flags=os.map(()=>({wall:false,zone:false,hit:false}));
   const frames=[];const stageAt=[];
   let t=0,still=0,rest=false,si=0,st=0;
-  const MAXT=25;
+  const MAXT=maxT||25;
   for(let step=0;t<MAXT;step++){
     const stg=p.stages[si];
-    const mag=TILT[stg.s];const ax0=stg.d.v[0]*mag,ay0=stg.d.v[1]*mag;
-    let allStill=true;
-    for(const o of os){
+    const mag=TILT[stg.s]*(tiltMul||1);const ax0=stg.d.v[0]*mag,ay0=stg.d.v[1]*mag;
+    let allStill=true;for(let i=0;i<3;i++){PX[i]=os[i].x;PY[i]=os[i].y}
+    for(let oi=0;oi<3;oi++){const o=os[oi];
       let ax=ax0,ay=ay0;
-      for(const n of o.c){const d=ax*n[0]+ay*n[1];if(d<0){ax-=n[0]*d;ay-=n[1]*d}}
+      for(let c=0;c<o.nc;c++){const n0=o.cx[c],n1=o.cy[c];const d=ax*n0+ay*n1;if(d<0){ax-=n0*d;ay-=n1*d}}
       const z=zoneAt(p,o.x,o.y);const mult=z?ZONE[z.type]:1;
-      if(z&&(Math.abs(o.vx)+Math.abs(o.vy))>0.05)flags[os.indexOf(o)].zone=true;
+      if(z&&(Math.abs(o.vx)+Math.abs(o.vy))>0.05)flags[oi].zone=true;
       const sp=Math.sqrt(o.vx*o.vx+o.vy*o.vy);
       const am=Math.sqrt(ax*ax+ay*ay);
       if(sp<0.01){
@@ -250,16 +298,16 @@ function simulate(p){
         if(s2<=f){o.vx=0;o.vy=0}else{const k=(s2-f)/s2;o.vx*=k;o.vy*=k}
       }
       o.x+=o.vx*DT;o.y+=o.vy*DT;
-      if(Math.abs(o.vx)+Math.abs(o.vy)>0.004)allStill=false;
     }
     // collisions
-    for(const o of os)o.c=[];
+    for(const o of os)o.nc=0;
     for(let it=0;it<2;it++){
       for(let i=0;i<os.length;i++){const o=os[i];collideBounds(o);for(const w of p.walls){if(collideRect(o,w))flags[i].wall=true}}
       for(let i=0;i<os.length;i++)for(let j=i+1;j<os.length;j++){if(collidePair(os[i],os[j])){flags[i].hit=flags[j].hit=true}}
     }
-    if(step%4===0)frames.push(os.map(o=>[o.x,o.y]));
-    stageAt.push(si);
+    // at rest = no net movement this step (an object pinned against a wall/edge keeps a tiny velocity that the contact cancels each step)
+    for(let i=0;i<3;i++){if(Math.abs(os[i].x-PX[i])+Math.abs(os[i].y-PY[i])>0.004*DT)allStill=false}
+    if(!lite&&step%4===0)frames.push(os.map(o=>[o.x,o.y]));
     t+=DT;st+=DT;
     if(stg.dur!==null&&st>=stg.dur){si++;st=0;still=0;continue}
     if(stg.dur===null){
@@ -273,7 +321,7 @@ function rad(o){return o.T.shape==='box'?o.T.h:o.T.r}
 function bounce(o,nx,ny){
   const vn=o.vx*nx+o.vy*ny;
   if(vn<0){const e=Math.abs(vn)>0.4?o.T.e:0;o.vx-=(1+e)*vn*nx;o.vy-=(1+e)*vn*ny}
-  o.c.push([nx,ny]);
+  if(o.nc<16){o.cx[o.nc]=nx;o.cy[o.nc]=ny;o.nc++}
 }
 function collideBounds(o){
   const r=rad(o);
@@ -312,14 +360,16 @@ function collidePair(a,b){
   const vn=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;
   if(vn<0){const e=Math.abs(vn)>0.4?Math.min(a.T.e,b.T.e):0;const j=-(1+e)*vn/sum;
     a.vx-=j*ia*nx;a.vy-=j*ia*ny;b.vx+=j*ib*nx;b.vy+=j*ib*ny}
-  a.c.push([-nx,-ny]);b.c.push([nx,ny]);
+  if(a.nc<16){a.cx[a.nc]=-nx;a.cy[a.nc]=-ny;a.nc++}
+  if(b.nc<16){b.cx[b.nc]=nx;b.cy[b.nc]=ny;b.nc++}
   return true;
 }
 
 // ---------- state ----------
 const EPOCH=Date.UTC(2026,10,5);
 function todayKey(){const d=new Date();return Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())}
-const dayNum=Math.floor((todayKey()-EPOCH)/864e5)+1;
+function curDay(){return Math.floor((todayKey()-EPOCH)/864e5)+1}
+let dayNum=curDay(),playDay=dayNum; // playDay = the daily tray currently loaded (a tab can stay open past midnight)
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let mode='daily',puzzle=null,seed=0,guesses=[null,null,null],locked=false,result=null,anim=null,pathAlpha=0;
 
@@ -334,24 +384,36 @@ function stageText(p){
   else t+=' and stays raised.';
   return t;
 }
+// two-step events: tell players how far things get in the first stage, so it's reasoning, not guessing
+function speedGuide(p){
+  if(p.stages.length<2)return '';
+  const a=p.stages[0],mag=TILT[a.s],t=a.dur;
+  const d=k=>{const net=mag-TYPES[k].mu*N;return net<=0?0:0.5*net*t*t};
+  const f=x=>x<1?'under 1 square':x>=11.5?'the full tray':`~${Math.round(x)} squares`;
+  const blk=TILT[a.s]>TYPES.block.mus*N?f(d('block')):'stays put (unless on ice)';
+  return `Speed guide for those ${t} s on open tray: ball ${f(d('ball'))}, puck ${f(d('puck'))}, block ${blk}. Anything still moving keeps its momentum when the tilt changes.`;
+}
 
 function load(newMode,newSeed){
-  mode=newMode;seed=newSeed;
+  mode=newMode;seed=newSeed;if(mode==='daily')playDay=dayNum;
   document.body.classList.toggle('mode-practice',mode==='practice');
   puzzle=genPuzzle(seed);
-  locked=false;result=null;guesses=[null,null,null];pathAlpha=0;anim&&cancelAnimationFrame(anim.raf);anim=null;
-  board.style.transform='';
-  $('modePill').textContent=mode==='daily'?`Daily #${dayNum}`:'Practice';
+  locked=false;result=null;guesses=[null,null,null];pathAlpha=0;anim&&(cancelAnimationFrame(anim.raf),clearTimeout(anim.end));anim=null;
+  board.style.transform='';board.classList.remove('tilting');$('phase').classList.remove('show');$('sharebox')&&$('sharebox').remove();
+  $('modePill').textContent=mode==='daily'?`Daily #${playDay}`:'Practice';
   $('modeBtn').textContent=mode==='daily'?'Practice':'Daily';
   $('dateLbl').textContent=mode==='daily'?new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'}):'Unlimited random trays · not scored';
-  $('trigTxt').textContent=stageText(puzzle);
+  $('trigTxt').textContent=stageText(puzzle);$('trigSub').textContent=speedGuide(puzzle);
   $('trigIco').textContent=puzzle.stages.map(s=>s.d.ico).join(' ');
   $('results').classList.remove('show');
-  $('goBtn').style.display='';dock.style.display='';
+  $('goBtn').style.display='';$('goBtn').textContent='Lock predictions & run';$('goBtn').classList.remove('ghost');dock.style.display='';
   buildLegend();buildMarkers();
   if(mode==='daily'){
-    const saved=store.get('ripple-day-'+dayNum);
-    if(saved&&saved.seed===seed){guesses=saved.guesses;locked=true;result=saved.result;placeAll();finish(true);return}
+    const saved=store.get('ripple-day-'+playDay);
+    if(saved&&saved.seed===seed){guesses=saved.guesses;locked=true;result=saved.result;resize();placeAll();
+      // reloaded before the tilt finished? the score is already locked, but still show the reveal once
+      if(saved.revealed===false){markers.forEach(m=>m.el.classList.add('locked'));$('goBtn').disabled=true;$('hint').textContent='Your guesses were locked in. Watch closely…';updateDock();play();return}
+      finish(true);return}
   }
   resize();updateUI();
 }
@@ -363,7 +425,7 @@ function buildLegend(){
     ['block',2,'Block','Grippy. Won\'t budge on a <b>gentle</b> tilt; slides on a <b>steep</b> one. Heavy, doesn\'t bounce.'],
     ['puck',3,'Puck','Glides on any tilt with light drag. Barely bounces.'],
     ['felt','','Felt patch','Grabs everything: stops the block dead, stops the puck on a gentle tilt, only slows the ball.',!hasFelt],
-    ['ice','','Ice patch','Almost no friction — even the block slides on a gentle tilt.',!hasIce],
+    ['ice','','Ice patch','Almost no friction — even the block slides on a gentle tilt, and once moving it coasts on past the ice.',!hasIce],
     ['wall','','Barrier','Fixed. Objects stop against it or slide along it.']
   ];
   $('legend').innerHTML=items.map(([c,n,t,d,dim])=>`<div class="leg${dim?' dim':''}"><b class="t"><span class="sw ${c}">${n}</span>${t}</b>${d}</div>`).join('');
@@ -376,11 +438,12 @@ function buildMarkers(){
   dock.querySelectorAll('.slot').forEach(s=>s.remove());
   ORDER.forEach((t,i)=>{
     const slot=document.createElement('div');slot.className='slot';dock.appendChild(slot);
-    const el=document.createElement('div');el.className='marker';el.textContent=i+1;
+    const el=document.createElement('div');el.className='marker';el.textContent=i+1;el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-label',`Marker ${i+1} for the ${TYPES[t].name.toLowerCase()}. Drag onto the tray, or use arrow keys.`);
     el.style.borderColor=TYPES[t].color;el.style.color='#2b2a33';
     slot.appendChild(el);
     const m={el,slot,i};markers.push(m);
     el.addEventListener('pointerdown',e=>startDrag(e,m));
+    el.addEventListener('keydown',e=>keyMove(e,m));
   });
 }
 function placeAll(){markers.forEach(m=>{if(guesses[m.i])attach(m)})}
@@ -388,26 +451,36 @@ function attach(m){
   inner.appendChild(m.el);
   m.el.style.left=(guesses[m.i].x*unit)+'px';m.el.style.top=(guesses[m.i].y*unit)+'px';
 }
-function toDock(m){m.slot.appendChild(m.el);m.el.style.left='20px';m.el.style.top='20px'}
+function toDock(m){m.slot.appendChild(m.el);m.el.style.left='22px';m.el.style.top='22px'}
+function settle(el){el.classList.remove('settle');void el.offsetWidth;el.classList.add('settle')}
+function keyMove(e,m){
+  if(locked)return;
+  const K={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+  if(!K&&e.key!=='Escape')return;e.preventDefault();
+  if(e.key==='Escape'){guesses[m.i]=null;toDock(m);m.el.focus();draw();updateUI();return}
+  const stp=e.shiftKey?1:0.25,g=guesses[m.i]||{x:W/2,y:H/2};
+  guesses[m.i]=guesses[m.i]?{x:Math.max(0.2,Math.min(W-0.2,g.x+K[0]*stp)),y:Math.max(0.2,Math.min(H-0.2,g.y+K[1]*stp))}:g;
+  attach(m);m.el.focus();draw();updateUI();
+}
 let drag=null;
 function startDrag(e,m){
   if(locked)return;e.preventDefault();
   const r=m.el.getBoundingClientRect();
   document.body.appendChild(m.el);
   m.el.style.position='fixed';m.el.classList.add('drag');
-  drag={m,id:e.pointerId};
+  drag={m,id:e.pointerId,off:e.pointerType==='touch'?30:14};
   moveDrag(e);
   m.el.setPointerCapture(e.pointerId);
   m.el.onpointermove=moveDrag;m.el.onpointerup=endDrag;m.el.onpointercancel=endDrag;
 }
-function moveDrag(e){if(!drag)return;const el=drag.m.el;el.style.left=e.clientX+'px';el.style.top=(e.clientY-14)+'px';
-  const g=clientToUnit(e.clientX,e.clientY-14);
+function moveDrag(e){if(!drag)return;const el=drag.m.el;el.style.left=e.clientX+'px';el.style.top=(e.clientY-drag.off)+'px';
+  const g=clientToUnit(e.clientX,e.clientY-drag.off);
   if(g){guesses[drag.m.i]=g}else guesses[drag.m.i]=null;draw();}
 function endDrag(e){
   if(!drag)return;const m=drag.m;drag=null;
   m.el.classList.remove('drag');m.el.style.position='';m.el.onpointermove=m.el.onpointerup=m.el.onpointercancel=null;
   if(guesses[m.i])attach(m);else toDock(m);
-  draw();updateUI();
+  settle(m.el);draw();updateUI();
 }
 function clientToUnit(cx,cy){
   const r=cv.getBoundingClientRect();
@@ -415,10 +488,11 @@ function clientToUnit(cx,cy){
   if(x<-0.3||y<-0.3||x>W+0.3||y>H+0.3)return null;
   return {x:Math.max(0.2,Math.min(W-0.2,x)),y:Math.max(0.2,Math.min(H-0.2,y))};
 }
+function updateDock(){$('goBtn').style.display='';dock.classList.toggle('full',guesses.filter(Boolean).length===3)}
 function updateUI(){
   const n=guesses.filter(Boolean).length;
   $('goBtn').disabled=n<3||locked;
-  $('dockTxt').style.display=n===3?'none':'';
+  $('dockTxt').textContent=n===3?'All three placed. Drag any marker to adjust.':'Drag each numbered marker to where that object will come to rest';dock.classList.toggle('full',n===3);
   if(!locked)$('hint').textContent=n<3?`Place all three markers (${n}/3). Move them freely until you lock in.`:'Happy with your guesses? Lock in — the tray tilts once.';
 }
 
@@ -432,6 +506,7 @@ function resize(){
   markers.forEach(m=>{if(guesses[m.i]&&m.el.parentNode===inner)attach(m)});
   draw();
 }
+function txt(str,x,y,size,weight,family,align,base){ctx.save();ctx.translate(x,y);ctx.scale(0.01,0.01);ctx.font=`${weight} ${Math.round(size*100)}px ${family}`;ctx.textAlign=align||'left';ctx.textBaseline=base||'alphabetic';ctx.fillText(str,0,0);ctx.restore()}
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
 function draw(frame){
   const p=puzzle;if(!p)return;
@@ -447,13 +522,15 @@ function draw(frame){
       ctx.fillStyle='#6aa877';rr(z.x0,z.y0,z.x1-z.x0,z.y1-z.y0,0.12);ctx.fill();
       ctx.fillStyle='rgba(255,255,255,.08)';
       for(let x=z.x0+0.1;x<z.x1;x+=0.18)for(let y=z.y0+0.1;y<z.y1;y+=0.18){ctx.fillRect(x+((Math.round(y*10)%2)*0.09),y,0.04,0.04)}
-      ctx.fillStyle='rgba(255,255,255,.75)';ctx.font='600 0.26px Space Grotesk';ctx.fillText('FELT',z.x0+0.14,z.y0+0.34);
+      ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=0.03;rr(z.x0+0.015,z.y0+0.015,z.x1-z.x0-0.03,z.y1-z.y0-0.03,0.11);ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,.8)';txt('FELT',z.x0+0.14,z.y0+0.34,0.26,700,'"Space Grotesk", ui-sans-serif, system-ui, sans-serif');
     }else{
       const g=ctx.createLinearGradient(z.x0,z.y0,z.x1,z.y1);g.addColorStop(0,'#d7f0fa');g.addColorStop(.5,'#b9e0f0');g.addColorStop(1,'#d7f0fa');
       ctx.fillStyle=g;rr(z.x0,z.y0,z.x1-z.x0,z.y1-z.y0,0.12);ctx.fill();
       ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=0.04;
       for(let k=0;k<3;k++){ctx.beginPath();const sx=z.x0+0.3+k*0.5;ctx.moveTo(sx,z.y1-0.25);ctx.lineTo(sx+0.6,z.y0+0.35);ctx.stroke()}
-      ctx.fillStyle='rgba(40,110,140,.7)';ctx.font='600 0.26px Space Grotesk';ctx.fillText('ICE',z.x0+0.14,z.y0+0.34);
+      ctx.strokeStyle='rgba(120,190,220,.7)';ctx.lineWidth=0.03;rr(z.x0+0.015,z.y0+0.015,z.x1-z.x0-0.03,z.y1-z.y0-0.03,0.11);ctx.stroke();
+      ctx.fillStyle='rgba(40,110,140,.75)';txt('ICE',z.x0+0.14,z.y0+0.34,0.26,700,'"Space Grotesk", ui-sans-serif, system-ui, sans-serif');
     }
   }
   // walls
@@ -485,18 +562,35 @@ function draw(frame){
     const labels=[];
     guesses.forEach((g,i)=>{const a=p.sim.final[i];
       svg+=`<line x1="${g.x}" y1="${g.y}" x2="${a.x}" y2="${a.y}" stroke="#2b2a33" stroke-width="0.04" stroke-dasharray="0.08 0.1" opacity=".6"/>`;
-      // label sits on the guess→actual line, a bit toward the guess, nudged away from other labels/objects
-      let lx=g.x+(a.x-g.x)*0.4,ly=g.y+(a.y-g.y)*0.4-0.5;
-      if(Math.hypot(a.x-g.x,a.y-g.y)<1.2){lx=g.x;ly=g.y-0.75}
-      for(let k=0;k<8;k++){const hit=labels.find(L=>Math.abs(L[0]-lx)<0.95&&Math.abs(L[1]-ly)<0.5);if(!hit)break;ly+=ly>H/2?-0.55:0.55}
-      lx=Math.max(0.5,Math.min(W-0.5,lx));ly=Math.max(0.3,Math.min(H-0.3,ly));labels.push([lx,ly]);
+      const [lx,ly]=labelSpot(p,g,a,i,labels);labels.push([lx,ly]);
       const c=TYPES[p.objs[i].t].color;
-      svg+=`<g transform="translate(${lx} ${ly})"><rect x="-0.45" y="-0.21" width="0.9" height="0.42" rx="0.13" fill="#2b2a33" stroke="${c}" stroke-width="0.05"/><text x="0" y="0.1" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="0.27" fill="#fff">${result.scores[i]}</text></g>`;
+      svg+=`<g transform="translate(${lx} ${ly})"><rect x="-0.45" y="-0.21" width="0.9" height="0.42" rx="0.13" fill="#2b2a33" stroke="${c}" stroke-width="0.05"/><text x="0" y="0.1" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,Menlo,monospace" font-weight="700" font-size="0.27" fill="#fff">${result.scores[i]}</text></g>`;
     });
   }
   ov.innerHTML=svg;
   // objects
   p.objs.forEach((o,i)=>drawObj(o.t,pos[i][0],pos[i][1],i,1));
+}
+// score labels: pick the nearby spot that covers the fewest barriers, objects, markers and other labels
+function labelSpot(p,g,a,i,labels){
+  const hw=0.47,hh=0.23;let mr=((markers[0]&&markers[0].el.offsetWidth)||34)/(unit||50)/2+0.05;if(!isFinite(mr)||mr<0.4)mr=0.4;if(mr>0.8)mr=0.8;
+  const ov1=(x0,y0,x1,y1,X0,Y0,X1,Y1)=>Math.max(0,Math.min(x1,X1)-Math.max(x0,X0))*Math.max(0,Math.min(y1,Y1)-Math.max(y0,Y0));
+  const boxes=[];
+  p.walls.forEach(w=>boxes.push([w.x0,w.y0,w.x1,w.y1,3]));
+  p.sim.final.forEach(f=>boxes.push([f.x-0.5,f.y-0.5,f.x+0.5,f.y+0.5,3]));
+  guesses.forEach(q=>q&&boxes.push([q.x-mr,q.y-mr,q.x+mr,q.y+mr,4]));
+  labels.forEach(L=>boxes.push([L[0]-hw-0.05,L[1]-hh-0.05,L[0]+hw+0.05,L[1]+hh+0.05,6]));
+  p.objs.forEach(o=>boxes.push([o.x-0.45,o.y-0.45,o.x+0.45,o.y+0.45,0.6])); // faded start ghosts matter less
+  const cands=[];
+  for(const r of [mr+0.3,mr+0.55,mr+0.9,mr+1.3])for(let k=0;k<16;k++){const an=-Math.PI/2+k*Math.PI/8;cands.push([g.x+Math.cos(an)*(r+0.2),g.y+Math.sin(an)*r])}
+  let best=null,bp=1e9;
+  for(const [x,y] of cands){
+    let pen=Math.hypot(x-g.x,y-g.y)*0.25;
+    if(x-hw<0.05||x+hw>W-0.05||y-hh<0.05||y+hh>H-0.05)pen+=50;
+    for(const B of boxes)pen+=ov1(x-hw,y-hh,x+hw,y+hh,B[0],B[1],B[2],B[3])*B[4]*10;
+    if(pen<bp){bp=pen;best=[x,y]}
+  }
+  return best||[Math.max(0.5,Math.min(W-0.5,g.x)),Math.max(0.3,Math.min(H-0.3,g.y-0.75))];
 }
 function hexA(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${n>>8&255},${n&255},${a})`}
 function drawObj(t,x,y,i,alpha){
@@ -508,30 +602,34 @@ function drawObj(t,x,y,i,alpha){
   if(t==='ball'){
     const g=ctx.createRadialGradient(x-T.r*0.35,y-T.r*0.4,T.r*0.1,x,y,T.r);g.addColorStop(0,'#f27a70');g.addColorStop(1,T.color);
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,T.r,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(120,20,15,.25)';ctx.lineWidth=0.03;ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.55)';ctx.beginPath();ctx.ellipse(x-T.r*0.38,y-T.r*0.45,T.r*0.2,T.r*0.12,-0.6,0,Math.PI*2);ctx.fill();
   }else if(t==='block'){
     ctx.fillStyle=T.color;rr(x-T.h,y-T.h,T.h*2,T.h*2,0.1);ctx.fill();
     ctx.fillStyle='rgba(255,255,255,.18)';rr(x-T.h,y-T.h,T.h*2,T.h*0.5,0.1);ctx.fill();
+    ctx.strokeStyle='rgba(10,30,90,.28)';ctx.lineWidth=0.03;rr(x-T.h,y-T.h,T.h*2,T.h*2,0.1);ctx.stroke();
   }else{
     ctx.fillStyle='#d99a1c';ctx.beginPath();ctx.arc(x,y+0.05,T.r,0,Math.PI*2);ctx.fill();
     ctx.fillStyle=T.color;ctx.beginPath();ctx.arc(x,y,T.r,0,Math.PI*2);ctx.fill();
     ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=0.04;ctx.beginPath();ctx.arc(x,y,T.r*0.7,0,Math.PI*2);ctx.stroke();
   }
-  ctx.fillStyle='#fff';ctx.font='700 0.42px JetBrains Mono';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(String(i+1),x,y+0.02);ctx.restore();ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  ctx.fillStyle=t==='puck'?'#5a3d05':'#fff';txt(String(i+1),x,y+0.03,0.4,700,'"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace','center','middle');ctx.restore();
 }
 
 // ---------- run ----------
 function tiltCSS(st){if(!st)return '';const k=st.s==='steep'?11:6;return `rotateX(${(-st.d.v[1]*k).toFixed(2)}deg) rotateY(${(st.d.v[0]*k).toFixed(2)}deg)`}
-function score(g,a){const d=Math.hypot(g.x-a.x,g.y-a.y);return Math.round(100*Math.max(0,1-d/6))}
+// v2: within 0.3 squares (the object's own footprint) is a perfect 100; it then falls to 0 at 4.5 squares away
+const BULL=0.3,ZERO=4.5;
+function score(g,a){const d=Math.hypot(g.x-a.x,g.y-a.y);return d<=BULL?100:Math.round(100*Math.max(0,1-(d-BULL)/(ZERO-BULL)))}
 function lockIn(){
   if(locked||guesses.some(g=>!g))return;
   locked=true;markers.forEach(m=>m.el.classList.add('locked'));
   const scores=guesses.map((g,i)=>score(g,puzzle.sim.final[i]));
   result={scores,total:Math.round(scores.reduce((a,b)=>a+b,0)/3)};
   if(mode==='daily'){
-    store.set('ripple-day-'+dayNum,{seed,guesses,result});
+    store.set('ripple-day-'+playDay,{seed,guesses,result,revealed:false});
     const st=store.get('ripple-stats')||{played:0,sum:0,best:0,streak:0,last:0};
-    st.played++;st.sum+=result.total;st.best=Math.max(st.best,result.total);st.streak=(st.last===dayNum-1)?st.streak+1:1;st.last=dayNum;
+    st.played++;st.sum+=result.total;st.best=Math.max(st.best,result.total);st.streak=(st.last===playDay-1)?st.streak+1:1;st.last=playDay;
     store.set('ripple-stats',st);
   }
   $('goBtn').disabled=true;$('hint').textContent='Watch closely…';
@@ -539,23 +637,29 @@ function lockIn(){
 }
 function play(){
   const fr=puzzle.sim.frames;const p=puzzle;
-  const SLOW=0.5, FPS=60;
-  const step=(1/240*4)/(1/FPS)*SLOW; // sim frames per display frame
+  // v2: time-based playback. Slow motion (half speed) for the part that matters — the start and the tilt change —
+  // then it speeds up so long slow rolls don't drag on. The button below the tray skips to the end.
+  const FR_PER_S=60; // one stored frame = 4 physics steps = 1/60 s of tray time
+  const slowUntil=Math.max(3,(p.sim.stageSwitch!==null?p.stages[0].dur+1.5:0));
+  const speed=ts=>ts<slowUntil?0.5:Math.min(2,0.5+(ts-slowUntil)*1.5);
+  const go=$('goBtn');go.style.display='';go.disabled=false;go.textContent='Skip to the end';go.classList.add('ghost');
   $('results').classList.remove('show');
+  if(anim)cancelAnimationFrame(anim.raf),clearTimeout(anim.end);
   ov.innerHTML='';pathAlpha=0.0;
   const phase=$('phase');
   // pre-roll: tilt board
-  board.style.transform=tiltCSS(p.stages[0]);
+  board.style.transform=tiltCSS(p.stages[0]);board.classList.add('tilting');
   phase.textContent=p.stages[0].d.raised.replace(/^./,c=>c.toUpperCase())+' rises'+(p.stages.length>1?` · ${p.stages[0].dur}s`:'');phase.classList.add('show');
-  let f=0,started=null,switched=false;
-  anim={raf:0};
+  let f=0,started=null,switched=false,last=null;
+  const me=anim={raf:0,end:0,skip:()=>{f=fr.length}};
   const startAt=performance.now()+750;
   function tick(now){
     if(now<startAt){draw(0);anim.raf=requestAnimationFrame(tick);return}
-    f+=step;const fi=Math.min(fr.length-1,Math.floor(f));
+    const dt=last===null?1/60:Math.min(0.1,(now-last)/1000);last=now;
+    f+=dt*FR_PER_S*speed(f/FR_PER_S);const fi=Math.min(fr.length-1,Math.floor(f));
     if(p.sim.stageSwitch!==null&&!switched&&fi>=p.sim.stageSwitch){switched=true;board.style.transform=tiltCSS(p.stages[1]);phase.textContent=p.stages[1].d.raised.replace(/^./,c=>c.toUpperCase())+' rises'}
     pathAlpha=0.6;draw(fi);
-    if(fi>=fr.length-1){setTimeout(()=>{board.style.transform='';phase.classList.remove('show');pathAlpha=1;finish(false)},500);return}
+    if(fi>=fr.length-1){if(p.sim.stageSwitch!==null&&!switched){switched=true}go.style.display='none';me.skip=null;me.end=setTimeout(()=>{if(anim!==me||puzzle!==p)return;board.style.transform='';board.classList.remove('tilting');phase.classList.remove('show');pathAlpha=1;finish(false)},500);return}
     anim.raf=requestAnimationFrame(tick);
   }
   anim.raf=requestAnimationFrame(tick);
@@ -573,11 +677,15 @@ function explain(i){
   const s=bits.join(', ');return s.charAt(0).toUpperCase()+s.slice(1)+'.';
 }
 function finish(instant){
-  locked=true;pathAlpha=1;markers.forEach(m=>m.el.classList.add('locked'));
-  $('goBtn').style.display='none';dock.style.display='none';$('hint').textContent=mode==='daily'?'Come back tomorrow for a new tray — or try a practice tray.':'Practice tray · try another, or go back to the daily.';
+  locked=true;
+  if(mode==='daily'){const sv=store.get('ripple-day-'+playDay);if(sv&&sv.revealed===false){sv.revealed=true;store.set('ripple-day-'+playDay,sv)}}
+  setTimeout(checkNewDay,1500);pathAlpha=1;markers.forEach(m=>m.el.classList.add('locked'));
+  $('goBtn').style.display='none';dock.style.display='none';$('hint').textContent=mode==='daily'?'A new tray arrives at midnight — or try a practice tray.':'Practice tray · try another, or go back to the daily.';
   draw();
   const r=result;
-  $('bigScore').innerHTML=`${r.total}<small>/100</small>`;
+  const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(instant||reduce)$('bigScore').innerHTML=`${r.total}<small>/100</small>`;
+  else{const t0=performance.now(),tot=r.total,p0=puzzle;(function up(now){if(puzzle!==p0)return;const k=Math.min(1,(now-t0)/700),v=Math.round(tot*(1-Math.pow(1-k,3)));$('bigScore').innerHTML=`${v}<small>/100</small>`;if(k<1)requestAnimationFrame(up)})(t0)}
   $('verdict').textContent=r.total>=90?'Laboratory precision.':r.total>=75?'Sharp physical intuition.':r.total>=55?'Solid read — a few surprises.':r.total>=35?'The tray had other ideas.':'Chaos theory wins today.';
   $('rows').innerHTML=puzzle.objs.map((o,i)=>`<div class="row"><span class="sw ${o.t}" style="width:22px;height:22px;font-size:12px">${i+1}</span><div class="bar"><i style="background:${TYPES[o.t].color}" data-w="${r.scores[i]}"></i></div><span class="n">${r.scores[i]}</span><div class="why">${TYPES[o.t].name}: ${explain(i)}</div></div>`).join('');
   setTimeout(()=>document.querySelectorAll('.bar i').forEach(b=>b.style.width=b.dataset.w+'%'),instant?0:60);
@@ -590,20 +698,38 @@ function finish(instant){
 function shareText(){
   const sq=s=>s>=85?'🟢':s>=60?'🟡':s>=35?'🟠':'🔴';
   const ev=puzzle.stages.map(s=>s.d.ico).join('');
-  return `Ripple #${dayNum} ${ev}  ${result.total}/100\n${result.scores.map((s,i)=>['🔴','🔵','🟡'][i]+' '+sq(s)+' '+s).join('\n')}`;
+  return `Ripple #${playDay} ${ev}  ${result.total}/100\n${result.scores.map((s,i)=>['🔴','🔵','🟡'][i]+' '+sq(s)+' '+s).join('\n')}`;
 }
 function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),1800)}
 
+// ---------- new day while the tab is open ----------
+function checkNewDay(){
+  const d=curDay();if(d===dayNum)return;
+  dayNum=d;
+  if(mode!=='daily')return; // practice continues; the daily button will load today's tray
+  const busy=locked&&!$('results').classList.contains('show'); // tilt animation still running
+  const placing=!locked&&guesses.some(Boolean);
+  if(busy||placing){toast('A new daily tray is ready — it loads when you finish this one');return}
+  load('daily',hashStr('ripple-'+dayNum));toast('New day — new tray!');
+}
+setInterval(checkNewDay,30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkNewDay()});
+window.addEventListener('focus',checkNewDay);
 // ---------- wire up ----------
-$('goBtn').onclick=lockIn;
+$('goBtn').onclick=()=>{if(anim&&anim.skip&&locked){anim.skip();return}lockIn()};
 $('replayBtn').onclick=()=>{play()};
 $('practiceBtn').onclick=()=>load('practice',(Math.random()*1e9)|0);
-$('modeBtn').onclick=()=>mode==='daily'?load('practice',(Math.random()*1e9)|0):load('daily',hashStr('ripple-'+dayNum));
-$('shareBtn').onclick=async()=>{const t=shareText();try{await navigator.clipboard.writeText(t);toast('Copied to clipboard')}catch(e){toast('Copy failed — select the text below');$('stats').insertAdjacentHTML('afterend',`<pre style="white-space:pre-wrap;user-select:all;background:#fff;padding:10px;border-radius:8px">${t}</pre>`)}};
-$('helpBtn').onclick=()=>$('modal').classList.add('show');
-$('closeModal').onclick=()=>{$('modal').classList.remove('show');store.set('ripple-seen',1)};
+$('modeBtn').onclick=()=>{dayNum=curDay();mode==='daily'?load('practice',(Math.random()*1e9)|0):load('daily',hashStr('ripple-'+dayNum))};
+$('shareBtn').onclick=async()=>{const t=shareText();try{await navigator.clipboard.writeText(t);toast('Copied to clipboard')}catch(e){toast('Copy blocked here. Select the text below');let bx=$('sharebox');if(!bx){bx=document.createElement('pre');bx.id='sharebox';bx.className='sharebox';$('stats').after(bx)}bx.textContent=t}};
+let modalFromBtn=false;
+function openModal(fromBtn){modalFromBtn=fromBtn===true;$('modal').classList.add('show');setTimeout(()=>$('closeModal').focus(),30)}
+function closeModal(){if(!$('modal').classList.contains('show'))return;$('modal').classList.remove('show');store.set('ripple-seen',1);if(modalFromBtn)$('helpBtn').focus({preventScroll:true})}
+$('helpBtn').onclick=()=>openModal(true);
+$('closeModal').onclick=closeModal;
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 window.addEventListener('resize',resize);
-if(!store.get('ripple-seen'))$('modal').classList.add('show');
+if(!store.get('ripple-seen'))openModal();
 load('daily',hashStr('ripple-'+dayNum));
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>draw(result?undefined:undefined));
 window.__ripple={genPuzzle,simulate,hashStr,score};

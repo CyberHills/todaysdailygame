@@ -7,34 +7,36 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f5f0e2;--card:#fffdf6;--ink:#2e3a2b;--mute:#6f7a66;--water:#2f8fdc;--water2:#7cc4f5;--grass:#5fae4b;--warn:#d9573b;--line:#e3dcc8}
+:root{color-scheme:light;--bg:#f5f0e2;--card:#fffdf6;--ink:#2e3a2b;--mute:#6f7a66;--water:#2f8fdc;--water2:#7cc4f5;--grass:#5fae4b;--warn:#d9573b;--line:#e3dcc8}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif}
 .wrap{max-width:780px;margin:0 auto;padding:14px 12px 40px}
 header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .logo{width:42px;height:42px;flex:none}
-h1{font-family:Fredoka,Nunito,sans-serif;font-size:28px;margin:0;line-height:1;letter-spacing:.3px}
+h1{font-family:Fredoka,Nunito,sans-serif;font-size:28px;margin:0;line-height:1;letter-spacing:.3px;text-wrap:balance}
 .tag{font-size:13px;color:var(--mute);margin-top:3px}
 .hright{margin-left:auto;display:flex;gap:8px;align-items:center}
 .pill{font-size:12px;font-weight:800;background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:5px 10px;white-space:nowrap}
-.iconbtn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);font:800 16px Fredoka,sans-serif;color:var(--ink);cursor:pointer}
+.iconbtn{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);font:800 16px Fredoka,sans-serif;color:var(--ink);cursor:pointer}
 .bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mute);margin:0 2px 6px}
 .bar b{color:var(--ink)}
 .mode{font-weight:800;font-size:11px;letter-spacing:.8px;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:#dceefb;color:#1d6aa8}
 .mode.practice{background:#f6e2c9;color:#9a5a1c}
 #stage{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 2px 0 #d9d1bb,0 10px 30px rgba(60,70,40,.12);background:#9cb98a}
 canvas{display:block;width:100%;touch-action:none;cursor:default}
-#toast{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:rgba(34,48,32,.88);color:#fff;font-weight:700;font-size:13px;padding:7px 13px;border-radius:999px;pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis}
+#toast{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:rgba(34,48,32,.88);color:#fff;font-weight:700;font-size:13px;padding:7px 13px;border-radius:999px;pointer-events:none;opacity:0;transition:opacity .25s;max-width:92%;text-align:center;line-height:1.3;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 #toast.on{opacity:1}
+#toast{border-radius:14px;transition:opacity .25s,transform .25s;transform:translate(-50%,-4px)}#toast.on{transform:translate(-50%,0)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--mute);margin:8px 2px 10px}
 .legend span{display:inline-flex;align-items:center;gap:5px}
 .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
 .panel{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:12px}
 .tray{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
-.card{border:2px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;background:#fff;display:flex;gap:9px;align-items:center;user-select:none;transition:transform .1s,border-color .15s}
+.card{border:2px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;background:#fff;display:flex;gap:9px;align-items:center;user-select:none;transition:transform .12s,border-color .15s,box-shadow .15s,background-color .2s;font:inherit;color:inherit;text-align:left;width:100%;min-height:58px}
 .card:hover{transform:translateY(-1px)}
 .card.armed{border-color:var(--water);box-shadow:0 0 0 3px rgba(47,143,220,.18)}
-.card.sel{border-color:var(--water)}
+.card.sel{border-color:var(--water);box-shadow:0 0 0 3px rgba(47,143,220,.12)}
+.card:active{transform:translateY(0) scale(.985)}
 .card.placed{background:#f3faf0}
 .card .ic{width:30px;height:30px;flex:none}
 .card .t{font-weight:800;font-size:14px}
@@ -47,9 +49,13 @@ canvas{display:block;width:100%;touch-action:none;cursor:default}
 .row{display:grid;grid-template-columns:78px 1fr 58px;align-items:center;gap:8px;font-size:13px;margin:4px 0}
 .row .v{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
 .row.off{opacity:.4}
-input[type=range]{width:100%;accent-color:var(--water)}
-.btn{font:700 15px Fredoka,Nunito,sans-serif;border:none;border-radius:12px;padding:11px 16px;cursor:pointer;background:#e9e3d2;color:var(--ink)}
-.btn.small{font-size:13px;padding:6px 10px;border-radius:9px}
+input[type=range]{width:100%;accent-color:var(--water);height:28px;margin:0;cursor:pointer}
+input[type=range]:disabled{cursor:default}
+.btn{font:700 15px Fredoka,Nunito,sans-serif;border:none;border-radius:12px;padding:11px 16px;cursor:pointer;background:#e9e3d2;color:var(--ink);transition:transform .1s,box-shadow .1s,background-color .15s;min-height:40px}
+.btn:active:not(:disabled){transform:translateY(2px)}
+.btn.primary:active:not(:disabled){box-shadow:0 1px 0 #1f6fb0}
+.btn.ghost:hover{background:#fff}
+.btn.small{font-size:13px;padding:7px 11px;border-radius:9px;min-height:36px}
 .btn.primary{background:var(--water);color:#fff;box-shadow:0 3px 0 #1f6fb0}
 .btn.primary:disabled{background:#a9c7df;box-shadow:none;cursor:not-allowed}
 .btn.ghost{background:transparent;border:1.5px solid var(--line)}
@@ -60,7 +66,10 @@ input[type=range]{width:100%;accent-color:var(--water)}
 .score{display:flex;align-items:baseline;gap:10px}
 .score .big{font:700 52px Fredoka,sans-serif;line-height:1;color:var(--ink)}
 .score .of{font:600 20px Fredoka,sans-serif;color:var(--mute)}
-.score .verdict{margin-left:auto;font:600 16px Fredoka,sans-serif;color:var(--water)}
+.score .verdict{margin-left:auto;font:600 15px Fredoka,sans-serif;color:#1d6aa8;background:#dceefb;padding:4px 11px;border-radius:999px;align-self:center}
+.result.on{animation:rise .35s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.score .big{font-variant-numeric:tabular-nums}
 .lines{margin:10px 0 4px;font-size:14px}
 .lines div{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line)}
 .lines .neg{color:var(--warn);font-weight:800}
@@ -73,7 +82,25 @@ input[type=range]{width:100%;accent-color:var(--water)}
 .mbox p,.mbox li{font-size:14px;line-height:1.45}
 .mbox ul{padding-left:18px;margin:6px 0}
 .mbox .tip{background:#eaf5fd;border-radius:10px;padding:9px 11px;font-size:13px;margin-top:8px}
-.mbox .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.mbox .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+#modal.on .mbox{animation:pop .22s ease-out}
+@keyframes pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:none}}
+button:focus-visible,input:focus-visible,canvas:focus-visible{outline:3px solid #1d6aa8;outline-offset:2px}
+.lines div{gap:10px}
+@media (max-width:480px){
+  .wrap{padding:12px 12px 32px}
+  h1{font-size:25px}.tag{font-size:12px}.logo{width:38px;height:38px}
+  #stage{border-radius:14px}
+  .legend{font-size:11.5px;gap:4px 12px}
+  .tray{grid-template-columns:1fr 1fr;gap:7px}
+  .card{padding:7px 8px;gap:7px}.card .t{font-size:13px}.card .ic{width:26px;height:26px}
+  .row{grid-template-columns:70px 1fr 54px}
+  .actions .hint{flex-basis:100%}
+  #runBtn{flex:1 1 100%}
+  #pActs{flex-wrap:wrap}
+  .score .big{font-size:46px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -84,23 +111,25 @@ input[type=range]{width:100%;accent-color:var(--water)}
     <div class="hright"><span class="pill" id="streak">🔥 0</span><button class="iconbtn" id="helpBtn" aria-label="How to play">?</button></div>
   </header>
   <div class="bar"><span id="dayLabel"></span><span class="mode" id="modeTag">Daily</span></div>
-  <div id="stage"><canvas id="c"></canvas><div id="toast"></div></div>
+  <div id="stage"><canvas id="c" role="img" aria-label="Backyard plan. Place and aim sprinklers here; the sliders below also adjust the selected sprinkler."></canvas><div id="toast" role="status" aria-live="polite"></div></div>
   <div class="legend">
     <span><i class="sw" style="background:#a57a4f"></i>Fences, house &amp; shrubs block water</span>
-    <span><i class="sw" style="background:#8a6a4a"></i>Beds &amp; patio: fine to wet, not scored</span>
-    <span><i class="sw" style="border:2px dashed #d9573b"></i>Keep dry: laundry, dog, windows, grill, lounger</span>
+    <span><i class="sw" style="background:radial-gradient(circle,#2f8fdc 0 45%,#b5dcf7 100%)"></i>Spray fades toward its edge</span>
+    <span><i class="sw" style="background:#8a6a4a"></i>Beds: fine to wet</span>
+    <span><i class="sw" style="background:#cfcfc8"></i>Patio, drive &amp; street: wasted water</span>
+    <span><i class="sw" style="border:2px dashed #d9573b"></i><span id="keepDry">Keep dry: red dashed outlines</span></span>
   </div>
   <div class="panel" id="planPanel">
     <div class="tray" id="tray"></div>
     <div class="ctrls" id="ctrls">
       <div class="ctrlhead"><span id="ctrlTitle"></span><button class="btn small ghost" id="removeBtn">Back to tray</button></div>
-      <div class="row" id="rowDir"><span>Direction</span><input type="range" id="inDir" min="0" max="359" step="1"><span class="v" id="vDir"></span></div>
-      <div class="row" id="rowArc"><span>Spray arc</span><input type="range" id="inArc" step="1"><span class="v" id="vArc"></span></div>
-      <div class="row" id="rowR"><span>Throw</span><input type="range" id="inR" step="1"><span class="v" id="vR"></span></div>
+      <div class="row" id="rowDir"><label for="inDir">Direction</label><input type="range" id="inDir" min="0" max="359" step="1"><span class="v" id="vDir"></span></div>
+      <div class="row" id="rowArc"><label for="inArc">Spray arc</label><input type="range" id="inArc" step="1"><span class="v" id="vArc"></span></div>
+      <div class="row" id="rowR"><label for="inR">Throw</label><input type="range" id="inR" step="1"><span class="v" id="vR"></span></div>
     </div>
     <div class="actions">
       <div class="hint" id="hint"></div>
-      <span id="pActs" style="display:none;gap:6px"><button class="btn ghost small" id="pYard">Another yard</button><button class="btn ghost small" id="pBot">Bot layout</button><button class="btn ghost small" id="pToday">Today's result</button></span>
+      <span id="pActs" style="display:none;gap:6px;flex-wrap:wrap"><button class="btn ghost small" id="pYard">Another yard</button><button class="btn ghost small" id="pBot">Bot layout</button><button class="btn ghost small" id="pToday">Today's result</button></span>
       <button class="btn primary" id="runBtn" disabled>Run sprinklers 💧</button>
     </div>
   </div>
@@ -111,7 +140,7 @@ input[type=range]{width:100%;accent-color:var(--water)}
     <div class="actions" id="rActs"></div>
   </div>
 </div>
-<div id="modal"><div class="mbox" id="mbox"></div></div>
+<div id="modal"><div class="mbox" id="mbox" role="dialog" aria-modal="true"></div></div>
 <script>
 // ===== Dry Run core: yards, geometry, coverage, scoring =====
 var DR = (function () {
@@ -129,73 +158,388 @@ var DR = (function () {
     dog:     { label: 'the dog',     max: 10, icon: '🐕' },
     window:  { label: 'a window',    max: 10, icon: '🪟' },
     grill:   { label: 'the grill',   max: 8,  icon: '🔥' },
-    chair:   { label: 'the lounger', max: 8,  icon: '🪑' }
+    chair:   { label: 'the lounger', max: 8,  icon: '🪑' },
+    car:     { label: 'the car',     max: 8,  icon: '🚗' },
+    sandbox: { label: 'the sandbox', max: 10, icon: '🪣' },
+    bikes:   { label: 'the bikes',   max: 6,  icon: '🚲' },
+    table:   { label: 'the picnic table', max: 8, icon: '🍽️' }
   };
   var GRACE = 0.05; // a splash under 5% of an object is free
+  // v2 rules. graded: a spray is lighter toward its edge (real nozzles throw less water at the end of the stream),
+  // so a cell needs the edges of two sprays (head-to-head) or the strong inner part of one to count fully.
+  // waste: water thrown onto paving or into the street is wasted and costs a little.
+  var RULES = { graded: true, waste: true, knee: 0.55, edge: 0.4, wf: 1, free: 0.5, cap: 12 };
+  if (typeof DR_RULES !== 'undefined') for (var rk in DR_RULES) RULES[rk] = DR_RULES[rk];
+  function dose(f) { if (!RULES.graded || f <= RULES.knee) return 1; return 1 - (1 - RULES.edge) * Math.min(1, (f - RULES.knee) / (1 - RULES.knee)); }
+  function credit(w) { return RULES.graded ? (w >= 0.999 ? 1 : w) : (w > 0 ? 1 : 0); }
 
   // ---------- yards (rect = [x,y,w,h], circle = [x,y,r]) ----------
   var YARDS = [
-    { name: 'The L',
-      bounds: [10, 10, 620, 420],
-      house: [[10, 10, 350, 110]],
-      patio: [[10, 120, 350, 140]],
-      lawn: [[360, 10, 270, 420], [10, 260, 350, 145]],
-      beds: [[470, 10, 160, 45]],
-      shrubs: [[383, 36, 18]],
-      fences: [],
-      sens: [{ kind: 'window', rect: [140, 120, 70, 7] },
-             { kind: 'laundry', rect: [80, 410, 140, 15] },
-             { kind: 'dog', circle: [588, 250, 20] }],
-      kit: ['fan', 'fan', 'circle'] },
-    { name: 'Back Deck',
-      bounds: [10, 10, 620, 420],
-      house: [[10, 330, 620, 100]],
-      patio: [[200, 255, 240, 75]],
-      lawn: [[10, 10, 620, 245], [10, 255, 190, 75], [440, 255, 190, 75]],
-      beds: [[320, 120, 38]],
-      shrubs: [[60, 55, 18], [580, 55, 18]],
-      fences: [],
-      sens: [{ kind: 'grill', rect: [398, 268, 30, 26] },
-             { kind: 'chair', rect: [216, 268, 44, 30] },
-             { kind: 'window', rect: [90, 323, 70, 7] },
-             { kind: 'window', rect: [480, 323, 70, 7] }],
-      kit: ['rotor', 'fan', 'fan', 'fan'] },
-    { name: 'Dog Run',
-      bounds: [10, 10, 620, 420],
-      house: [[10, 10, 620, 100]],
-      patio: [[250, 110, 140, 60]],
-      lawn: [[10, 110, 620, 290], [200, 400, 430, 30]],
-      beds: [],
-      shrubs: [[40, 140, 16], [600, 140, 16]],
-      fences: [[320, 210, 320, 430]],
-      sens: [{ kind: 'laundry', rect: [30, 410, 150, 15] },
-             { kind: 'dog', circle: [500, 360, 22] }],
-      kit: ['fan', 'fan', 'fan'] },
-    { name: 'Courtyard',
-      bounds: [10, 10, 620, 420],
-      house: [[10, 10, 620, 90], [10, 100, 120, 140], [510, 100, 120, 140]],
-      patio: [[250, 100, 140, 50]],
-      lawn: [[130, 100, 380, 330], [10, 240, 120, 190], [510, 240, 120, 190]],
-      beds: [[320, 345, 30]],
-      shrubs: [[150, 120, 14], [490, 120, 14]],
-      fences: [],
-      sens: [{ kind: 'window', rect: [130, 150, 7, 60] },
-             { kind: 'window', rect: [503, 150, 7, 60] },
-             { kind: 'grill', rect: [300, 108, 30, 26] }],
-      kit: ['circle', 'fan', 'fan'] },
-    { name: 'Garden Path',
-      bounds: [10, 10, 620, 420],
-      house: [[480, 10, 150, 420]],
-      patio: [[10, 200, 470, 40], [370, 40, 80, 76]],
-      lawn: [[10, 10, 470, 190], [10, 240, 470, 190]],
-      beds: [],
-      shrubs: [[32, 32, 15], [32, 408, 15]],
-      fences: [],
-      sens: [{ kind: 'laundry', rect: [60, 206, 150, 15] },
-             { kind: 'chair', rect: [388, 60, 44, 36] },
-             { kind: 'window', rect: [473, 290, 7, 70] }],
-      kit: ['fan', 'fan', 'fan', 'circle'] }
+      { name: 'The L',
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 350, 110]],
+        patio: [[10, 120, 350, 140]],
+        lawn: [[360, 10, 270, 420], [10, 260, 350, 145]],
+        beds: [[470, 10, 160, 45]],
+        shrubs: [[383, 36, 18]],
+        fences: [],
+        sens: [{ kind: 'window', rect: [140, 120, 70, 7] },
+               { kind: 'laundry', rect: [80, 410, 140, 15] },
+               { kind: 'dog', circle: [588, 250, 20] }],
+        kit: ['fan', 'fan', 'circle'] },
+      { name: 'Back Deck',
+        bounds: [10, 10, 620, 420],
+        house: [[10, 330, 620, 100]],
+        patio: [[200, 255, 240, 75]],
+        lawn: [[10, 10, 620, 245], [10, 255, 190, 75], [440, 255, 190, 75]],
+        beds: [[320, 120, 38]],
+        shrubs: [[60, 55, 18], [580, 55, 18]],
+        fences: [],
+        sens: [{ kind: 'grill', rect: [398, 268, 30, 26] },
+               { kind: 'chair', rect: [216, 268, 44, 30] },
+               { kind: 'window', rect: [90, 323, 70, 7] },
+               { kind: 'window', rect: [480, 323, 70, 7] }],
+        kit: ['rotor', 'fan', 'fan', 'fan'] },
+      { name: 'Dog Run',
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 100]],
+        patio: [[250, 110, 140, 60]],
+        lawn: [[10, 110, 620, 290], [200, 400, 430, 30]],
+        beds: [],
+        shrubs: [[40, 140, 16], [600, 140, 16]],
+        fences: [[320, 210, 320, 430]],
+        sens: [{ kind: 'laundry', rect: [30, 410, 150, 15] },
+               { kind: 'dog', circle: [500, 360, 22] }],
+        kit: ['fan', 'fan', 'fan'] },
+      { name: 'Courtyard',
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 90], [10, 100, 120, 140], [510, 100, 120, 140]],
+        patio: [[250, 100, 140, 50]],
+        lawn: [[130, 100, 380, 330], [10, 240, 120, 190], [510, 240, 120, 190]],
+        beds: [[320, 345, 30]],
+        shrubs: [[150, 120, 14], [490, 120, 14]],
+        fences: [],
+        sens: [{ kind: 'window', rect: [130, 150, 7, 60] },
+               { kind: 'window', rect: [503, 150, 7, 60] },
+               { kind: 'grill', rect: [300, 108, 30, 26] }],
+        kit: ['circle', 'fan', 'fan'] },
+      { name: 'Garden Path',
+        bounds: [10, 10, 620, 420],
+        house: [[480, 10, 150, 420]],
+        patio: [[10, 200, 470, 40], [370, 40, 80, 76]],
+        lawn: [[10, 10, 470, 190], [10, 240, 470, 190]],
+        beds: [],
+        shrubs: [[32, 32, 15], [32, 408, 15]],
+        fences: [],
+        sens: [{ kind: 'laundry', rect: [60, 206, 150, 15] },
+               { kind: 'chair', rect: [388, 60, 44, 36] },
+               { kind: 'window', rect: [473, 290, 7, 70] }],
+        kit: ['fan', 'fan', 'fan', 'circle'] },
+      // ---- added Nov 2026 ----
+      { name: 'Front Walk', // front yard: porch walk to the sidewalk, car in the driveway
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 90]],
+        patio: [[240, 100, 130, 40], [290, 140, 40, 240]],
+        drive: [[490, 100, 140, 330], [10, 380, 480, 50]],
+        lawn: [[10, 100, 480, 280]],
+        beds: [[10, 100, 230, 30]],
+        shrubs: [[36, 115, 13], [214, 115, 13]],
+        fences: [],
+        open: ['s'], // sidewalk then the street: no fence
+        sens: [{ kind: 'window', rect: [90, 100, 70, 7] },
+               { kind: 'window', rect: [400, 100, 60, 7] },
+               { kind: 'bikes', rect: [425, 330, 54, 30] },
+               { kind: 'car', rect: [527, 170, 66, 140] }],
+        kit: ['fan', 'fan', 'fan'] },
+      { name: 'Park Strip', // lawn between sidewalk and curb, driveway down the side
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 100]],
+        patio: [],
+        drive: [[10, 110, 120, 320], [130, 340, 500, 30]],
+        lawn: [[130, 110, 500, 230], [130, 370, 500, 60]],
+        beds: [],
+        shrubs: [[600, 140, 16]],
+        fences: [],
+        open: ['s'], // park strip runs to the curb
+        sens: [{ kind: 'car', rect: [38, 160, 64, 140] },
+               { kind: 'bikes', rect: [140, 118, 50, 30] },
+               { kind: 'window', rect: [330, 110, 70, 7] }],
+        kit: ['rotor', 'fan', 'fan'] },
+      { name: 'Side Yard', // narrow side yard with the clothesline, back lawn behind the house
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 480, 240]],
+        patio: [[150, 250, 200, 60]],
+        lawn: [[490, 10, 140, 240], [10, 250, 620, 180]],
+        beds: [],
+        shrubs: [[40, 400, 16]],
+        fences: [],
+        sens: [{ kind: 'laundry', rect: [600, 40, 15, 150] },
+               { kind: 'window', rect: [490, 150, 7, 60] },
+               { kind: 'grill', rect: [306, 262, 30, 26] }],
+        kit: ['fan', 'fan', 'rotor', 'fan'] },
+      { name: 'Sandbox',
+        bounds: [10, 10, 620, 420],
+        house: [[10, 340, 620, 90]],
+        patio: [[10, 270, 220, 70]],
+        lawn: [[10, 10, 620, 330]],
+        beds: [[230, 10, 400, 32]],
+        shrubs: [[40, 40, 20]],
+        fences: [],
+        sens: [{ kind: 'sandbox', rect: [480, 70, 70, 70] },
+               { kind: 'table', rect: [130, 120, 60, 46] },
+               { kind: 'window', rect: [420, 333, 70, 7] }],
+        kit: ['fan', 'fan', 'fan', 'circle'] },
+      { name: 'Big Trees', // three shade trees throw dry shadows
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 200, 140]],
+        patio: [[10, 150, 140, 80]],
+        lawn: [[210, 10, 420, 420], [10, 150, 200, 280]],
+        beds: [],
+        shrubs: [[340, 160, 26], [170, 330, 24], [500, 320, 28]],
+        fences: [],
+        sens: [{ kind: 'chair', rect: [30, 170, 44, 30] },
+               { kind: 'window', rect: [210, 50, 7, 60] }],
+        kit: ['rotor', 'circle', 'fan'] },
+      { name: 'Raised Beds', // vegetable garden on gravel, lawn wraps around it
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 90]],
+        patio: [[230, 100, 180, 50]],
+        lawn: [[10, 100, 620, 90], [10, 190, 330, 240], [340, 370, 290, 60], [590, 190, 40, 180]],
+        beds: [[360, 205, 95, 65], [480, 205, 95, 65], [360, 290, 95, 65], [480, 290, 95, 65]],
+        shrubs: [],
+        fences: [],
+        sens: [{ kind: 'table', rect: [150, 270, 60, 46] },
+               { kind: 'window', rect: [80, 100, 70, 7] }],
+        kit: ['fan', 'fan', 'fan', 'circle'] },
+      { name: 'Townhouse', // narrow lot, small lawn
+        bounds: [160, 10, 320, 420],
+        house: [[160, 10, 320, 110]],
+        patio: [[160, 120, 320, 70]],
+        lawn: [[160, 190, 320, 240]],
+        beds: [[160, 400, 320, 30]],
+        shrubs: [],
+        fences: [],
+        sens: [{ kind: 'chair', rect: [182, 138, 44, 30] },
+               { kind: 'bikes', rect: [440, 240, 30, 60] }],
+        kit: ['fan', 'fan'] },
+      { name: 'Duplex', // a fence splits two back yards
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 100]],
+        patio: [[60, 110, 120, 50], [460, 110, 120, 50]],
+        lawn: [[10, 110, 310, 320], [320, 110, 310, 320]],
+        beds: [],
+        shrubs: [],
+        fences: [[320, 110, 320, 430]],
+        sens: [{ kind: 'dog', circle: [210, 330, 20] },
+               { kind: 'laundry', rect: [400, 400, 150, 15] }],
+        kit: ['fan', 'fan', 'fan', 'fan'] },
+      { name: 'Ranch', // wide, shallow back yard
+        bounds: [10, 90, 620, 340],
+        house: [[10, 340, 620, 90]],
+        patio: [[250, 270, 140, 70]],
+        lawn: [[10, 90, 620, 250]],
+        beds: [],
+        shrubs: [[40, 120, 16]],
+        fences: [],
+        sens: [{ kind: 'window', rect: [100, 333, 70, 7] },
+               { kind: 'window', rect: [460, 333, 70, 7] },
+               { kind: 'grill', rect: [352, 282, 28, 26] }],
+        kit: ['rotor', 'fan', 'fan'] },
+      { name: 'Driveway Split', // front yard with the driveway down the middle
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 110]],
+        patio: [[130, 120, 34, 80]],
+        drive: [[250, 120, 140, 310]],
+        lawn: [[10, 120, 240, 310], [390, 120, 240, 310]],
+        beds: [],
+        shrubs: [[40, 400, 15]],
+        fences: [],
+        open: ['s'],
+        sens: [{ kind: 'car', rect: [287, 150, 66, 140] },
+               { kind: 'bikes', rect: [400, 130, 50, 30] }],
+        kit: ['fan', 'fan', 'fan'] },
+      { name: 'Picnic Lawn', // picnic table right in the middle
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 120, 420]],
+        patio: [[130, 150, 80, 140]],
+        lawn: [[130, 10, 500, 420]],
+        beds: [],
+        shrubs: [[600, 40, 18], [600, 400, 18]],
+        fences: [],
+        sens: [{ kind: 'table', rect: [380, 195, 64, 50] },
+               { kind: 'window', rect: [130, 60, 7, 60] }],
+        kit: ['rotor', 'fan', 'fan'] },
+      { name: 'Laundry Day',
+        bounds: [10, 10, 620, 420],
+        house: [[330, 10, 300, 130]],
+        patio: [[330, 140, 120, 70]],
+        lawn: [[10, 50, 320, 380], [330, 140, 300, 290]],
+        beds: [[10, 10, 320, 40]],
+        shrubs: [],
+        fences: [],
+        sens: [{ kind: 'laundry', rect: [90, 200, 15, 160] },
+               { kind: 'dog', circle: [530, 370, 20] }],
+        kit: ['fan', 'fan', 'circle', 'fan'] },
+      { name: 'Side Gate', // fence across the yard with a gate gap
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 260, 150]],
+        patio: [],
+        lawn: [[270, 10, 360, 210], [10, 160, 260, 60], [10, 220, 620, 210]],
+        beds: [],
+        shrubs: [[600, 40, 16]],
+        fences: [[10, 220, 250, 220], [310, 220, 630, 220]],
+        sens: [{ kind: 'window', rect: [270, 50, 7, 60] },
+               { kind: 'sandbox', rect: [500, 330, 64, 64] }],
+        kit: ['fan', 'fan', 'fan', 'rotor'] },
+      { name: 'Patio Island', // detached patio out in the lawn
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 80]],
+        patio: [[240, 200, 160, 120], [300, 90, 40, 110]],
+        lawn: [[10, 90, 620, 340]],
+        beds: [],
+        shrubs: [[40, 400, 16], [600, 400, 16]],
+        fences: [],
+        sens: [{ kind: 'chair', rect: [258, 214, 44, 30] },
+               { kind: 'grill', rect: [360, 282, 28, 26] },
+               { kind: 'window', rect: [120, 90, 70, 7] },
+               { kind: 'window', rect: [450, 90, 70, 7] }],
+        kit: ['fan', 'fan', 'fan', 'fan'] },
+      { name: 'Detached Garage',
+        bounds: [10, 10, 620, 420],
+        house: [[250, 330, 380, 100], [10, 10, 180, 170]],
+        patio: [],
+        drive: [[10, 180, 150, 250]],
+        lawn: [[190, 10, 440, 320], [160, 180, 90, 250]],
+        beds: [],
+        shrubs: [[600, 40, 16]],
+        fences: [],
+        open: ['s'], // driveway out to the street
+        sens: [{ kind: 'car', rect: [44, 240, 66, 140] },
+               { kind: 'laundry', rect: [330, 25, 150, 15] },
+               { kind: 'window', rect: [400, 323, 70, 7] }],
+        kit: ['rotor', 'fan', 'fan'] },
+      { name: 'Kid Zone',
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 160, 420]],
+        patio: [[170, 40, 120, 120]],
+        lawn: [[170, 10, 460, 420]],
+        beds: [],
+        shrubs: [[600, 40, 18]],
+        fences: [],
+        sens: [{ kind: 'sandbox', rect: [500, 290, 76, 76] },
+               { kind: 'bikes', rect: [190, 380, 60, 34] }],
+        kit: ['rotor', 'fan', 'circle'] },
+      { name: 'Island Beds', // round island beds with a tree in each
+        bounds: [10, 10, 620, 420],
+        house: [[10, 350, 620, 80]],
+        patio: [[400, 280, 200, 70]],
+        lawn: [[10, 10, 620, 340]],
+        beds: [[180, 150, 55], [470, 110, 45]],
+        shrubs: [[180, 150, 22], [470, 110, 18]],
+        fences: [],
+        sens: [{ kind: 'chair', rect: [420, 296, 44, 30] },
+               { kind: 'window', rect: [80, 343, 70, 7] }],
+        kit: ['fan', 'fan', 'circle'] },
+      { name: 'Zero Lot', // house built right on the side property line
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 200, 420]],
+        patio: [[210, 150, 90, 140]],
+        lawn: [[210, 10, 420, 420]],
+        beds: [],
+        shrubs: [[600, 400, 16]],
+        fences: [],
+        sens: [{ kind: 'grill', rect: [226, 160, 28, 26] },
+               { kind: 'window', rect: [210, 50, 7, 60] },
+               { kind: 'window', rect: [210, 320, 7, 60] },
+               { kind: 'dog', circle: [560, 70, 20] }],
+        kit: ['rotor', 'fan', 'fan'] },
+      { name: 'Deep Lot', // long lawn with a shed at the back
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 160, 100], [540, 340, 90, 90]],
+        patio: [[170, 10, 120, 100]],
+        lawn: [[10, 110, 620, 320], [290, 10, 340, 100]],
+        beds: [],
+        shrubs: [[40, 140, 16], [340, 250, 26]],
+        fences: [],
+        sens: [{ kind: 'laundry', rect: [200, 410, 150, 15] },
+               { kind: 'window', rect: [70, 110, 60, 7] },
+               { kind: 'window', rect: [533, 360, 7, 50] }],
+        kit: ['rotor', 'fan', 'fan'] },
+      { name: 'Bay Window', // the bay sticks out into the lawn with glass on three sides
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 110], [250, 120, 140, 50]],
+        patio: [],
+        lawn: [[10, 120, 620, 310]],
+        beds: [[10, 120, 200, 30]],
+        shrubs: [[40, 400, 16]],
+        fences: [],
+        sens: [{ kind: 'window', rect: [270, 170, 100, 7] },
+               { kind: 'window', rect: [243, 128, 7, 34] },
+               { kind: 'window', rect: [390, 128, 7, 34] }],
+        kit: ['fan', 'fan', 'circle'] },
+      { name: 'Hedge Row', // a row of shrubs splits the lawn
+        bounds: [10, 10, 620, 420],
+        house: [[10, 360, 620, 70]],
+        patio: [[240, 300, 160, 60]],
+        lawn: [[10, 10, 620, 350]],
+        beds: [[40, 182, 210, 36], [390, 182, 210, 36]],
+        shrubs: [[70, 200, 16], [130, 200, 16], [190, 200, 16], [450, 200, 16], [510, 200, 16], [570, 200, 16]],
+        fences: [],
+        sens: [{ kind: 'chair', rect: [256, 314, 44, 30] },
+               { kind: 'bikes', rect: [560, 40, 50, 30] }],
+        kit: ['fan', 'fan', 'fan', 'fan'] },
+      { name: 'Alley Garage', // garage off the back alley, car on the apron
+        bounds: [10, 10, 620, 420],
+        house: [[380, 10, 250, 140], [10, 350, 400, 80]],
+        patio: [[10, 280, 180, 70]],
+        drive: [[380, 150, 250, 60]],
+        lawn: [[10, 10, 370, 340], [380, 210, 250, 220]],
+        beds: [],
+        shrubs: [[600, 400, 16]],
+        fences: [],
+        sens: [{ kind: 'car', rect: [470, 160, 140, 60] },
+               { kind: 'laundry', rect: [60, 30, 150, 15] }],
+        kit: ['fan', 'fan', 'rotor', 'fan'] },
+      { name: 'Stepping Stones',
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 250, 140]],
+        patio: [[262, 150, 30, 30], [306, 196, 30, 30], [350, 242, 30, 30], [394, 288, 30, 30], [438, 334, 30, 30]],
+        lawn: [[260, 10, 370, 420], [10, 150, 250, 280]],
+        beds: [],
+        shrubs: [[600, 40, 16]],
+        fences: [],
+        sens: [{ kind: 'table', rect: [450, 80, 60, 46] },
+               { kind: 'dog', circle: [110, 360, 20] }],
+        kit: ['rotor', 'fan', 'circle'] },
+      { name: 'Corner Lot',
+        bounds: [10, 10, 620, 420],
+        house: [[380, 250, 250, 180]],
+        patio: [],
+        drive: [[510, 10, 120, 240]],
+        lawn: [[10, 10, 500, 240], [10, 250, 370, 180]],
+        beds: [],
+        shrubs: [[170, 130, 28]],
+        fences: [],
+        open: ['n', 'w'], // streets on two sides
+        sens: [{ kind: 'car', rect: [537, 50, 66, 140] },
+               { kind: 'sandbox', rect: [60, 330, 64, 64] },
+               { kind: 'window', rect: [373, 300, 7, 60] }],
+        kit: ['rotor', 'fan', 'circle'] },
+      { name: 'Dog Corner', // angled fence pens the dog into the far corner
+        bounds: [10, 10, 620, 420],
+        house: [[10, 10, 620, 100]],
+        patio: [[60, 110, 180, 70]],
+        lawn: [[10, 110, 620, 320]],
+        beds: [],
+        shrubs: [[600, 140, 16]],
+        fences: [[400, 430, 630, 250]],
+        sens: [{ kind: 'dog', circle: [570, 380, 20] },
+               { kind: 'chair', rect: [80, 124, 44, 30] }],
+        kit: ['fan', 'fan', 'fan', 'circle'] }
   ];
+
+  // daily order of base yards (gentle ramp through week 1); see variantFor() for mirrors
+  var ORDER = [11,  6,  25,  24,  9,  15,  0,  5,  2,  3,  7,  8,  1,  12,  14,  10,  16,  18,  19,  20,  22,  4,  28,  13,  17,  21,  26,  27,  23,  29];
 
   function mirrorRect(r) { return [W - r[0] - r[2], r[1], r[2], r[3]]; }
   function mirrorShape(s) { return s.length === 3 ? [W - s[0], s[1], s[2]] : mirrorRect(s); }
@@ -203,13 +547,16 @@ var DR = (function () {
     var y = JSON.parse(JSON.stringify(YARDS[i]));
     y.sens = y.sens.filter(function (s) { return !s.skip; });
     if (mirror) {
-      ['house', 'patio', 'lawn', 'beds'].forEach(function (k) { y[k] = y[k].map(mirrorShape); });
+      ['house', 'patio', 'lawn', 'beds', 'drive'].forEach(function (k) { if (y[k]) y[k] = y[k].map(mirrorShape); });
       y.shrubs = y.shrubs.map(mirrorShape);
       y.fences = y.fences.map(function (f) { return [W - f[0], f[1], W - f[2], f[3]]; });
+      if (y.open) y.open = y.open.map(function (o) { return o === 'e' ? 'w' : o === 'w' ? 'e' : o; });
       y.sens.forEach(function (s) { if (s.rect) s.rect = mirrorRect(s.rect); if (s.circle) s.circle = mirrorShape(s.circle); });
       y.bounds = mirrorRect(y.bounds);
     }
     y.id = i + (mirror ? 'm' : '');
+    // driveways/sidewalks are drawn as concrete but behave exactly like patio (hard, not scored)
+    y.drive = y.drive || []; y.patio = y.patio.concat(y.drive);
     return build(y);
   }
 
@@ -224,7 +571,9 @@ var DR = (function () {
   }
 
   function build(y) {
-    y.segs = rectSegs(y.bounds);
+    y.open = y.open || [];
+    // rectSegs order: n, e, s, w -- open sides (street) get no fence
+    y.segs = rectSegs(y.bounds).filter(function (s, k) { return y.open.indexOf('nesw'[k]) < 0; });
     y.fenceSegs = y.segs.slice().concat(y.fences);
     y.house.forEach(function (h) { y.segs = y.segs.concat(rectSegs(h)); });
     y.segs = y.segs.concat(y.fences);
@@ -318,7 +667,7 @@ var DR = (function () {
 
   // coverage of one sprinkler: {cells:[idx], frac:[0..1]}
   function cover(y, sp) {
-    var cells = [], frac = [], r = sp.r, r2 = r * r;
+    var cells = [], frac = [], dist = [], r = sp.r, r2 = r * r;
     var gx0 = Math.max(0, Math.floor((sp.x - r) / CELL)), gx1 = Math.min(GW - 1, Math.floor((sp.x + r) / CELL));
     var gy0 = Math.max(0, Math.floor((sp.y - r) / CELL)), gy1 = Math.min(GH - 1, Math.floor((sp.y + r) / CELL));
     for (var gy = gy0; gy <= gy1; gy++) for (var gx = gx0; gx <= gx1; gx++) {
@@ -327,9 +676,9 @@ var DR = (function () {
       var dx = x - sp.x, dy = yy - sp.y; if (dx * dx + dy * dy > r2) continue;
       var f = arcFrac(sp, Math.atan2(dy, dx)); if (f < 0) continue;
       if (!los(y, sp.x, sp.y, x, yy)) continue;
-      cells.push(i); frac.push(f);
+      cells.push(i); frac.push(f); dist.push(Math.sqrt(dx * dx + dy * dy) / r);
     }
-    return { cells: cells, frac: frac };
+    return { cells: cells, frac: frac, dist: dist };
   }
 
   function reachPoly(y, sp, step) {
@@ -343,6 +692,31 @@ var DR = (function () {
     return pts;
   }
 
+  // area (in 4x4 cells) a head throws past an open edge into the street
+  function streetWaste(y, sp) {
+    if (!RULES.waste || !y.open.length) return 0;
+    var b = y.bounds, step = D2R, n = Math.max(1, Math.round(sp.arc / step)), dA = sp.arc / n, a0 = arcStart(sp), area = 0;
+    for (var k = 0; k < n; k++) {
+      var a = a0 + (k + 0.5) * dA, dx = Math.cos(a), dy = Math.sin(a), te = Infinity;
+      for (var o = 0; o < y.open.length; o++) {
+        var e = y.open[o], t = Infinity;
+        if (e === 's' && dy > 1e-9) t = (b[1] + b[3] - sp.y) / dy;
+        else if (e === 'n' && dy < -1e-9) t = (b[1] - sp.y) / dy;
+        else if (e === 'e' && dx > 1e-9) t = (b[0] + b[2] - sp.x) / dx;
+        else if (e === 'w' && dx < -1e-9) t = (b[0] - sp.x) / dx;
+        if (t > 0 && t < te) te = t;
+      }
+      if (te >= sp.r) continue;
+      var d = rayHit(y, sp.x, sp.y, a, sp.r);
+      if (d > te + 1e-6) area += 0.5 * (d * d - te * te) * dA;
+    }
+    return area / (CELL * CELL);
+  }
+  function wastePts(y, pave, street) {
+    if (!RULES.waste) return 0;
+    var pct = 100 * (pave + street) / y.total;
+    return Math.min(RULES.cap, Math.max(0, Math.round((pct - RULES.free) * RULES.wf)));
+  }
   function evaluate(y, sps) {
     var wet = new Uint8Array(GW * GH), covers = sps.map(function (s) { return cover(y, s); });
     var sensBy = y.sens.map(function () { return sps.map(function () { return 0; }); });
@@ -354,9 +728,17 @@ var DR = (function () {
         if (!wet[i]) { wet[i] = 1; if (sId >= 0) sensWet[sId]++; }
       }
     });
-    var cov = 0; for (var i = 0; i < wet.length; i++) if (wet[i] && y.target[i]) cov++;
+    var water = new Float32Array(GW * GH);
+    covers.forEach(function (c) { for (var k = 0; k < c.cells.length; k++) water[c.cells[k]] += dose(c.dist[k]); });
+    var cov = 0, full = 0, light = 0, pave = 0;
+    for (var i = 0; i < wet.length; i++) {
+      if (y.target[i] && wet[i]) { var cr = credit(water[i]); cov += cr; if (cr >= 1) full++; else light++; }
+      if (wet[i] && y.type[i] === T.PATIO) pave++;
+    }
+    var street = 0; sps.forEach(function (s) { street += streetWaste(y, s); });
+    var waste = wastePts(y, pave, street);
     var covPct = 100 * cov / y.total, covPts = Math.round(covPct);
-    if (covPts === 100 && cov < y.total) covPts = 99;
+    if (covPts === 100 && full < y.total) covPts = 99;
     var pens = [], penTotal = 0;
     y.sens.forEach(function (s, k) {
       var fr = sensWet[k] / Math.max(1, y.sensCount[k]); if (!sensWet[k]) return;
@@ -365,10 +747,28 @@ var DR = (function () {
       var by = 0; sensBy[k].forEach(function (v, si) { if (v > sensBy[k][by]) by = si; });
       pens.push({ id: k, kind: s.kind, frac: fr, pts: pts, by: by }); penTotal += pts;
     });
-    var total = Math.max(0, covPts - penTotal);
-    return { wet: wet, covers: covers, cov: cov, covPct: covPct, covPts: covPts, pens: pens, penTotal: penTotal, score: total };
+    var total = Math.max(0, covPts - penTotal - waste);
+    return { wet: wet, water: water, covers: covers, cov: cov, covPct: covPct, covPts: covPts, pens: pens, penTotal: penTotal,
+      light: light, pave: pave, street: street, waste: waste, extra: waste, score: total };
   }
 
+  // starting nozzle when a head is dropped: full circle out in the open, a half circle spraying in when it sits
+  // against a wall/fence/house edge, a quarter circle in a corner (how an installer would set it)
+  function smartDefault(y, sp) {
+    var k = KIT[sp.kind]; if (k.arcMin === k.arcMax) return sp;
+    var near = [], NEAR = 45;
+    y.segs.forEach(function (s) {
+      var d = segDist(sp.x, sp.y, s); if (d > NEAR) return;
+      var dx = s[2] - s[0], dy = s[3] - s[1], L = Math.hypot(dx, dy) || 1, t = Math.max(0, Math.min(1, ((sp.x - s[0]) * dx + (sp.y - s[1]) * dy) / (L * L)));
+      var px = sp.x - (s[0] + t * dx), py = sp.y - (s[1] + t * dy), pl = Math.hypot(px, py) || 1;
+      var a = Math.atan2(py / pl, px / pl), dup = near.some(function (q) { return Math.abs(Math.atan2(Math.sin(q - a), Math.cos(q - a))) < 0.3; });
+      if (!dup) near.push(a);
+    });
+    if (!near.length) { sp.arc = TAU; }
+    else if (near.length === 1) { sp.dir = near[0]; sp.arc = Math.PI; }
+    else { var vx = 0, vy = 0; near.forEach(function (a) { vx += Math.cos(a); vy += Math.sin(a); }); sp.dir = Math.atan2(vy, vx); sp.arc = Math.PI / 2; }
+    return clampSp(sp);
+  }
   function makeSprinkler(kind, x, y, dir) {
     var k = KIT[kind];
     return { kind: kind, x: x, y: y, dir: dir || 0, arc: k.arc0 * D2R, r: k.r0 };
@@ -380,14 +780,16 @@ var DR = (function () {
     return sp;
   }
 
-  return { W: W, H: H, CELL: CELL, GW: GW, GH: GH, T: T, KIT: KIT, SENS: SENS, YARDS: YARDS, GRACE: GRACE,
+  return { W: W, H: H, CELL: CELL, GW: GW, GH: GH, T: T, KIT: KIT, SENS: SENS, YARDS: YARDS, ORDER: ORDER, GRACE: GRACE,
     D2R: D2R, TAU: TAU, variant: variant, canPlace: canPlace, cover: cover, evaluate: evaluate, reachPoly: reachPoly,
-    rayHit: rayHit, arcStart: arcStart, arcFrac: arcFrac, makeSprinkler: makeSprinkler, clampSp: clampSp, classify: classify,
+    rayHit: rayHit, arcStart: arcStart, smartDefault: smartDefault, RULES: RULES, dose: dose, credit: credit, streetWaste: streetWaste, wastePts: wastePts, arcFrac: arcFrac, makeSprinkler: makeSprinkler, clampSp: clampSp, classify: classify,
     inShape: inShape };
 })();
 
 
-var PRO = [{"score":94,"sps":[{"kind":"fan","x":469.7,"y":77,"dir":4.7928,"arc":6.2832,"r":190},{"kind":"fan","x":182.4,"y":386.4,"dir":4.874,"arc":3.9141,"r":187},{"kind":"circle","x":481.9,"y":365.2,"dir":6.053,"arc":6.2832,"r":140}]},{"score":96,"sps":[{"kind":"rotor","x":520.1,"y":211.3,"dir":-1.1278,"arc":4.9048,"r":239},{"kind":"fan","x":94.3,"y":146.5,"dir":6.6593,"arc":6.1443,"r":177.6},{"kind":"fan","x":364.5,"y":141.9,"dir":3.482,"arc":3.3006,"r":165.6},{"kind":"fan","x":582.6,"y":290.4,"dir":3.4694,"arc":1.3282,"r":154.8}]},{"score":95,"sps":[{"kind":"fan","x":226.8,"y":277.3,"dir":0.0263,"arc":3.4387,"r":183.3},{"kind":"fan","x":496.6,"y":278.5,"dir":-1.5978,"arc":5.8031,"r":190},{"kind":"fan","x":127.6,"y":247,"dir":1.4889,"arc":6.2832,"r":161}]},{"score":97,"sps":[{"kind":"circle","x":332.4,"y":403.5,"dir":0.6489,"arc":6.2832,"r":140},{"kind":"fan","x":127.3,"y":259.5,"dir":14.5417,"arc":6.2832,"r":189.8},{"kind":"fan","x":504.5,"y":249.8,"dir":8.259,"arc":5.4574,"r":188.1}]},{"score":95,"sps":[{"kind":"fan","x":133.2,"y":410.9,"dir":-1.3001,"arc":5.958,"r":189.4},{"kind":"fan","x":297,"y":365.8,"dir":0.1491,"arc":6.0625,"r":174.3},{"kind":"fan","x":354.2,"y":84,"dir":3.0912,"arc":5.4916,"r":190},{"kind":"circle","x":126.2,"y":63.7,"dir":-1.5182,"arc":6.2832,"r":140}]}];
+// Groundskeeper bot best layouts under the v2 rules (graded water + wasted-water penalty), one per base yard.
+// Best of 3 annealing runs per yard plus a polish pass from the v1 layouts (playtest/drybots.js).
+var PRO = [{"score":81,"sps":[{"kind":"fan","x":491.64,"y":320.59,"dir":2.5198,"arc":5.9873,"r":190},{"kind":"fan","x":182.31,"y":404.21,"dir":4.8154,"arc":3.3888,"r":185.7},{"kind":"circle","x":493.51,"y":110.77,"dir":8.0011,"arc":6.2832,"r":140}]},{"score":94,"sps":[{"kind":"rotor","x":277.43,"y":249.48,"dir":4.5756,"arc":3.6458,"r":290},{"kind":"fan","x":83.09,"y":133.85,"dir":-3.4393,"arc":6.2832,"r":190},{"kind":"fan","x":605.09,"y":148.07,"dir":-5.8611,"arc":6.2832,"r":186.2},{"kind":"fan","x":441.08,"y":23.07,"dir":6.7091,"arc":6.2832,"r":190}]},{"score":83,"sps":[{"kind":"fan","x":485.57,"y":291.11,"dir":10.8029,"arc":5.7365,"r":190},{"kind":"fan","x":286.74,"y":319.51,"dir":0.8341,"arc":6.2832,"r":149.1},{"kind":"fan","x":91.55,"y":219.82,"dir":-1,"arc":6.2832,"r":190}]},{"score":88,"sps":[{"kind":"circle","x":550.14,"y":337.97,"dir":4.0445,"arc":6.2832,"r":140},{"kind":"fan","x":125.39,"y":276.8,"dir":7.9906,"arc":6.2832,"r":190},{"kind":"fan","x":355.25,"y":328.49,"dir":7.2934,"arc":6.2832,"r":190}]},{"score":80,"sps":[{"kind":"fan","x":82.93,"y":264.46,"dir":2.054,"arc":4.6137,"r":190},{"kind":"fan","x":315.9,"y":367.15,"dir":6.6837,"arc":6.2832,"r":158.5},{"kind":"fan","x":377.37,"y":125.32,"dir":2.2001,"arc":5.0403,"r":190},{"kind":"circle","x":129.28,"y":65.92,"dir":5.3148,"arc":6.2832,"r":140}]},{"score":82,"sps":[{"kind":"fan","x":95.81,"y":286.31,"dir":8.0295,"arc":6.2832,"r":180.1},{"kind":"fan","x":347.34,"y":134.64,"dir":2.7383,"arc":5.9979,"r":190},{"kind":"fan","x":342.06,"y":294.51,"dir":3.5479,"arc":5.9114,"r":190}]},{"score":83,"sps":[{"kind":"rotor","x":589.67,"y":300.87,"dir":9.2067,"arc":6.2741,"r":268.4},{"kind":"fan","x":289.63,"y":134.39,"dir":1.4234,"arc":3.2326,"r":190},{"kind":"fan","x":261.77,"y":367.76,"dir":-14.2348,"arc":6.2832,"r":190}]},{"score":91,"sps":[{"kind":"fan","x":581.21,"y":160.5,"dir":-2.19,"arc":1.633,"r":190},{"kind":"fan","x":479.76,"y":328.55,"dir":0.2754,"arc":5.9503,"r":190},{"kind":"rotor","x":136.06,"y":320.57,"dir":-10.0852,"arc":5.1239,"r":289.7},{"kind":"fan","x":512.72,"y":385.13,"dir":11.4425,"arc":6.089,"r":179.5}]},{"score":82,"sps":[{"kind":"fan","x":585.8,"y":143.82,"dir":0.541,"arc":5.3028,"r":190},{"kind":"fan","x":408.74,"y":304.41,"dir":-2.2907,"arc":5.3045,"r":190},{"kind":"fan","x":114.95,"y":96.86,"dir":4.2314,"arc":6.2832,"r":187.5},{"kind":"circle","x":341.84,"y":117.51,"dir":-1.4897,"arc":6.2832,"r":140}]},{"score":89,"sps":[{"kind":"rotor","x":496.88,"y":164.69,"dir":-4.3869,"arc":6.2832,"r":289.6},{"kind":"circle","x":94.12,"y":362.92,"dir":16.3708,"arc":6.2832,"r":140},{"kind":"fan","x":297.37,"y":286.56,"dir":12.9322,"arc":6.2832,"r":190}]},{"score":84,"sps":[{"kind":"fan","x":106.5,"y":296,"dir":-3.2391,"arc":5.3968,"r":190},{"kind":"fan","x":387.1,"y":369.58,"dir":1.3443,"arc":6.2135,"r":190},{"kind":"fan","x":548.64,"y":239.42,"dir":6.0067,"arc":5.092,"r":190},{"kind":"circle","x":283.67,"y":154.82,"dir":13.1782,"arc":6.2832,"r":140}]},{"score":86,"sps":[{"kind":"fan","x":402.55,"y":314.4,"dir":2.5269,"arc":5.5225,"r":129.8},{"kind":"fan","x":263.43,"y":372.4,"dir":2.4675,"arc":6.2764,"r":190}]},{"score":87,"sps":[{"kind":"fan","x":113.92,"y":345.62,"dir":2.6872,"arc":5.3638,"r":190},{"kind":"fan","x":475.68,"y":357.63,"dir":4.7626,"arc":4.2982,"r":190},{"kind":"fan","x":234.12,"y":273.91,"dir":5.1082,"arc":5.6635,"r":190},{"kind":"fan","x":482.9,"y":208.8,"dir":1.887,"arc":5.1455,"r":190}]},{"score":91,"sps":[{"kind":"rotor","x":382.61,"y":256.33,"dir":4.8227,"arc":3.903,"r":290},{"kind":"fan","x":584.51,"y":167.8,"dir":-8.0571,"arc":6.2832,"r":175.8},{"kind":"fan","x":71.44,"y":145.98,"dir":-4.1538,"arc":6.2832,"r":190}]},{"score":79,"sps":[{"kind":"fan","x":95.76,"y":251.13,"dir":3.1236,"arc":5.0259,"r":189.4},{"kind":"fan","x":552.73,"y":282.82,"dir":8.8415,"arc":6.2832,"r":167.8},{"kind":"fan","x":241.85,"y":244.41,"dir":3.1429,"arc":3.2741,"r":190}]},{"score":88,"sps":[{"kind":"rotor","x":437.85,"y":146.52,"dir":5.0881,"arc":5.3804,"r":290},{"kind":"fan","x":266.46,"y":396.41,"dir":0.0579,"arc":6.2832,"r":190},{"kind":"fan","x":496.01,"y":275.45,"dir":6.9003,"arc":5.6984,"r":190}]},{"score":85,"sps":[{"kind":"fan","x":518.1,"y":320,"dir":-1.7975,"arc":5.5975,"r":190},{"kind":"fan","x":85.7,"y":193.3,"dir":4.2141,"arc":5.3352,"r":190},{"kind":"circle","x":231.48,"y":397.58,"dir":-3.6682,"arc":6.2832,"r":140},{"kind":"fan","x":292.25,"y":214.71,"dir":2.61,"arc":5.386,"r":190}]},{"score":92,"sps":[{"kind":"fan","x":561,"y":322,"dir":5.3575,"arc":4.8743,"r":190},{"kind":"fan","x":465.18,"y":105.12,"dir":-0.6299,"arc":6.2832,"r":190},{"kind":"fan","x":160.76,"y":187.2,"dir":3.3307,"arc":6.2832,"r":190},{"kind":"rotor","x":211.56,"y":339.12,"dir":-6.6991,"arc":6.2832,"r":290}]},{"score":86,"sps":[{"kind":"fan","x":400.6,"y":321.49,"dir":7.0527,"arc":4.7903,"r":190},{"kind":"fan","x":594.72,"y":266.02,"dir":5.8906,"arc":6.2615,"r":190},{"kind":"fan","x":106.02,"y":109.58,"dir":1.83,"arc":4.0436,"r":189.7},{"kind":"fan","x":98.03,"y":363.5,"dir":10.9438,"arc":6.2654,"r":183.2}]},{"score":83,"sps":[{"kind":"rotor","x":417.97,"y":98.33,"dir":7.731,"arc":4.6296,"r":290},{"kind":"fan","x":490.37,"y":228.39,"dir":0.7274,"arc":6.2832,"r":190},{"kind":"fan","x":161.43,"y":264.78,"dir":6.2556,"arc":3.1934,"r":175.2}]},{"score":83,"sps":[{"kind":"rotor","x":534.07,"y":259.29,"dir":10.2035,"arc":6.2832,"r":290},{"kind":"fan","x":254.25,"y":343.01,"dir":5.1878,"arc":5.3648,"r":190},{"kind":"circle","x":427.95,"y":64.15,"dir":-6.0566,"arc":6.2832,"r":140}]},{"score":83,"sps":[{"kind":"fan","x":301.61,"y":158.12,"dir":1.6403,"arc":6.2832,"r":190},{"kind":"fan","x":102.63,"y":155.86,"dir":-3.7428,"arc":6.2832,"r":190},{"kind":"circle","x":538.21,"y":142.2,"dir":24.6594,"arc":6.2832,"r":140}]},{"score":91,"sps":[{"kind":"rotor","x":283.23,"y":222.77,"dir":6.298,"arc":3.948,"r":290},{"kind":"fan","x":532.5,"y":350.9,"dir":1.0396,"arc":6.2832,"r":190},{"kind":"fan","x":522.36,"y":104.46,"dir":2.3515,"arc":5.5618,"r":190}]},{"score":89,"sps":[{"kind":"rotor","x":203.05,"y":397.68,"dir":10.4731,"arc":4.3881,"r":290},{"kind":"fan","x":463.38,"y":109.98,"dir":3.7138,"arc":6.2832,"r":190},{"kind":"fan","x":547.66,"y":311.68,"dir":3.5153,"arc":6.2832,"r":190}]},{"score":90,"sps":[{"kind":"fan","x":538.48,"y":285.48,"dir":-9.1391,"arc":6.2832,"r":190},{"kind":"fan","x":120.29,"y":304.98,"dir":6.1583,"arc":6.2832,"r":190},{"kind":"circle","x":331.37,"y":313.91,"dir":-1.1644,"arc":6.2832,"r":140}]},{"score":91,"sps":[{"kind":"fan","x":514.14,"y":84.15,"dir":2.7389,"arc":5.7953,"r":190},{"kind":"fan","x":63.92,"y":272.46,"dir":5.9765,"arc":6.2832,"r":190},{"kind":"fan","x":453.46,"y":290.71,"dir":5.9378,"arc":5.6983,"r":190},{"kind":"fan","x":202.09,"y":116.15,"dir":1.7767,"arc":6.2832,"r":190}]},{"score":91,"sps":[{"kind":"fan","x":327.72,"y":80.28,"dir":-6.033,"arc":6.2832,"r":124.6},{"kind":"fan","x":96.74,"y":92.35,"dir":1.8693,"arc":4.5827,"r":189.7},{"kind":"rotor","x":471.47,"y":225.71,"dir":1.6749,"arc":3.5339,"r":290},{"kind":"fan","x":233.22,"y":136.5,"dir":13.5421,"arc":5.6065,"r":160.8}]},{"score":87,"sps":[{"kind":"rotor","x":465.7,"y":237.2,"dir":1.6674,"arc":5.8222,"r":290},{"kind":"fan","x":102.71,"y":282,"dir":4.6247,"arc":5.8622,"r":190},{"kind":"circle","x":324.88,"y":16.93,"dir":4.0599,"arc":6.2832,"r":140}]},{"score":75,"sps":[{"kind":"rotor","x":272.1,"y":50,"dir":-1.2283,"arc":6.2832,"r":273.3},{"kind":"fan","x":192.07,"y":392.38,"dir":0.3245,"arc":5.594,"r":184.9},{"kind":"circle","x":61.93,"y":191.97,"dir":26.575,"arc":6.2832,"r":140}]},{"score":89,"sps":[{"kind":"fan","x":491.88,"y":209.84,"dir":-8.2025,"arc":6.2832,"r":190},{"kind":"fan","x":554.4,"y":339.3,"dir":4.3466,"arc":5.5134,"r":190},{"kind":"fan","x":309.33,"y":303.45,"dir":-6.7608,"arc":6.2832,"r":190},{"kind":"circle","x":88,"y":318.29,"dir":20.4824,"arc":6.2832,"r":140}]}];
 </script>
 <script>
 (function(){
@@ -395,20 +797,27 @@ var W=DR.W,H=DR.H,CELL=DR.CELL,GW=DR.GW,GH=DR.GH,T=DR.T,TAU=DR.TAU,D2R=DR.D2R;
 var cv=document.getElementById('c'),ctx=cv.getContext('2d');
 var $=function(id){return document.getElementById(id)};
 var LETTERS='ABCD';
+var REDUCE=false;try{var mq=window.matchMedia('(prefers-reduced-motion: reduce)');REDUCE=mq.matches;mq.addEventListener&&mq.addEventListener('change',function(e){REDUCE=e.matches})}catch(e){}
+// mid-game draft of today's plan (separate key, so the saved results format is untouched)
+var draft={k:'dryrun:draft',get:function(){try{return JSON.parse(localStorage.getItem(this.k))}catch(e){return null}},
+  set:function(v){try{localStorage.setItem(this.k,JSON.stringify(v))}catch(e){}},clear:function(){try{localStorage.removeItem(this.k)}catch(e){}}};
 var store=(function(){var k='dryrun:v1';function get(){try{return JSON.parse(localStorage.getItem(k))||{days:{}}}catch(e){return {days:{}}}}
   function set(v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}return{get:get,set:set}})();
 
 function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function dayNum(d){var a=new Date(2026,10,5),b=new Date(d.getFullYear(),d.getMonth(),d.getDate());return Math.max(1,Math.round((b-a)/864e5)+1)}
 var TODAY=dayNum(new Date());
-function variantFor(n){var v=(n-1)%10;return {i:v%5,m:Math.floor(v/5)===1}}
+// Daily schedule: every base yard once (ORDER), then the same order mirrored, then repeat.
+// A yard's mirror always lands exactly ORDER.length days after the original.
+var ORDER=DR.ORDER,NY=ORDER.length;
+function variantFor(n){var k=(n-1)%(2*NY);return {i:ORDER[k%NY],m:k>=NY}}
 
 var S={mode:'daily',v:null,yard:null,sps:[],sel:-1,armed:-1,phase:'plan',polys:[],res:null,run:null,react:{},parts:[],splash:[],wet:null,t:0,practiceV:0};
 
 // ---------- canvas sizing ----------
-var sc=1,dpr=1,under=null,over=null,blades=null;
+var sc=1,dpr=1,U=1,under=null,over=null,blades=null,ptrTouch=false,hoverH=null;
 function resize(){var w=cv.parentElement.clientWidth;dpr=Math.min(2,window.devicePixelRatio||1);sc=w/W;
-  cv.width=Math.round(w*dpr);cv.height=Math.round(H*sc*dpr);cv.style.height=(H*sc)+'px';if(S.yard)prerender()}
+  U=Math.max(1,1/sc);cv.width=Math.round(w*dpr);cv.height=Math.round(H*sc*dpr);cv.style.height=(H*sc)+'px';if(S.yard)prerender()}
 window.addEventListener('resize',resize);
 
 function lawnPath(c,y){c.beginPath();y.lawn.forEach(function(r){c.rect(r[0],r[1],r[2],r[3])})}
@@ -424,13 +833,25 @@ function prerender(){
   // ground (gravel)
   var b=y.bounds;c.fillStyle='#dcd2ba';c.fillRect(b[0],b[1],b[2],b[3]);
   for(k=0;k<900;k++){c.fillStyle=R()<.5?'rgba(150,135,110,.35)':'rgba(255,255,255,.4)';c.fillRect(b[0]+R()*b[2],b[1]+R()*b[3],1.4,1.4)}
+  // open edges: curb + street instead of a fence
+  y.open.forEach(function(e){var x0=0,y0=0,w=W,h=H;if(e==='s'){y0=b[1]+b[3]}else if(e==='n'){h=b[1]}else if(e==='e'){x0=b[0]+b[2]}else{w=b[0]}
+    if(e==='s'||e==='n'){w=W}else{h=H}
+    c.fillStyle='#5f6467';c.fillRect(x0,y0,w,h);for(var k=0;k<w*h/12;k++){c.fillStyle=R()<.5?'rgba(0,0,0,.18)':'rgba(255,255,255,.16)';c.fillRect(x0+R()*w,y0+R()*h,1.2,1.2)}
+    c.fillStyle='#e9e7df';if(e==='s')c.fillRect(b[0],y0-1.5,b[2],3);else if(e==='n')c.fillRect(b[0],h-1.5,b[2],3);else if(e==='e')c.fillRect(x0-1.5,b[1],3,b[3]);else c.fillRect(w-1.5,b[1],3,b[3])});
   a=mk();c=a[1];over=a[0];
   // patio
-  y.patio.forEach(function(p){c.save();rr(c,p[0],p[1],p[2],p[3],3);c.fillStyle='#ebe4d4';c.fill();c.clip();
+  y.patio.slice(0,y.patio.length-y.drive.length).forEach(function(p){c.save();rr(c,p[0],p[1],p[2],p[3],3);c.fillStyle='#ebe4d4';c.fill();c.clip();
     c.strokeStyle='#d6cdb9';c.lineWidth=1.2;var s=22;
     for(var yy=p[1];yy<p[1]+p[3];yy+=s){var off=((yy-p[1])/s)%2?s/2:0;c.beginPath();c.moveTo(p[0],yy);c.lineTo(p[0]+p[2],yy);c.stroke();
       for(var xx=p[0]-off;xx<p[0]+p[2];xx+=s){c.beginPath();c.moveTo(xx,yy);c.lineTo(xx,yy+s);c.stroke()}}
     c.restore();rr(c,p[0],p[1],p[2],p[3],3);c.strokeStyle='#cfc5ae';c.lineWidth=1.5;c.stroke()});
+  // driveways & sidewalks (concrete with control joints)
+  y.drive.forEach(function(p){c.fillStyle='#d9d8d2';c.fillRect(p[0],p[1],p[2],p[3]);c.save();c.beginPath();c.rect(p[0],p[1],p[2],p[3]);c.clip();
+    for(var k=0;k<p[2]*p[3]/90;k++){c.fillStyle=R()<.5?'rgba(120,120,115,.18)':'rgba(255,255,255,.35)';c.fillRect(p[0]+R()*p[2],p[1]+R()*p[3],1.3,1.3)}
+    c.strokeStyle='rgba(140,140,132,.7)';c.lineWidth=1.1;var long=p[3]>=p[2],J=long?Math.max(50,p[2]):Math.max(50,p[3]);
+    if(long)for(var t=p[1]+J;t<p[1]+p[3]-6;t+=J){c.beginPath();c.moveTo(p[0],t);c.lineTo(p[0]+p[2],t);c.stroke()}
+    else for(t=p[0]+J;t<p[0]+p[2]-6;t+=J){c.beginPath();c.moveTo(t,p[1]);c.lineTo(t,p[1]+p[3]);c.stroke()}
+    c.restore();c.strokeStyle='#bdbcb4';c.lineWidth=1.4;c.strokeRect(p[0],p[1],p[2],p[3])});
   // beds
   y.beds.forEach(function(s){c.save();shapePath(c,s);c.fillStyle='#8a6a4a';c.fill();c.clip();
     for(var k=0;k<260;k++){c.fillStyle='rgba(60,40,25,.35)';c.fillRect(s[0]-80+R()*400,s[1]-80+R()*300,1.6,1.6)}
@@ -465,21 +886,26 @@ function prerender(){
 var gcan=document.createElement('canvas');gcan.width=GW;gcan.height=GH;var gctx=gcan.getContext('2d'),gimg=gctx.createImageData(GW,GH),noise=new Float32Array(GW*GH);
 var hard=document.createElement('canvas');hard.width=GW;hard.height=GH;var hctx=hard.getContext('2d'),himg=hctx.createImageData(GW,GH);
 var miss=document.createElement('canvas');miss.width=GW;miss.height=GH;var mctx=miss.getContext('2d');
+var shn=document.createElement('canvas');shn.width=GW;shn.height=GH;var sctx=shn.getContext('2d'),simg=sctx.createImageData(GW,GH),sheenOn=false;
 (function(){var R=rng(9);for(var gy=0;gy<GH;gy++)for(var gx=0;gx<GW;gx++){noise[gy*GW+gx]=(Math.sin(gx*.23+Math.sin(gy*.17)*2.2)+Math.sin(gy*.19+gx*.07+1.3)+R()*0.9)/2.9*0.5+0.5}})();
-function paintGrass(wet){var d=gimg.data,h=himg.data,y=S.yard;
+function paintGrass(wet){var d=gimg.data,h=himg.data,sd=simg.data,y=S.yard,front=false;
   for(var i=0;i<GW*GH;i++){var n=noise[i],w=wet?wet[i]:0,j=i*4;
     var dr=204-n*26,dg=194-n*16,db=118-n*24, wr=86+n*26,wg=164+n*24,wb=70+n*18;
     d[j]=dr+(wr-dr)*w;d[j+1]=dg+(wg-dg)*w;d[j+2]=db+(wb-db)*w;d[j+3]=255;
-    var t=y.type[i],isHard=(t===T.PATIO||t===T.GROUND||t===T.BED);h[j]=40;h[j+1]=70;h[j+2]=110;h[j+3]=isHard?w*70:0}
-  gctx.putImageData(gimg,0,0);hctx.putImageData(himg,0,0)}
+    var t=y.type[i],isHard=(t===T.PATIO||t===T.GROUND||t===T.BED);h[j]=40;h[j+1]=70;h[j+2]=110;h[j+3]=isHard?w*70:0;
+    var f=w>0&&w<1?4*w*(1-w):0;if(f)front=true;sd[j]=150;sd[j+1]=215;sd[j+2]=255;sd[j+3]=f*170}
+  gctx.putImageData(gimg,0,0);hctx.putImageData(himg,0,0);sheenOn=front;if(front||sheenOn)sctx.putImageData(simg,0,0)}
 
 // ---------- yard setup ----------
 function setVariant(v,keepLayout){S.v=v;S.yard=DR.variant(v.i,v.m);
+  var kd=[];S.yard.sens.forEach(function(z){var l=DR.SENS[z.kind].label.replace(/^(the|a) /,'');if(z.kind==='window')l='windows';if(kd.indexOf(l)<0)kd.push(l)});$('keepDry').textContent='Keep dry: '+kd.join(', ');
   if(!keepLayout)S.sps=S.yard.kit.map(function(k,i){var s=DR.makeSprinkler(k,0,0,0);s.placed=false;s.label=LETTERS[i];return s});
   S.sel=-1;S.armed=-1;S.phase='plan';S.res=null;S.react={};S.parts=[];S.splash=[];S.wet=null;
   prerender();paintGrass(null);recalc();buildTray();updateUI()}
 function placed(){return S.sps.filter(function(s){return s.placed})}
-function recalc(){S.polys=S.sps.map(function(s){return s.placed?DR.reachPoly(S.yard,s,0.75*D2R):null})}
+function recalc(){S.polys=S.sps.map(function(s){return s.placed?DR.reachPoly(S.yard,s,0.75*D2R):null});saveDraft()}
+function saveDraft(){if(S.mode!=='daily'||S.phase!=='plan'||!S.yard)return;
+  draft.set({day:TODAY,sps:S.sps.map(function(s){return {kind:s.kind,placed:!!s.placed,x:s.x,y:s.y,dir:s.dir,arc:s.arc,r:s.r}})})}
 
 // ---------- tray ----------
 function headSVG(kind){var col=kind==='fan'?'#d4a64a':kind==='rotor'?'#4f5b68':'#8b98a5';
@@ -487,7 +913,7 @@ function headSVG(kind){var col=kind==='fan'?'#d4a64a':kind==='rotor'?'#4f5b68':'
   return '<svg class="ic" viewBox="0 0 30 30">'+arc+'<circle cx="15" cy="15" r="6" fill="'+col+'" stroke="#333" stroke-width="1.2"/><circle cx="15" cy="15" r="2" fill="#333"/></svg>'}
 function specText(k){var K=DR.KIT[k],a=K.arcMin===K.arcMax?'360° fixed':K.arcMin+'–'+K.arcMax+'°',r=K.rMin===K.rMax?(K.rMin/10)+' ft fixed':(K.rMin/10)+'–'+(K.rMax/10)+' ft';return a+' · '+r}
 function buildTray(){var t=$('tray');t.innerHTML='';
-  S.sps.forEach(function(s,i){var d=document.createElement('div');d.className='card';d.dataset.i=i;
+  S.sps.forEach(function(s,i){var d=document.createElement('button');d.type='button';d.className='card';d.dataset.i=i;
     d.innerHTML=headSVG(s.kind)+'<div><div class="t">'+s.label+' · '+DR.KIT[s.kind].name+'</div><div class="s">'+specText(s.kind)+'</div><div class="st"></div></div>';
     d.onclick=function(){if(S.phase!=='plan')return;if(s.placed){S.sel=i;S.armed=-1}else{S.armed=S.armed===i?-1:i;S.sel=-1;if(S.armed>=0)toast('Tap the yard to place '+DR.KIT[s.kind].short+' '+s.label)}updateUI()};
     t.appendChild(d)})}
@@ -498,7 +924,7 @@ function updateUI(){
   var plan=S.phase==='plan';$('planPanel').style.display=(S.phase==='done')?'none':'block';$('resultPanel').classList.toggle('on',S.phase==='done');
   var all=S.sps.every(function(s){return s.placed});$('runBtn').disabled=!all||!plan;
   $('runBtn').textContent=S.mode==='daily'?'Run sprinklers 💧':'Practice run 💧';
-  $('hint').textContent=S.phase==='run'?'Watering…':!all?'Place every sprinkler, then run. The faint outline is exactly where water will land.':(S.mode==='daily'?'Happy with it? You get one official run today.':'Practice runs are unlimited.');
+  $('hint').textContent=S.phase==='run'?'Watering…':!all?'Place every sprinkler, then run. The shaded outline is exactly where water lands — strong inside the dotted ring, thin at the edge.':(S.mode==='daily'?'Happy with it? You get one official run today.':'Practice runs are unlimited.');
   var c2=$('ctrls');if(plan&&S.sel>=0){var s=S.sps[S.sel],K=DR.KIT[s.kind];c2.classList.add('on');
     $('ctrlTitle').textContent=s.label+' · '+K.name;
     var full360=K.arcMin===360;$('rowDir').classList.toggle('off',full360);$('inDir').disabled=full360;
@@ -510,37 +936,45 @@ function updateUI(){
   $('modeTag').textContent=S.mode==='daily'?'Daily · #'+TODAY:'Practice';$('modeTag').className='mode'+(S.mode==='practice'?' practice':'');
   $('dayLabel').innerHTML='<b>'+S.yard.name+'</b> · '+new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
   $('streak').textContent='🔥 '+streak();
-  var pr=S.mode==='practice'&&plan;$('pActs').style.display=pr?'inline-flex':'none';$('pToday').style.display=store.get().days[TODAY]?'':'none';
+  var pr=S.mode==='practice'&&plan;$('pActs').style.display=pr?'inline-flex':'none';$('pYard').style.display=TODAY>1?'':'none';$('pToday').style.display=store.get().days[TODAY]?'':'none';
 }
 function compass(a){var d=((a/D2R)%360+360)%360,n=['E','SE','S','SW','W','NW','N','NE'];return n[Math.round(d/45)%8]+' '+Math.round((90+d)%360)+'°'}
-$('inDir').oninput=function(){var s=S.sps[S.sel];s.dir=this.value*D2R;recalc();updateUI()};
-$('inArc').oninput=function(){var s=S.sps[S.sel];s.arc=this.value*D2R;DR.clampSp(s);recalc();updateUI()};
-$('inR').oninput=function(){var s=S.sps[S.sel];s.r=+this.value;DR.clampSp(s);recalc();updateUI()};
-$('removeBtn').onclick=function(){var s=S.sps[S.sel];s.placed=false;S.sel=-1;recalc();updateUI()};
+$('inDir').oninput=function(){var s=S.sps[S.sel];if(!s)return;s.dir=this.value*D2R;recalc();updateUI()};
+$('inArc').oninput=function(){var s=S.sps[S.sel];if(!s)return;s.arc=this.value*D2R;DR.clampSp(s);recalc();updateUI()};
+$('inR').oninput=function(){var s=S.sps[S.sel];if(!s)return;s.r=+this.value;DR.clampSp(s);recalc();updateUI()};
+$('removeBtn').onclick=function(){var s=S.sps[S.sel];if(!s)return;s.placed=false;S.sel=-1;recalc();updateUI()};
 
 var toastT=0;function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on')},2200)}
 
 // ---------- pointer ----------
 var drag=null;
 function pos(e){var r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)/sc,y:(e.clientY-r.top)/sc}}
-function handles(s){var K=DR.KIT[s.kind],o=[],a0=DR.arcStart(s);
-  if(K.arcMin<360)o.push({t:'dir',x:s.x+Math.cos(s.dir)*32,y:s.y+Math.sin(s.dir)*32});
-  if(K.rMin<K.rMax)o.push({t:'r',x:s.x+Math.cos(s.dir)*s.r,y:s.y+Math.sin(s.dir)*s.r});
+function inView(x,y){var m=8*U;return x>m&&x<W-m&&y>m&&y<H-m}
+function ringAngle(s){ // a point on the throw ring that is on screen (drag uses distance only)
+  var full=s.arc>=TAU-1e-6,span=full?TAU:s.arc,cand=[s.dir];
+  for(var k=1;k<=8;k++){cand.push(s.dir+span*k/18);cand.push(s.dir-span*k/18)}
+  if(full)for(k=1;k<12;k++)cand.push(s.dir+TAU*k/12);
+  for(k=0;k<cand.length;k++)if(inView(s.x+Math.cos(cand[k])*s.r,s.y+Math.sin(cand[k])*s.r))return cand[k];return s.dir}
+function handles(s){var K=DR.KIT[s.kind],o=[],a0=DR.arcStart(s),dl=Math.max(32,40*U);
+  if(K.arcMin<360)o.push({t:'dir',x:s.x+Math.cos(s.dir)*dl,y:s.y+Math.sin(s.dir)*dl});
+  if(K.rMin<K.rMax){var ra=ringAngle(s);o.push({t:'r',a:ra,x:s.x+Math.cos(ra)*s.r,y:s.y+Math.sin(ra)*s.r})}
   if(K.arcMin<K.arcMax){o.push({t:'a0',x:s.x+Math.cos(a0)*s.r*.72,y:s.y+Math.sin(a0)*s.r*.72});o.push({t:'a1',x:s.x+Math.cos(a0+s.arc)*s.r*.72,y:s.y+Math.sin(a0+s.arc)*s.r*.72})}
   return o}
 function wrapPi(a){while(a>Math.PI)a-=TAU;while(a<-Math.PI)a+=TAU;return a}
-cv.addEventListener('pointerdown',function(e){if(S.phase!=='plan')return;var p=pos(e),tol=18/sc;
-  if(S.sel>=0){var s=S.sps[S.sel],hs=handles(s);for(var k=0;k<hs.length;k++){if(Math.hypot(p.x-hs[k].x,p.y-hs[k].y)<tol){drag={t:hs[k].t,i:S.sel,last:Math.atan2(p.y-s.y,p.x-s.x)};cv.setPointerCapture(e.pointerId);return}}}
-  for(var i=S.sps.length-1;i>=0;i--){var q=S.sps[i];if(q.placed&&Math.hypot(p.x-q.x,p.y-q.y)<tol){S.sel=i;S.armed=-1;drag={t:'move',i:i,dx:q.x-p.x,dy:q.y-p.y};cv.setPointerCapture(e.pointerId);updateUI();return}}
+function cap(e){try{cv.setPointerCapture(e.pointerId)}catch(_){}}
+function tolFor(e){ptrTouch=e.pointerType==='touch'||e.pointerType==='pen';return (ptrTouch?24:18)/sc}
+cv.addEventListener('pointerdown',function(e){if(S.phase!=='plan')return;var p=pos(e),tol=tolFor(e);
+  if(S.sel>=0){var s=S.sps[S.sel],hs=handles(s);for(var k=0;k<hs.length;k++){if(Math.hypot(p.x-hs[k].x,p.y-hs[k].y)<tol){drag={t:hs[k].t,i:S.sel,last:Math.atan2(p.y-s.y,p.x-s.x)};cap(e);return}}}
+  for(var i=S.sps.length-1;i>=0;i--){var q=S.sps[i];if(q.placed&&Math.hypot(p.x-q.x,p.y-q.y)<tol){S.sel=i;S.armed=-1;drag={t:'move',i:i,dx:q.x-p.x,dy:q.y-p.y};cap(e);updateUI();return}}
   if(S.armed>=0){var sp=S.sps[S.armed],others=placed();
-    if(DR.canPlace(S.yard,p.x,p.y,others)){sp.x=p.x;sp.y=p.y;sp.placed=true;var b=S.yard.bounds;sp.dir=Math.atan2(b[1]+b[3]/2-p.y,b[0]+b[2]/2-p.x);
+    if(DR.canPlace(S.yard,p.x,p.y,others)){sp.x=p.x;sp.y=p.y;sp.placed=true;var b=S.yard.bounds;sp.dir=Math.atan2(b[1]+b[3]/2-p.y,b[0]+b[2]/2-p.x);sp.arc=DR.KIT[sp.kind].arc0*D2R;sp.r=DR.KIT[sp.kind].r0;DR.smartDefault(S.yard,sp);
       S.sel=S.armed;S.armed=-1;var nx=S.sps.findIndex(function(z){return !z.placed});if(nx>=0)S.armed=-1;recalc();updateUI();
       toast(DR.KIT[sp.kind].arcMin<360?'Drag the handles to aim, set the arc and the throw':'Drag the head to move it')}
     else toast("Can't go there — needs open ground, not walls, shrubs or keep-dry spots");return}
   S.sel=-1;updateUI()});
 cv.addEventListener('pointermove',function(e){var p=pos(e);
-  if(!drag){if(S.phase==='plan'){var over=false,tol=18/sc;S.sps.forEach(function(q){if(q.placed&&Math.hypot(p.x-q.x,p.y-q.y)<tol)over=true});
-      if(S.sel>=0)handles(S.sps[S.sel]).forEach(function(h){if(Math.hypot(p.x-h.x,p.y-h.y)<tol)over=true});cv.style.cursor=over?'grab':(S.armed>=0?'crosshair':'default')}return}
+  if(!drag){if(S.phase==='plan'){var over=false,tol=18/sc;hoverH=null;S.sps.forEach(function(q){if(q.placed&&Math.hypot(p.x-q.x,p.y-q.y)<tol)over=true});
+      if(S.sel>=0)handles(S.sps[S.sel]).forEach(function(h){if(!hoverH&&Math.hypot(p.x-h.x,p.y-h.y)<tol){over=true;hoverH=h.t}});cv.style.cursor=over?'grab':(S.armed>=0?'crosshair':'default')}return}
   var s=S.sps[drag.i],K=DR.KIT[s.kind];
   if(drag.t==='move'){var nx=p.x+drag.dx,ny=p.y+drag.dy,others=S.sps.filter(function(z,j){return z.placed&&j!==drag.i});
     if(DR.canPlace(S.yard,nx,ny,others)){s.x=nx;s.y=ny}}
@@ -553,6 +987,7 @@ cv.addEventListener('pointermove',function(e){var p=pos(e);
     DR.clampSp(s)}
   recalc();updateUI()});
 function endDrag(){drag=null}
+cv.addEventListener('pointerleave',function(){hoverH=null});
 cv.addEventListener('pointerup',endDrag);cv.addEventListener('pointercancel',endDrag);
 
 // ---------- run ----------
@@ -561,31 +996,37 @@ $('runBtn').onclick=function(){if(S.mode==='daily'){modal('<h2>One official run<
 function startRun(animate){S.sel=-1;S.armed=-1;var res=DR.evaluate(S.yard,S.sps);S.res=res;S.react={};S.parts=[];S.splash=[];
   // when should each penalised object react?
   res.pens.forEach(function(p){if(!p.pts)return;var c=res.covers[p.by],f=1;for(var k=0;k<c.cells.length;k++)if(S.yard.sensGrid[c.cells[k]]===p.id&&c.frac[k]<f)f=c.frac[k];p.at=f});
-  S.wet=new Float32Array(GW*GH);
-  if(!animate){S.wet.fill(0);res.covers.forEach(function(c){c.cells.forEach(function(i){S.wet[i]=1})});res.pens.forEach(function(p){if(p.pts)S.react[p.id]={t0:-99}});
+  S.wet=new Float32Array(GW*GH);S.lvl=new Float32Array(GW*GH);for(var q=0;q<GW*GH;q++)if(res.wet[q])S.lvl[q]=S.yard.type[q]===T.LAWN?Math.max(0.3,DR.credit(res.water[q])):1;
+  if(S.mode==='daily'&&animate)saveResult(res);
+  if(!animate){S.wet.set(S.lvl);res.pens.forEach(function(p){if(p.pts)S.react[p.id]={t0:-99}});
     paintGrass(S.wet);finish(false);return}
   S.phase='run';S.run={t0:performance.now()};updateUI()}
 var RUN=3.4;
 function stepRun(now){var r=S.run,t=(now-r.t0)/1000,p=Math.min(1,Math.max(0,(t-0.25)/RUN)),res=S.res,wet=S.wet;
-  wet.fill(0);res.covers.forEach(function(c){for(var k=0;k<c.cells.length;k++){var v=(p-c.frac[k])*9;if(p>=1)v=1;if(v>0){v=v>1?1:v;if(v>wet[c.cells[k]])wet[c.cells[k]]=v}}});
+  wet.fill(0);res.covers.forEach(function(c){for(var k=0;k<c.cells.length;k++){var v=(p-c.frac[k])*9;if(p>=1)v=1;if(v>0){v=(v>1?1:v)*S.lvl[c.cells[k]];if(v>wet[c.cells[k]])wet[c.cells[k]]=v}}});
   paintGrass(wet);
-  if(p>0&&p<1)S.sps.forEach(function(s){var a=DR.arcStart(s)+s.arc*p;for(var n=0;n<5;n++){var aa=a+(Math.random()-.5)*0.12,L=DR.rayHit(S.yard,s.x,s.y,aa,s.r)*Math.pow(Math.random(),0.45);
+  if(p>0&&p<1)S.sps.forEach(function(s){var a=DR.arcStart(s)+s.arc*p;for(var n=0;n<(REDUCE?1:5);n++){var aa=a+(Math.random()-.5)*0.12,L=DR.rayHit(S.yard,s.x,s.y,aa,s.r)*Math.pow(Math.random(),0.45);
       S.parts.push({x0:s.x,y0:s.y,x1:s.x+Math.cos(aa)*L,y1:s.y+Math.sin(aa)*L,t0:now,d:280+L*1.4,h:8+L*.12})}});
   res.pens.forEach(function(pn){if(pn.pts&&!S.react[pn.id]&&p>=pn.at)S.react[pn.id]={t0:now}});
   if(t>RUN+1.1)finish(true)}
 function finish(fresh){S.phase='done';var res=S.res;
   // missed mask
-  var md=mctx.createImageData(GW,GH);for(var i=0;i<GW*GH;i++){if(S.yard.target[i]&&!res.wet[i]){md.data[i*4]=235;md.data[i*4+1]=110;md.data[i*4+2]=40;md.data[i*4+3]=255}}mctx.putImageData(md,0,0);
-  if(S.mode==='daily'&&fresh){var st=store.get();st.days[TODAY]={score:res.score,cov:Math.round(res.covPct*10)/10,pens:res.pens.filter(function(p){return p.pts}).map(function(p){return [p.kind,p.pts,p.by]}),
-    sps:S.sps.map(function(s){return {kind:s.kind,x:s.x,y:s.y,dir:s.dir,arc:s.arc,r:s.r}})};store.set(st)}
+  var md=mctx.createImageData(GW,GH);for(var i=0;i<GW*GH;i++){if(S.yard.target[i]){var lack=res.wet[i]?1-DR.credit(res.water[i]):1;if(lack>0.02){md.data[i*4]=235;md.data[i*4+1]=110;md.data[i*4+2]=40;md.data[i*4+3]=Math.round(255*Math.min(1,0.25+lack))}}}mctx.putImageData(md,0,0);
+  if(S.mode==='daily'&&fresh)saveResult(res);
   showResult();updateUI()}
 
-function verdict(sc){return sc>=97?'Golf-course grade':sc>=92?'Head-to-head pro':sc>=85?'Nicely watered':sc>=70?'Some dry spots':sc>=50?'Patchy':'Drought'}
-function showResult(){var r=S.res;$('rScore').textContent=r.score;$('rVerdict').textContent=verdict(r.score);
-  var h='<div><span>💧 Lawn watered '+(Math.floor(r.covPct*10)/10)+'%</span><span class="pos">+'+r.covPts+'</span></div>';
+function saveResult(res){var st=store.get();if(st.days[TODAY]&&st.days[TODAY].v2)return;st.days[TODAY]={score:res.score,cov:Math.round(res.covPct*10)/10,pens:res.pens.filter(function(p){return p.pts}).map(function(p){return [p.kind,p.pts,p.by]}),
+    waste:res.waste,v2:1,sps:S.sps.map(function(s){return {kind:s.kind,x:s.x,y:s.y,dir:s.dir,arc:s.arc,r:s.r}})};store.set(st);draft.clear()}
+function verdict(sc){return sc>=90?'Golf-course grade':sc>=82?'Head-to-head pro':sc>=70?'Nicely watered':sc>=55?'Some dry spots':sc>=35?'Patchy':'Drought'}
+function countUp(el,to){if(REDUCE||to<=0){el.textContent=to;return}var t0=performance.now(),D=700;(function st(n){var k=Math.min(1,(n-t0)/D),e=1-Math.pow(1-k,3);el.textContent=Math.round(to*e);if(k<1)requestAnimationFrame(st)})(t0)}
+function showResult(){var r=S.res;countUp($('rScore'),r.score);$('rVerdict').textContent=verdict(r.score);
+  var h='<div><span>💧 Lawn watered '+(Math.floor(r.covPct*10)/10)+'%'+(r.light&&DR.RULES.graded?' <span class="small">(thin spray edges count partly)</span>':'')+'</span><span class="pos">+'+r.covPts+'</span></div>';
   r.pens.forEach(function(p){var I=DR.SENS[p.kind],sp=S.sps[p.by];
     h+='<div><span>'+I.icon+' '+DR.KIT[sp.kind].short+' '+sp.label+(p.pts?' soaked ':' splashed ')+I.label+(p.pts?'':' <span class="small">(tiny, free)</span>')+'</span><span class="'+(p.pts?'neg':'small')+'">'+(p.pts?'−'+p.pts:'0')+'</span></div>'});
-  if(!r.pens.length)h+='<div><span>✨ No overspray</span><span class="small">0</span></div>';
+  if(DR.RULES.waste){var wp=Math.round((r.pave+r.street)*16/100),where=r.street>=1&&r.pave>=1?'paving & street':r.street>=1?'the street':'paving';
+    if(r.waste)h+='<div><span>💦 Wasted on '+where+' (~'+wp+' sq ft)</span><span class="neg">−'+r.waste+'</span></div>';
+    else if(r.pave+r.street>=1)h+='<div><span>💦 A little on '+where+' <span class="small">(tiny, free)</span></span><span class="small">0</span></div>'}
+  if(!r.pens.length&&!r.waste)h+='<div><span>✨ No overspray</span><span class="small">0</span></div>';
   $('rLines').innerHTML=h;setTimeout(tick,0);
   var pro=proFor(S.v),acts=$('rActs');acts.innerHTML='';
   if(S.mode==='daily'){$('rNote').innerHTML='Orange = grass that stayed dry. Groundskeeper bot\'s best on this yard: <b>'+pro.score+'</b>. Next yard in <b id="cd"></b>.';
@@ -593,20 +1034,25 @@ function showResult(){var r=S.res;$('rScore').textContent=r.score;$('rVerdict').
   else{$('rNote').innerHTML='Orange = grass that stayed dry. Groundskeeper bot\'s best here: <b>'+pro.score+'</b>.';
     btn('Adjust layout',true,function(){S.phase='plan';S.res=null;S.wet=null;S.react={};paintGrass(null);updateUI()});
     btn('Show bot layout',false,loadBot);
-    btn('Another yard',false,nextYard);
+    if(TODAY>1)btn('Another yard',false,nextYard);
     if(store.get().days[TODAY])btn('Today\'s result',false,loadDaily)}
   function btn(t,pri,fn){var b=document.createElement('button');b.className='btn'+(pri?' primary':' ghost');b.textContent=t;b.onclick=fn;acts.appendChild(b)}
 }
 function loadBot(){var pro=proFor(S.v);S.sps=pro.sps.map(function(s,i){var o=Object.assign({},s);o.placed=true;o.label=LETTERS[i];return o});S.phase='plan';S.res=null;S.wet=null;S.react={};S.sel=-1;paintGrass(null);recalc();buildTray();updateUI();toast('Bot layout loaded — run it or tweak it')}
-function nextYard(){S.practiceV=(S.practiceV+1)%10;enterPractice({i:S.practiceV%5,m:Math.floor(S.practiceV/5)===1},false)}
+// practice only visits yards that have already aired (today and earlier), so nobody can scout a future yard or its bot layout
+function aired(){var o=[],seen={};for(var n=TODAY;n>=1&&o.length<2*NY;n--){var v=variantFor(n),k=v.i+(v.m?'m':'');if(!seen[k]){seen[k]=1;o.push(v)}}return o}
+function nextYard(){var L=aired();if(L.length<2){toast('More practice yards unlock each day');return}
+  var cur=S.v.i+(S.v.m?'m':''),j=0;for(var q=0;q<L.length;q++)if(L[q].i+(L[q].m?'m':'')===cur)j=q;var v=L[(j+1)%L.length];
+  enterPractice(v,false);var d=TODAY;while(d>1){var w=variantFor(d);if(w.i===v.i&&w.m===v.m)break;d--}toast(d===TODAY?"Practice: today's yard":'Practice: yard from day #'+d)}
 $('pYard').onclick=nextYard;$('pBot').onclick=loadBot;$('pToday').onclick=function(){loadDaily()};
 function proFor(v){var p=PRO[v.i],sps=p.sps.map(function(s){var o=Object.assign({},s);if(v.m){o.x=W-o.x;o.dir=Math.PI-o.dir}return o});var y=DR.variant(v.i,v.m);return {score:DR.evaluate(y,sps).score,sps:sps}}
-function enterPractice(v,keep){S.mode='practice';S.practiceV=(v.m?5:0)+v.i;var lay=keep?S.sps.map(function(s){return Object.assign({},s)}):null;
-  setVariant(v,false);if(lay){S.sps=lay;recalc();buildTray()}updateUI();toast('Practice mode — run as often as you like')}
+function enterPractice(v,keep){S.mode='practice';S.practiceV=(v.m?NY:0)+v.i;var lay=keep?S.sps.map(function(s){return Object.assign({},s)}):null;
+  setVariant(v,false);if(lay){S.sps=lay;recalc();buildTray()}updateUI();if(keep)toast('Practice mode — run as often as you like')}
 function loadDaily(){S.mode='daily';var st=store.get().days[TODAY];setVariant(variantFor(TODAY),false);
-  if(st){S.sps=st.sps.map(function(s,i){var o=Object.assign({},s);o.placed=true;o.label=LETTERS[i];return o});recalc();buildTray();startRun(false)}updateUI()}
+  if(st){S.sps=st.sps.map(function(s,i){var o=Object.assign({},s);o.placed=true;o.label=LETTERS[i];return o});recalc();buildTray();startRun(false);
+    if(!st.v2&&typeof st.score==='number'&&S.res){S.res.score=st.score;showResult()}}updateUI()}
 function share(){var r=S.res,n=Math.round(r.covPct/10),line='🟩'.repeat(n)+'🟫'.repeat(10-n);
-  var txt='Dry Run #'+TODAY+' 💧 '+r.score+'/100\n'+line+' '+Math.floor(r.covPct)+'% lawn\n'+(r.pens.filter(function(p){return p.pts}).map(function(p){return DR.SENS[p.kind].icon+' −'+p.pts}).join('  ')||'✨ no overspray');
+  var txt='Dry Run #'+TODAY+' 💧 '+r.score+'/100\n'+line+' '+Math.floor(r.covPct)+'% lawn\n'+((r.pens.filter(function(p){return p.pts}).map(function(p){return DR.SENS[p.kind].icon+' −'+p.pts}).concat(r.waste?['💦 −'+r.waste]:[]).join('  '))||'✨ no overspray');
   var done=function(){toast('Copied to clipboard')};
   try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
   function fallback(){var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){toast('Copy failed')}ta.remove()}}
@@ -616,10 +1062,11 @@ function tick(){var cd=$('cd');if(!cd)return;var now=new Date(),m=new Date(now.g
 setInterval(tick,15000);
 
 // ---------- modal ----------
-function modal(html){$('mbox').innerHTML=html;$('modal').classList.add('on');$('mbox').querySelectorAll('[data-close]').forEach(function(b){b.onclick=closeModal})}
-function closeModal(){$('modal').classList.remove('on')}
+var lastFocus=null;function modal(html){lastFocus=document.activeElement;$('mbox').innerHTML=html;$('modal').classList.add('on');$('mbox').querySelectorAll('[data-close]').forEach(function(b){b.onclick=closeModal});var f=$('mbox').querySelector('.btn.primary')||$('mbox').querySelector('button');if(f)f.focus({preventScroll:true})}
+function closeModal(){$('modal').classList.remove('on');if(lastFocus&&lastFocus.focus)try{lastFocus.focus({preventScroll:true})}catch(e){}}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('modal').classList.contains('on'))closeModal()});
 $('modal').onclick=function(e){if(e.target.id==='modal')closeModal()};
-function help(){modal('<h2>How to play</h2><p>Every day there\'s a new backyard and a fixed set of sprinklers. Water as much lawn as you can without soaking the things marked with a red dashed outline.</p><ul><li>Tap a sprinkler in the tray, then tap the yard to place it.</li><li>Drag the head to move it. Drag the <b>blue arrow</b> to aim, the <b>white dots</b> to widen or narrow the spray arc, and the <b>ring handle</b> to change throw.</li><li>The faint outline is exactly where water lands. Fences, the house and shrubs cast a dry shadow.</li><li>One official run a day, then unlimited practice.</li></ul><p><b>Scoring:</b> % of lawn watered (up to 100), minus points for wetting keep-dry spots. Overlap earns nothing extra. Tiny splashes under 5% of an object are free.</p><div class="tip">💡 Irrigation tip: put part-circle heads on the edges spraying in, and let each spray reach the next head — "head-to-head" coverage leaves no dry rings.</div><div class="acts"><button class="btn primary" data-close>Let\'s water</button></div>')}
+function help(){modal('<h2>How to play</h2><p>Every day there\'s a new backyard and a fixed set of sprinklers. Water as much lawn as you can without soaking the things marked with a red dashed outline.</p><ul><li>Tap a sprinkler in the tray, then tap the yard to place it.</li><li>Drag the head to move it. Drag the <b>blue arrow</b> to aim, the <b>white dots</b> to widen or narrow the spray arc, and the <b>ring handle</b> to change throw.</li><li>The shaded outline is exactly where water lands. Fences, the house and shrubs cast a dry shadow.</li><li>Like a real nozzle, each spray is <b>heavy near the head and thin at the edge</b> (the fade in the outline; the dotted ring is where it starts to thin). Thin edges only count fully where another spray overlaps them.</li><li>One official run a day, then unlimited practice.</li></ul><p><b>Scoring:</b> % of lawn watered (up to 100), minus points for wetting keep-dry spots, minus a little for water wasted on the patio, driveway or street (where there\'s no fence, water flies into the road). Beds are fine to wet. Tiny splashes are free.</p><div class="tip">💡 Irrigation tip: put part-circle heads on the edges spraying in, and let each spray reach the next head. "Head-to-head" coverage fills the thin edges, and arcs that stop at the walk keep water off the paving.</div><div class="acts"><button class="btn primary" data-close>Let\'s water</button></div>')}
 $('helpBtn').onclick=help;
 
 // ---------- drawing ----------
@@ -672,27 +1119,71 @@ function drawSens(now){var y=S.yard,tt=now/1000;
       var vert2=sh[3]>sh[2];ctx.save();rr(ctx,sh[0]+3,sh[1]+3,sh[2]-6,sh[3]-6,3);ctx.clip();for(var st=0;st<12;st++){ctx.fillStyle=st%2?'#2fa7a0':'#e8f6f4';if(vert2)ctx.fillRect(sh[0]+st*6,sh[1],6,sh[3]);else ctx.fillRect(sh[0],sh[1]+st*6,sh[2],6)}
       if(age>=0){ctx.fillStyle='rgba(20,50,90,'+(0.35*Math.min(1,age/0.5))+')';ctx.fillRect(sh[0],sh[1],sh[2],sh[3])}ctx.restore();
       ctx.fillStyle='#e8f6f4';rr(ctx,sh[0]+4,sh[1]+4,vert2?sh[2]-8:12,vert2?12:sh[3]-8,3);ctx.fill()}
+    else if(s.kind==='car'){var vc=sh[3]>sh[2];ctx.save();ctx.translate(sh[0]+sh[2]/2,sh[1]+sh[3]/2);if(!vc)ctx.rotate(Math.PI/2);
+      var cw=vc?sh[2]:sh[3],ch=vc?sh[3]:sh[2];ctx.fillStyle='rgba(0,0,0,.2)';rr(ctx,-cw/2+3,-ch/2+4,cw,ch,12);ctx.fill();
+      ctx.fillStyle='#2b2b2b';[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(w){ctx.fillRect(w[0]*cw/2-(w[0]>0?4:0),w[1]*ch*.3-9,4,18)});
+      ctx.fillStyle='#c8463a';rr(ctx,-cw/2+2,-ch/2,cw-4,ch,12);ctx.fill();ctx.strokeStyle='#8f2f27';ctx.lineWidth=1.4;ctx.stroke();
+      ctx.fillStyle='#d95a4c';rr(ctx,-cw/2+8,-ch*.18,cw-16,ch*.42,6);ctx.fill();
+      ctx.fillStyle='#bfe0f2';rr(ctx,-cw/2+7,-ch*.3,cw-14,ch*.13,5);ctx.fill();rr(ctx,-cw/2+8,ch*.25,cw-16,ch*.09,4);ctx.fill();
+      ctx.fillStyle='#fff6c8';ctx.fillRect(-cw/2+6,-ch/2+2,9,4);ctx.fillRect(cw/2-15,-ch/2+2,9,4);
+      if(age>=0){var R3=rng(s.id*17+5),a3=Math.min(1,age/0.5);ctx.fillStyle='rgba(255,255,255,'+(0.75*a3)+')';
+        for(var k=0;k<26;k++){ctx.beginPath();ctx.arc(-cw/2+4+R3()*(cw-8),-ch/2+4+R3()*(ch-8),0.8+R3()*1.6,0,TAU);ctx.fill()}
+        ctx.fillStyle='rgba(20,50,90,'+(0.18*a3)+')';rr(ctx,-cw/2+2,-ch/2,cw-4,ch,12);ctx.fill()}
+      ctx.restore();
+      if(age>=0&&age<1.4){ctx.fillStyle='rgba(60,60,60,'+(1-age/1.4)+')';ctx.font='700 10px Fredoka,sans-serif';ctx.fillText('spots!',sh[0]+sh[2]+3,sh[1]+10)}}
+    else if(s.kind==='sandbox'){ctx.fillStyle='rgba(0,0,0,.15)';ctx.fillRect(sh[0]+2,sh[1]+3,sh[2],sh[3]);
+      ctx.fillStyle='#a8784c';ctx.fillRect(sh[0],sh[1],sh[2],sh[3]);ctx.fillStyle='#ecd59a';ctx.fillRect(sh[0]+5,sh[1]+5,sh[2]-10,sh[3]-10);
+      var R4=rng(s.id*7+11);for(var k=0;k<60;k++){ctx.fillStyle='rgba(170,130,70,.35)';ctx.fillRect(sh[0]+5+R4()*(sh[2]-11),sh[1]+5+R4()*(sh[3]-11),1.3,1.3)}
+      ctx.strokeStyle='#7d5634';ctx.lineWidth=1;ctx.strokeRect(sh[0]+.5,sh[1]+.5,sh[2]-1,sh[3]-1);ctx.strokeRect(sh[0]+5,sh[1]+5,sh[2]-10,sh[3]-10);
+      var bx=sh[0]+sh[2]*.65,by=sh[1]+sh[3]*.35;ctx.fillStyle='#3f8fd8';ctx.beginPath();ctx.arc(bx,by,6,0,TAU);ctx.fill();ctx.fillStyle='#7cc4f5';ctx.beginPath();ctx.arc(bx,by,3.6,0,TAU);ctx.fill();
+      ctx.strokeStyle='#e9533f';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(sh[0]+sh[2]*.25,sh[1]+sh[3]*.7);ctx.lineTo(sh[0]+sh[2]*.42,sh[1]+sh[3]*.55);ctx.stroke();ctx.lineCap='butt';
+      ctx.fillStyle='#e9533f';ctx.beginPath();ctx.ellipse(sh[0]+sh[2]*.46,sh[1]+sh[3]*.51,4,3,-.7,0,TAU);ctx.fill();
+      if(age>=0){ctx.fillStyle='rgba(90,60,20,'+(0.4*Math.min(1,age/0.6))+')';ctx.fillRect(sh[0]+5,sh[1]+5,sh[2]-10,sh[3]-10);
+        if(age<1.5){ctx.fillStyle='rgba(60,60,60,'+(1-age/1.5)+')';ctx.font='700 10px Fredoka,sans-serif';ctx.fillText('mud!',sh[0]+sh[2]+3,sh[1]+10)}}}
+    else if(s.kind==='bikes'){var vb=sh[3]>sh[2],L2=vb?sh[3]:sh[2],T2=vb?sh[2]:sh[3];ctx.save();ctx.translate(sh[0]+sh[2]/2,sh[1]+sh[3]/2);if(vb)ctx.rotate(Math.PI/2);
+      var jig=age>=0&&age<0.9?Math.sin(age*40)*0.8:0;
+      [[-T2*.22,'#2f8fdc'],[T2*.22,'#e9a23b']].forEach(function(b,bi){var oy=b[0]+jig*(bi?1:-1);ctx.fillStyle='rgba(0,0,0,.15)';ctx.fillRect(-L2*.46+2,oy-1,L2*.92,4);ctx.strokeStyle='#2b2b2b';ctx.lineWidth=4.2;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(-L2*.46,oy);ctx.lineTo(-L2*.2,oy);ctx.moveTo(L2*.2,oy);ctx.lineTo(L2*.46,oy);ctx.stroke();
+        ctx.strokeStyle=b[1];ctx.lineWidth=3.4;ctx.beginPath();ctx.moveTo(-L2*.3,oy);ctx.lineTo(L2*.28,oy);ctx.stroke();
+        ctx.strokeStyle='#444';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(L2*.27,oy-6);ctx.lineTo(L2*.27,oy+6);ctx.stroke();
+        ctx.fillStyle='#2b2b2b';rr(ctx,-L2*.17,oy-2.5,10,5,2.5);ctx.fill()});ctx.lineCap='butt';ctx.restore();
+      if(age>=0&&age<2.4&&Math.random()<0.35){S.parts.push({x0:sh[0]+Math.random()*sh[2],y0:sh[1]+sh[3]*.5,x1:sh[0]+Math.random()*sh[2],y1:sh[1]+sh[3]+5,t0:now,d:350,h:0,drip:1})}}
+    else if(s.kind==='table'){var vt=sh[3]>sh[2];ctx.fillStyle='rgba(0,0,0,.16)';ctx.fillRect(sh[0]+2,sh[1]+3,sh[2],sh[3]);
+      ctx.fillStyle='#9a6a3e';if(vt){ctx.fillRect(sh[0],sh[1]+3,sh[2]*.22,sh[3]-6);ctx.fillRect(sh[0]+sh[2]*.78,sh[1]+3,sh[2]*.22,sh[3]-6)}else{ctx.fillRect(sh[0]+3,sh[1],sh[2]-6,sh[3]*.22);ctx.fillRect(sh[0]+3,sh[1]+sh[3]*.78,sh[2]-6,sh[3]*.22)}
+      var tx0=vt?sh[0]+sh[2]*.28:sh[0],ty0=vt?sh[1]:sh[1]+sh[3]*.28,tw=vt?sh[2]*.44:sh[2],th=vt?sh[3]:sh[3]*.44;ctx.fillStyle='#c08a55';ctx.fillRect(tx0,ty0,tw,th);
+      ctx.strokeStyle='rgba(90,55,25,.55)';ctx.lineWidth=1;for(var pl=1;pl<4;pl++){ctx.beginPath();if(vt){ctx.moveTo(tx0+tw*pl/4,ty0);ctx.lineTo(tx0+tw*pl/4,ty0+th)}else{ctx.moveTo(tx0,ty0+th*pl/4);ctx.lineTo(tx0+tw,ty0+th*pl/4)}ctx.stroke()}
+      ctx.strokeStyle='#7a5230';ctx.lineWidth=1.2;ctx.strokeRect(tx0,ty0,tw,th);
+      ctx.fillStyle='#e9533f';ctx.beginPath();ctx.arc(tx0+tw*.3,ty0+th*.5,3.2,0,TAU);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(tx0+tw*.62,ty0+th*.45,3.6,0,TAU);ctx.fill();
+      if(age>=0){ctx.fillStyle='rgba(50,30,10,'+(0.35*Math.min(1,age/0.5))+')';ctx.fillRect(sh[0],sh[1],sh[2],sh[3]);
+        var R5=rng(s.id*13+2);ctx.fillStyle='rgba(255,255,255,.6)';for(var k=0;k<12;k++){ctx.beginPath();ctx.arc(sh[0]+R5()*sh[2],sh[1]+R5()*sh[3],1+R5()*1.4,0,TAU);ctx.fill()}}}
   })}
-function drawHead(s,hi,bad){var K=s.kind;ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.arc(s.x+1.5,s.y+2,8,0,TAU);ctx.fill();
-  if(bad){ctx.strokeStyle='#d9573b';ctx.lineWidth=3;ctx.beginPath();ctx.arc(s.x,s.y,13,0,TAU);ctx.stroke()}
-  if(hi){ctx.strokeStyle='#2f8fdc';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(s.x,s.y,12,0,TAU);ctx.stroke()}
-  ctx.fillStyle=K==='fan'?'#d4a64a':K==='rotor'?'#4f5b68':'#8b98a5';ctx.strokeStyle='#2b2b2b';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(s.x,s.y,7,0,TAU);ctx.fill();ctx.stroke();
-  if(s.arc<TAU-1e-6){ctx.fillStyle='#2b2b2b';ctx.beginPath();ctx.arc(s.x+Math.cos(s.dir)*3.5,s.y+Math.sin(s.dir)*3.5,2,0,TAU);ctx.fill()}else{ctx.fillStyle='#2b2b2b';ctx.beginPath();ctx.arc(s.x,s.y,2,0,TAU);ctx.fill()}
-  ctx.fillStyle='#fff';ctx.strokeStyle='rgba(0,0,0,.5)';ctx.lineWidth=2.5;ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.strokeText(s.label,s.x,s.y-11);ctx.fillText(s.label,s.x,s.y-11);ctx.textAlign='left'}
-function drawHandles(s){var K=DR.KIT[s.kind],a0=DR.arcStart(s);
-  ctx.save();ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,TAU);ctx.stroke();ctx.restore();
-  if(K.arcMin<K.arcMax){ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.3;[a0,a0+s.arc].forEach(function(a){ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x+Math.cos(a)*s.r*.72,s.y+Math.sin(a)*s.r*.72);ctx.stroke()})}
-  handles(s).forEach(function(h){if(h.t==='dir'){ctx.strokeStyle='#2f8fdc';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(s.x+Math.cos(s.dir)*9,s.y+Math.sin(s.dir)*9);ctx.lineTo(h.x,h.y);ctx.stroke();
-      ctx.fillStyle='#2f8fdc';ctx.save();ctx.translate(h.x,h.y);ctx.rotate(s.dir);ctx.beginPath();ctx.moveTo(8,0);ctx.lineTo(-4,-7);ctx.lineTo(-4,7);ctx.closePath();ctx.fill();ctx.restore()}
-    else if(h.t==='r'){ctx.fillStyle='#fff';ctx.strokeStyle='#2f8fdc';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(h.x,h.y,7,0,TAU);ctx.fill();ctx.stroke();ctx.fillStyle='#2f8fdc';ctx.font='700 9px Nunito';ctx.textAlign='center';ctx.fillText('↔',h.x,h.y+3);ctx.textAlign='left'}
-    else{ctx.fillStyle='#fff';ctx.strokeStyle='#2b6';ctx.strokeStyle='#1d6aa8';ctx.lineWidth=2;ctx.beginPath();ctx.arc(h.x,h.y,6,0,TAU);ctx.fill();ctx.stroke()}})}
+function drawHead(s,hi,bad){var K=s.kind,u=U;ctx.save();ctx.translate(s.x,s.y);ctx.scale(u,u);
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.arc(1.5,2,8,0,TAU);ctx.fill();
+  if(hi){var pu=REDUCE?0:Math.sin(S.t/320)*1.2;ctx.fillStyle='rgba(47,143,220,.18)';ctx.beginPath();ctx.arc(0,0,15+pu,0,TAU);ctx.fill()}
+  if(bad){ctx.strokeStyle='#d9573b';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,13,0,TAU);ctx.stroke()}
+  if(hi){ctx.strokeStyle='#2f8fdc';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(0,0,12,0,TAU);ctx.stroke()}
+  var base=K==='fan'?'#d4a64a':K==='rotor'?'#4f5b68':'#8b98a5',g=ctx.createRadialGradient(-2.5,-2.5,1,0,0,7.5);g.addColorStop(0,'rgba(255,255,255,.55)');g.addColorStop(.45,'rgba(255,255,255,0)');
+  ctx.fillStyle=base;ctx.strokeStyle='#2b2b2b';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(0,0,7,0,TAU);ctx.fill();ctx.fillStyle=g;ctx.fill();ctx.stroke();
+  ctx.fillStyle='#2b2b2b';ctx.beginPath();if(s.arc<TAU-1e-6)ctx.arc(Math.cos(s.dir)*3.5,Math.sin(s.dir)*3.5,2,0,TAU);else ctx.arc(0,0,2,0,TAU);ctx.fill();
+  ctx.fillStyle='#fff';ctx.strokeStyle='rgba(0,0,0,.55)';ctx.lineWidth=2.6;ctx.lineJoin='round';ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.strokeText(s.label,0,-11);ctx.fillText(s.label,0,-11);ctx.textAlign='left';ctx.restore()}
+function drawHandles(s){var K=DR.KIT[s.kind],a0=DR.arcStart(s),u=U,act=drag?drag.t:hoverH;
+  ctx.save();ctx.setLineDash([3*u,4*u]);ctx.strokeStyle=act==='r'?'rgba(255,255,255,.95)':'rgba(255,255,255,.75)';ctx.lineWidth=(act==='r'?1.8:1.2)*u;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,TAU);ctx.stroke();ctx.restore();
+  if(K.arcMin<K.arcMax){ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.3*u;[a0,a0+s.arc].forEach(function(a){ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x+Math.cos(a)*s.r*.72,s.y+Math.sin(a)*s.r*.72);ctx.stroke()})}
+  handles(s).forEach(function(h){var on=act===h.t,k=on?1.18:1;
+    if(on){ctx.fillStyle='rgba(255,255,255,.35)';ctx.beginPath();ctx.arc(h.x,h.y,13*u,0,TAU);ctx.fill()}
+    if(h.t==='dir'){ctx.strokeStyle='#2f8fdc';ctx.lineWidth=3*u;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(s.x+Math.cos(s.dir)*10*u,s.y+Math.sin(s.dir)*10*u);ctx.lineTo(h.x,h.y);ctx.stroke();ctx.lineCap='butt';
+      ctx.save();ctx.translate(h.x,h.y);ctx.rotate(s.dir);ctx.scale(u*k,u*k);ctx.beginPath();ctx.moveTo(9,0);ctx.lineTo(-4,-7.5);ctx.lineTo(-4,7.5);ctx.closePath();ctx.fillStyle='#2f8fdc';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.fill();ctx.stroke();ctx.restore()}
+    else if(h.t==='r'){ctx.save();ctx.translate(h.x,h.y);ctx.scale(u*k,u*k);ctx.fillStyle='#fff';ctx.strokeStyle='#2f8fdc';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(0,0,7.5,0,TAU);ctx.fill();ctx.stroke();
+      ctx.rotate(h.a);ctx.fillStyle='#2f8fdc';[1,-1].forEach(function(d){ctx.beginPath();ctx.moveTo(4.6*d,0);ctx.lineTo(1.2*d,-2.8);ctx.lineTo(1.2*d,2.8);ctx.closePath();ctx.fill()});ctx.restore()}
+    else{ctx.save();ctx.translate(h.x,h.y);ctx.scale(u*k,u*k);ctx.fillStyle='#fff';ctx.strokeStyle='#1d6aa8';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,6.5,0,TAU);ctx.fill();ctx.stroke();ctx.fillStyle='#1d6aa8';ctx.beginPath();ctx.arc(0,0,2,0,TAU);ctx.fill();ctx.restore()}})}
 
 function frame(now){S.t=now;if(S.phase==='run')stepRun(now);
   ctx.setTransform(sc*dpr,0,0,sc*dpr,0,0);ctx.clearRect(0,0,W,H);
   if(!under){requestAnimationFrame(frame);return}
   ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(under,0,0);ctx.setTransform(sc*dpr,0,0,sc*dpr,0,0);
   ctx.save();lawnPath(ctx,S.yard);ctx.clip();ctx.imageSmoothingEnabled=true;ctx.drawImage(gcan,0,0,W,H);ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(blades,0,0);ctx.setTransform(sc*dpr,0,0,sc*dpr,0,0);
-  if(S.phase==='done'){ctx.globalAlpha=0.45+0.25*Math.sin(now/260);ctx.imageSmoothingEnabled=false;ctx.drawImage(miss,0,0,W,H);ctx.imageSmoothingEnabled=true;ctx.globalAlpha=1}
+  if(S.phase==='run'&&sheenOn){ctx.drawImage(shn,0,0,W,H)}
+  if(S.phase==='done'){ctx.globalAlpha=REDUCE?0.6:0.45+0.25*Math.sin(now/260);ctx.imageSmoothingEnabled=false;ctx.drawImage(miss,0,0,W,H);ctx.imageSmoothingEnabled=true;ctx.globalAlpha=1}
   ctx.restore();
   ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(over,0,0);ctx.setTransform(sc*dpr,0,0,sc*dpr,0,0);
   if(S.wet){ctx.save();ctx.beginPath();ctx.rect(S.yard.bounds[0],S.yard.bounds[1],S.yard.bounds[2],S.yard.bounds[3]);ctx.clip();ctx.drawImage(hard,0,0,W,H);ctx.restore()}
@@ -700,7 +1191,10 @@ function frame(now){S.t=now;if(S.phase==='run')stepRun(now);
   var badBy={};if(S.phase==='done')S.res.pens.forEach(function(p){if(p.pts)badBy[p.by]=1});
   // reach outlines
   if(S.phase==='plan'||S.phase==='done')S.sps.forEach(function(s,i){var P=S.polys[i];if(!P)return;var sel=i===S.sel;
-    drawPoly(P);if(S.phase==='plan'){ctx.fillStyle=sel?'rgba(70,160,235,.16)':'rgba(70,160,235,.07)';ctx.fill()}
+    drawPoly(P);if(S.phase==='plan'){var gr=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,Math.max(1,s.r)),k0=DR.RULES.graded?DR.RULES.knee:1,A=sel?0.34:0.22;
+      gr.addColorStop(0,'rgba(50,140,230,'+A+')');gr.addColorStop(k0,'rgba(50,140,230,'+A+')');gr.addColorStop(1,'rgba(50,140,230,'+(DR.RULES.graded?A*0.18:A)+')');ctx.fillStyle=gr;ctx.fill();
+      if(DR.RULES.graded){ctx.save();drawPoly(P);ctx.clip();ctx.setLineDash([2*U,4*U]);ctx.strokeStyle=sel?'rgba(255,255,255,.75)':'rgba(255,255,255,.45)';ctx.lineWidth=1.2*U;ctx.beginPath();
+        if(s.arc>=TAU-1e-6)ctx.arc(s.x,s.y,s.r*k0,0,TAU);else ctx.arc(s.x,s.y,s.r*k0,DR.arcStart(s),DR.arcStart(s)+s.arc);ctx.stroke();ctx.restore();drawPoly(P)}}
     ctx.save();ctx.setLineDash(S.phase==='done'?[6,4]:[]);ctx.strokeStyle=badBy[i]?'rgba(217,87,59,.95)':(sel?'rgba(30,110,200,.95)':'rgba(40,120,210,.5)');ctx.lineWidth=badBy[i]?2.2:(sel?2:1.3);ctx.stroke();ctx.restore()});
   if(S.phase==='plan'&&S.sel>=0)drawHandles(S.sps[S.sel]);
   // streams
@@ -716,14 +1210,19 @@ function frame(now){S.t=now;if(S.phase==='run')stepRun(now);
   S.sps.forEach(function(s,i){if(s.placed)drawHead(s,i===S.sel&&S.phase==='plan',!!badBy[i])});
   // penalty tags
   if(S.phase==='done')S.res.pens.forEach(function(p){if(!p.pts)return;var sh=S.yard.sens[p.id].shape,tx=sh.length===3?sh[0]:sh[0]+sh[2]/2,ty=sh.length===3?sh[1]-sh[2]-12:sh[1]-10;
-    tx=Math.max(26,Math.min(W-26,tx));ty=Math.max(14,Math.min(H-8,ty));var txt='−'+p.pts+' '+S.sps[p.by].label;ctx.font='700 12px Fredoka,sans-serif';var w=ctx.measureText(txt).width+14;
-    ctx.fillStyle='#d9573b';rr(ctx,tx-w/2,ty-10,w,19,9);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(txt,tx,ty+4);ctx.textAlign='left';sensOutline(S.yard.sens[p.id],'#d9573b')});
+    var u=U,txt='−'+p.pts+' '+S.sps[p.by].label;ctx.font='700 '+(12*u)+'px Fredoka,sans-serif';var w=ctx.measureText(txt).width+14*u;
+    tx=Math.max(w/2+4,Math.min(W-w/2-4,tx));ty=Math.max(12*u,Math.min(H-10*u,ty));
+    ctx.fillStyle='rgba(0,0,0,.18)';rr(ctx,tx-w/2+1,ty-10*u+2,w,19*u,9*u);ctx.fill();ctx.fillStyle='#d9573b';rr(ctx,tx-w/2,ty-10*u,w,19*u,9*u);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(txt,tx,ty+4*u);ctx.textAlign='left';sensOutline(S.yard.sens[p.id],'#d9573b')});
   requestAnimationFrame(frame)}
 
 // ---------- boot ----------
 resize();
 var st=store.get();
-if(st.days[TODAY])loadDaily();else{setVariant(variantFor(TODAY),false);if(!st.seen){help();st.seen=1;store.set(st)}}
+if(st.days[TODAY]){draft.clear();loadDaily()}else{var dr=draft.get();setVariant(variantFor(TODAY),false);
+  if(dr&&dr.day===TODAY&&dr.sps&&dr.sps.length===S.sps.length&&dr.sps.every(function(z,i){return z.kind===S.sps[i].kind})){
+    dr.sps.forEach(function(z,i){var s=S.sps[i];s.placed=!!z.placed;s.x=+z.x||0;s.y=+z.y||0;s.dir=+z.dir||0;s.arc=+z.arc||s.arc;s.r=+z.r||s.r;DR.clampSp(s)});recalc();updateUI();
+    if(placed().length)toast('Picked up where you left off')}
+  if(!st.seen){help();st.seen=1;store.set(st)}}
 tick();requestAnimationFrame(frame);
 })();
 </script>

@@ -42,7 +42,9 @@ h1{font-family:'Fraunces',serif;font-weight:700;font-size:28px;letter-spacing:.0
 .focusing .focusbadge{opacity:1}
 .transport{display:flex;align-items:center;gap:16px;margin-top:16px}
 .play{width:84px;height:84px;flex:none;border-radius:50%;background:var(--cream);color:var(--bg);display:grid;place-items:center;box-shadow:0 8px 22px -8px rgba(243,233,210,.45),inset 0 -4px 0 rgba(0,0,0,.12);transition:transform .12s}
+.play:hover{box-shadow:0 10px 26px -8px rgba(243,233,210,.55),inset 0 -4px 0 rgba(0,0,0,.12)}
 .play:active{transform:scale(.95)}
+.playing .play{box-shadow:0 0 0 5px rgba(243,233,210,.10),0 8px 22px -8px rgba(243,233,210,.45),inset 0 -4px 0 rgba(0,0,0,.12)}
 .play svg{width:34px;height:34px}
 .tright{flex:1;min-width:0}
 .vol{display:flex;align-items:center;gap:10px}
@@ -59,31 +61,39 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 
 /* slots */
 .slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
-.slot{position:relative;border-radius:14px;border:1.5px dashed #4c443c;min-height:88px;padding:10px 12px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+.slot{position:relative;border-radius:14px;border:1.5px dashed #4c443c;min-height:96px;padding:10px 10px 8px 12px;overflow:hidden;display:flex;flex-direction:column;gap:6px;transition:border-color .3s,box-shadow .4s}
+.slot .row{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:auto;position:relative;z-index:2;min-height:34px}
 .slot .ch{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em}
-.slot .name{font-weight:700;font-size:15px;line-height:1.2;color:var(--dim);position:relative;z-index:1}
-.slot .bars{display:flex;align-items:flex-end;gap:3px;height:22px;position:relative;z-index:1}
-.slot .bars i{width:5px;border-radius:2px;background:#433b34;height:15%}
+.slot .name{font-weight:700;font-size:15px;line-height:1.22;color:var(--dim);position:relative;z-index:1;text-wrap:balance;overflow-wrap:anywhere}
+.slot .bars{display:flex;align-items:flex-end;gap:3px;height:22px;position:relative;z-index:1;padding-bottom:4px}
+.slot .bars i{width:5px;border-radius:2px 2px 1px 1px;background:#433b34;height:15%;transition:background .3s}
 .slot .fill{position:absolute;inset:0;background:var(--col);transform:scaleX(0);transform-origin:left;opacity:.16}
-.slot.on{border:1.5px solid var(--col)}
+.slot.on{border:1.5px solid var(--col);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03),0 6px 18px -12px var(--col)}
+.slot.on.fresh{animation:pop .5s cubic-bezier(.2,1.6,.4,1),glow 1.2s ease-out}
+@keyframes glow{0%{box-shadow:0 0 0 0 var(--col)}35%{box-shadow:0 0 0 6px rgba(0,0,0,0),0 0 22px -2px var(--col)}100%{box-shadow:0 6px 18px -12px var(--col)}}
 .slot.on .fill{animation:sweep .7s cubic-bezier(.2,.8,.2,1) forwards}
 .slot.on .name{color:var(--cream)}
 .slot.on .ch{color:var(--col)}
 .slot.on .bars i{background:var(--col)}
-.slot.on{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
 .slot.revealed{border:1.5px solid #5b5249}
 .slot.revealed .name{color:var(--muted);font-style:italic}
 .slot.revealed .fill{transform:scaleX(1);opacity:.05;background:var(--cream)}
 @keyframes sweep{to{transform:scaleX(1)}}
 @keyframes pop{0%{transform:scale(.94)}100%{transform:scale(1)}}
-.mute{position:absolute;bottom:8px;right:8px;z-index:2;min-width:58px;padding:0 8px;height:30px;border-radius:9px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);display:none;place-items:center;font-size:11px;font-weight:700;letter-spacing:.06em}
+.mute{flex:none;min-width:64px;padding:0 10px;height:34px;border-radius:9px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);display:none;place-items:center;font-size:11px;font-weight:700;letter-spacing:.06em;transition:background .15s,color .15s,border-color .15s}
+.mute:hover{border-color:rgba(255,255,255,.3)}
 .slot.on .mute,.slot.revealed .mute{display:grid}
 .mute.m{background:var(--cream);color:var(--bg)}
-.slot.muted .bars,.slot.muted .name{opacity:.4}
+.slot.muted .bars,.slot.muted .name{opacity:.4;transition:opacity .2s}
 
 /* actions */
 .actions{display:flex;gap:10px;margin-top:14px}
-.act{flex:1;border-radius:14px;padding:13px 10px;font-weight:700;font-size:15px;border:1.5px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:center;gap:8px}
+.mutehint{font-size:13px;color:var(--muted);margin:10px 2px 0;line-height:1.4}.mutehint b{color:var(--cream);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em}
+.mutehint[hidden]{display:none}
+#wcost.hot{color:var(--bad)}
+.act{flex:1;min-height:48px;border-radius:14px;padding:12px 10px;font-weight:700;font-size:15px;border:1.5px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,color .2s,border-color .2s,transform .12s}
+.act:hover:not(:disabled){border-color:var(--muted)}
+.act:active:not(:disabled){transform:scale(.98)}
 .act .cost{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);font-weight:500}
 .act.focus{border-color:#6b6055}
 .act.focus.live{background:var(--cream);color:var(--bg)}
@@ -93,7 +103,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 
 /* search */
 .search{margin-top:20px}
-.search label{font-size:13px;color:var(--muted);display:block;margin:0 2px 8px}
+.search label{font-size:13px;color:var(--muted);display:block;margin:0 2px 10px;line-height:1.45}
+.search label b{display:block;font-family:'Fraunces',serif;font-size:19px;color:var(--cream);font-weight:500;margin-bottom:2px}
 .field{position:relative}
 .field input{width:100%;font:inherit;font-size:17px;color:var(--cream);background:#191613;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px 14px 44px;outline:none}
 .field input:focus{border-color:var(--muted)}
@@ -102,12 +113,15 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .field.shake{animation:shake .4s}
 @keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
 .lib{display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:330px;overflow:auto;padding:2px}
-.opt{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:12px 14px;border-radius:12px;background:var(--panel);border:1px solid #3b342e;font-size:15.5px}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;min-height:46px;padding:12px 14px;border-radius:12px;background:var(--panel);border:1px solid #3b342e;font-size:15.5px;transition:border-color .15s,background .15s,opacity .3s}
+.opt.flash{animation:flash .45s}
+@keyframes flash{30%{background:rgba(224,90,79,.22);border-color:var(--bad)}}
 .opt:hover:not(:disabled){border-color:var(--muted)}
 .opt .via{font-size:12px;color:var(--dim)}
 .opt.wrong{opacity:.45;text-decoration:line-through}
 .opt.right{border-color:#4f6b5d;color:var(--c3)}
-.opt .tick{font-size:13px}
+.opt .tick{font-size:13px;flex:none;font-family:'DM Mono',monospace}
+.opt.wrong .tick{color:var(--bad)}
 .empty{color:var(--dim);font-size:14px;padding:10px 4px}
 .float{position:fixed;font-family:'DM Mono',monospace;font-weight:500;color:var(--bad);font-size:20px;pointer-events:none;animation:up 1s forwards;z-index:9}
 @keyframes up{to{transform:translateY(-40px);opacity:0}}
@@ -123,11 +137,16 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .big span{font-size:20px;color:var(--dim)}
 .breakdown{color:var(--muted);font-size:14px}
 .grid{font-size:26px;letter-spacing:4px;margin:12px 0}
+.grid span{display:inline-block;animation:pop .4s cubic-bezier(.2,1.6,.4,1) both}
+.grid span:nth-child(2){animation-delay:.08s}.grid span:nth-child(3){animation-delay:.16s}.grid span:nth-child(4){animation-delay:.24s}
 .stats{display:flex;justify-content:center;gap:24px;margin:12px 0 16px}
 .stats b{font-family:'DM Mono',monospace;font-size:22px;display:block}
 .stats span{font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
 .btnrow{display:flex;gap:10px}
-.btn{flex:1;border-radius:14px;padding:14px;font-weight:700;background:var(--cream);color:var(--bg)}
+.btn{flex:1;min-height:50px;border-radius:14px;padding:12px 10px;font-weight:700;font-size:15px;line-height:1.2;background:var(--cream);color:var(--bg);transition:transform .12s,box-shadow .2s,border-color .2s}
+.btn:hover{box-shadow:0 6px 18px -10px rgba(243,233,210,.6)}
+.btn:active{transform:scale(.98)}
+.btn.ghost:hover{box-shadow:none;border-color:var(--muted)}
 .btn.ghost{background:transparent;color:var(--cream);border:1.5px solid var(--line)}
 .next{font-size:13px;color:var(--dim);margin-top:12px}
 .sharebox{display:none;width:100%;margin-top:10px;background:#191613;color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:10px;font:13px 'DM Mono',monospace;height:96px}
@@ -139,7 +158,17 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .foot a{color:var(--muted)}
 .practice-flag{display:none;font-size:11px;font-weight:700;letter-spacing:.1em;background:var(--c4);color:var(--bg);padding:2px 7px;border-radius:6px;margin-left:6px;vertical-align:2px}
 .practice .practice-flag{display:inline-block}
-.loading{opacity:.5;pointer-events:none}
+.loading .studio{opacity:.55;transition:opacity .2s}
+.loading{pointer-events:none}
+/* keyboard focus */
+button:focus-visible,input[type=range]:focus-visible,.foot summary:focus-visible,.next a:focus-visible{outline:2px solid var(--cream);outline-offset:3px;border-radius:12px}
+.play:focus-visible{border-radius:50%;outline-offset:4px}
+.field input:focus-visible{border-color:var(--cream);box-shadow:0 0 0 3px rgba(243,233,210,.12)}
+@media (max-width:380px){.big{font-size:46px}.act{font-size:14px}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+  .playing .rec{animation:none;opacity:1}
+}
 </style>
 </head>
 <body>
@@ -165,6 +194,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       </div>
     </div>
     <div class="slots" id="slots"></div>
+    <p class="mutehint" id="mutehint" hidden>Tip: tap <b>MUTE</b> on a solved channel (free) to hear what's underneath.</p>
     <div class="actions">
       <button class="act focus" id="focus">Focus <span class="cost">−10</span></button>
       <button class="act" id="reveal">Reveal answers</button>
@@ -172,7 +202,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   </section>
 
   <section class="search">
-    <label for="q">What do you hear? Search the sound library, then tap your answer. Wrong answers cost 5.</label>
+    <label for="q"><b>What do you hear?</b>Search the sound library, then tap your answer. <span id="wcost">Wrong answers cost 5 (10 after your third).</span></label>
     <div class="field" id="field">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="search" placeholder="Try “keys”, “ball”, “bell”…" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -199,7 +229,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <summary>How to play</summary>
       <ul>
         <li>Each day's recording layers four everyday sounds in an 8-second loop. Replay it as often as you like.</li>
-        <li>Search the library and tap the sound you think you hear. Right answers open a channel; wrong ones cost 5 points.</li>
+        <li>Search the library and tap the sound you think you hear. Right answers open a channel. Your first three wrong answers cost 5 points each, and every wrong answer after that costs 10, so listen before you guess.</li>
         <li>Mute solved channels (free) to hear what's left underneath.</li>
         <li><b>Focus</b> (−10) brings one unsolved sound forward for a full loop.</li>
         <li>You start with 100. The round ends when all four are solved or you reveal the answers — each sound still unsolved at reveal costs 25.</li>
@@ -209,7 +239,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <br><span id="foot2"></span>
   </div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 /* ===== Soundcheck synth engine: every sound is generated from math, 8 s loop ===== */
@@ -247,8 +277,12 @@ function envAD(t,a,d,h=0){ if(t<a) return t/a; if(t<a+h) return 1; return Math.e
 // sum of decaying sine partials: parts = [[freqMult, amp, decay], ...]
 function partials(base, parts, dur, attack=0.002, rng=null){
   const L=Math.round(dur*SR), b=new Float32Array(L);
+  const A=Math.round(attack*SR);
   for(const [m,a,d] of parts){ const f=base*m, ph=rng?rng()*6.28:0;
-    for(let i=0;i<L;i++){const t=i/SR; b[i]+=a*Math.sin(2*Math.PI*f*t+ph)*Math.exp(-t/d)*Math.min(1,t/attack);} }
+    // recursive oscillator + recursive decay (same result as sin()*exp(), much faster)
+    const w=2*Math.PI*f/SR, cw=Math.cos(w), sw=Math.sin(w), k=Math.exp(-1/(d*SR));
+    let re=Math.cos(ph), im=Math.sin(ph), e=a;
+    for(let i=0;i<L;i++){ b[i]+=e*im*(i<A?i/A:1); const nr=re*cw-im*sw; im=re*sw+im*cw; re=nr; e*=k; } }
   return b;
 }
 // sine with pitch glide
@@ -423,6 +457,204 @@ S.rain = (o,r)=>{
   for(let k=0;k<320;k++) put(o,r()*8,noiseBurst(r,0.012,'bp',2000+r()*3000,2,0.0003,0.002),0.15+r()*0.25);
 };
 
+/* ----- extra building blocks (added with the library expansion) ----- */
+// oscillator whose frequency follows fn(t); shape 'sin' | 'saw'
+function oscF(fn,dur,shape='sin'){const L=Math.round(dur*SR),b=new Float32Array(L);let p=0;for(let i=0;i<L;i++){p+=fn(i/SR)/SR;p-=Math.floor(p);b[i]=shape==='saw'?2*p-1:Math.sin(2*Math.PI*p);}return b;}
+// piecewise-linear curve through [[t,v],...]
+function curve(pts){let k=1;return t=>{if(t<=pts[0][0])return pts[0][1];if(t<pts[k-1][0])k=1;for(;k<pts.length;k++){const [t1,v1]=pts[k],[t0,v0]=pts[k-1];if(t<=t1)return v0+(v1-v0)*(t-t0)/(t1-t0);}k=pts.length-1;return pts[pts.length-1][1];};}
+// band-pass whose centre follows fc(t) (Chamberlin state-variable, 0 dB peak)
+function sweepBP(buf,fc,Q){let lp=0,bp=0;const q=1/Q;for(let i=0;i<buf.length;i++){const f=2*Math.sin(Math.PI*Math.min(fc(i/SR),SR/7)/SR);const hp=buf[i]-lp-q*bp;bp+=f*hp;lp+=f*bp;buf[i]=bp*q;}return buf;}
+// voice-like source (saw + breath) through moving formants: fm = [[fcFn,Q,amp],...]
+function formantVoice(r,f0,fm,dur,breath=0.1){const src=oscF(f0,dur,'saw');for(let i=0;i<src.length;i++)src[i]+=breath*(r()*2-1);
+  const out=new Float32Array(src.length);for(const [fc,Q,a] of fm){const b=sweepBP(Float32Array.from(src),fc,Q);for(let i=0;i<b.length;i++)out[i]+=a*b[i];}return out;}
+// engine-style pulse train: one sharp pulse per firing; rate(t) in Hz, amp(t) 0..1
+function pulseTrain(r,rate,amp,dur,sharp=6,noise=0.3){const L=Math.round(dur*SR),b=new Float32Array(L);let ph=0,ca=1;
+  for(let i=0;i<L;i++){const t=i/SR;ph+=rate(t)/SR;if(ph>=1){ph-=Math.floor(ph);ca=0.7+0.3*r();}
+    b[i]=amp(t)*ca*(Math.exp(-ph*sharp)+noise*(r()*2-1)*Math.exp(-ph*3));}return b;}
+
+S.dog = (o,r)=>{ // "woof woof ... woof woof woof"
+  const woof=(t,g,f0)=>{ const d=0.24, env=curve([[0,0],[0.008,1],[0.07,0.85],[0.24,0]]);
+    const b=formantVoice(r,tt=>f0*(tt<0.03?1+5*tt:1.15-1.7*Math.min(0.25,tt-0.03))*(1+0.06*(r()-0.5)),
+      [[curve([[0,750],[0.24,450]]),4,1],[curve([[0,1350],[0.24,950]]),5,0.75],[()=>2700,6,0.3]],d,0.35);
+    for(let i=0;i<b.length;i++){b[i]=Math.tanh(3*b[i]*env(i/SR));}
+    filt(b,'lp',3800,0.7); put(o,t,b,g); };
+  const a=0.5+r()*0.3, f=330+r()*50;
+  woof(a,1,f); woof(a+0.34,0.9,f*0.97);
+  const b=a+3.7+r()*0.3; woof(b,1,f*1.03); woof(b+0.3,0.85,f); woof(b+0.62,0.95,f*0.98);
+};
+S.cat = (o,r)=>{ // two meows: "m-ee-ow"
+  const meow=(t,len,k,g)=>{ const s=len/0.85;
+    const b=formantVoice(r,tt=>k*curve([[0,520],[0.25*s,760],[0.5*s,720],[len,470]])(tt)*(1+0.015*Math.sin(2*Math.PI*6*tt)),
+      [[curve([[0,350],[0.2*s,850],[0.55*s,760],[len,420]]),6,1],[curve([[0,1950],[0.2*s,1700],[0.55*s,1300],[len,850]]),8,0.8],[()=>3000,8,0.25]],len,0.06);
+    const env=curve([[0,0],[0.06*s,0.45],[0.2*s,1],[0.6*s,0.85],[len,0]]);
+    for(let i=0;i<b.length;i++) b[i]*=env(i/SR);
+    put(o,t,b,g); };
+  meow(1.0+r()*0.3,0.85,1,1); meow(4.6+r()*0.4,1.05,1.1,0.95);
+};
+S.camera = (o,r)=>{ // DSLR "ch-chk", then film wind-on; then a quick three-shot burst
+  const clk=(t,g,f)=>{ put(o,t,noiseBurst(r,0.03,'bp',f,1.2,0.0002,0.0035),g); put(o,t,glide(260,180,0.01,0.05,0.012),g*0.5); };
+  const shot=(t,g=1)=>{ clk(t,g,3200); put(o,t+0.004,noiseBurst(r,0.02,'hp',5000,0.7,0.0002,0.002),g*0.5);
+    clk(t+0.075,g*1.1,2400); put(o,t+0.083,noiseBurst(r,0.05,'bp',1200,1.5,0.001,0.01),g*0.6); };
+  const wind=(t,len)=>{ const b=mix(oscF(tt=>120+40*Math.min(1,tt/0.06),len,'saw'),scale(noiseBurst(r,len,null,0,0,0.001,1e9),0.2));
+    filt(b,'bp',1500,2); filt(b,'lp',3000,0.7); gate(b,0.02,0.04); put(o,t,b,0.4); };
+  const a=0.8+r()*0.3; shot(a); wind(a+0.22,0.6);
+  const b=a+3.4+r()*0.3; shot(b); shot(b+0.33,0.95); shot(b+0.66,0.9);
+};
+S.can = (o,r)=>{ // tab click, "pssht", fizz
+  const open=(t)=>{
+    put(o,t,noiseBurst(r,0.015,'bp',2500,2,0.0002,0.002),0.6);
+    put(o,t+0.06,noiseBurst(r,0.03,'bp',1800,3,0.0002,0.004),0.9);
+    put(o,t+0.06,partials(3100,[[1,1,0.02],[1.7,0.5,0.012]],0.08,0.0005,r),0.3);
+    put(o,t+0.065,noiseBurst(r,0.5,'hp',3000,0.7,0.002,0.12,0.03),1);
+    const len=2.2; for(let k=0;k<len*350;k++){ const tt=Math.pow(r(),1.6)*len;
+      put(o,t+0.12+tt,noiseBurst(r,0.004,'hp',4500,0.7,0.0001,0.0007),0.3*(1-tt/len)); }
+    put(o,t+0.12,noiseBurst(r,len,'hp',6000,0.7,0.02,0.8),0.08); };
+  open(0.9+r()*0.3); open(4.7+r()*0.3);
+};
+S.flush = (o,r)=>{ // handle clunk, roaring swirl, gurgle, cistern refilling
+  const t0=0.4+r()*0.3;
+  put(o,t0,glide(200,120,0.02,0.1,0.03),0.6); put(o,t0,noiseBurst(r,0.05,'bp',900,1.5,0.0005,0.01),0.8);
+  put(o,t0+0.03,partials(1700,[[1,1,0.03],[2.3,0.4,0.02]],0.1,0.0005,r),0.3);
+  const len=3.4, L=Math.round(len*SR), b=new Float32Array(L), ph=[r()*6.3,r()*6.3,r()*6.3];
+  for(let i=0;i<L;i++) b[i]=r()*2-1;
+  const lo=filt(Float32Array.from(b),'lp',500,0.7);
+  sweepBP(b,t=>1100-750*Math.min(1,t/2.6)+120*Math.sin(2*Math.PI*1.3*t),1.3);
+  const env=curve([[0,0],[0.25,1],[1.5,1],[2.6,0.55],[len,0]]);
+  for(let i=0;i<L;i++){ const t=i/SR, turb=0.62+0.2*Math.sin(2*Math.PI*3.1*t+ph[0])+0.12*Math.sin(2*Math.PI*7.3*t+ph[1])+0.06*Math.sin(2*Math.PI*13*t+ph[2]);
+    b[i]=(b[i]+0.9*lo[i])*env(t)*turb; }
+  put(o,t0+0.08,b,1.4);
+  for(let k=0;k<16;k++){ const t=t0+2.3+r()*1.4; put(o,t,glide(220+r()*200,480+r()*300,0.03,0.09,0.025,0.002),0.45); }
+  const fl=noiseBurst(r,4.2,'bp',2400,2,0.4,1e9); gate(fl,0.4,0.6); put(o,t0+3.3,fl,0.22);
+};
+S.hammer = (o,r)=>{ // two light taps, then full blows driving a nail
+  const hit=(t,g,k)=>{ const f=2600+k*60+r()*80;
+    put(o,t,partials(f,[[1,1,0.05],[1.51,0.55,0.035],[2.34,0.35,0.02],[3.2,0.15,0.012]],0.2,0.0003,r),g*0.55);
+    put(o,t,noiseBurst(r,0.04,'bp',1600,1,0.0002,0.004),g); put(o,t,glide(190,130,0.02,0.1,0.03),g*0.7); };
+  const a=0.4+r()*0.2; let k=0; hit(a,0.45,k++); hit(a+0.32,0.45,k++); for(let j=0;j<5;j++) hit(a+0.9+j*0.5,1,k++);
+  const b=a+4.3; k=0; hit(b,0.45,k++); hit(b+0.32,0.45,k++); for(let j=0;j<4;j++) hit(b+0.9+j*0.5,1,k++);
+};
+S.saw = (o,r)=>{ // hand saw: push/pull strokes with tooth rasp
+  const stroke=(t,len,push,g)=>{ const L=Math.round(len*SR), b=new Float32Array(L); let ph=0;
+    for(let i=0;i<L;i++){ const v=Math.sin(Math.PI*i/L); ph+=(push?140:110)*(0.25+0.75*v)/SR; const fr=ph-Math.floor(ph);
+      b[i]=(r()*2-1)*(0.25+0.75*Math.exp(-fr*7))*Math.pow(v,0.8); }
+    filt(b,'bp',push?2200:2800,0.7); const body=filt(Float32Array.from(b),'bp',650,2);
+    for(let i=0;i<L;i++) b[i]+=0.8*body[i]; put(o,t,b,g); };
+  let t=0.3; for(let k=0;k<7;k++){ stroke(t,0.42,k%2===0,k%2?0.75:1); t+=0.46; }
+  t=4.5+r()*0.1; for(let k=0;k<6;k++){ stroke(t,0.42,k%2===0,k%2?0.75:1); t+=0.46; }
+};
+S.blender = (o,r)=>{ // motor spin-up whine, load wobble, spin-down
+  const run=(t,len,g)=>{ const L=Math.round(len*SR), b=new Float32Array(L); let ph=0, lf=0, tg=0;
+    for(let i=0;i<L;i++){ const tt=i/SR; if(i%1500===0) tg=r(); lf+=(tg-lf)*0.0015;
+      const up=1-Math.exp(-tt/0.12), dn=tt>len-0.5?Math.exp(-(tt-(len-0.5))/0.18):1;
+      ph+=330*up*dn*(1-0.14*lf)/SR; const fr=ph-Math.floor(ph);
+      b[i]=((2*fr-1)*0.55+(fr<0.08?0.6:0)+(r()*2-1)*0.45)*Math.min(1,tt/0.03)*dn*(0.8+0.25*lf); }
+    filt(b,'hp',160,0.7); filt(b,'lp',4500,0.7); put(o,t,b,g);
+    for(let k=0;k<len*6;k++) put(o,t+0.3+r()*(len-0.8),noiseBurst(r,0.05,'lp',400,0.8,0.002,0.015),0.25*g); };
+  run(0.35,2.8,1); run(4.0+r()*0.2,0.6,0.9); run(5.1+r()*0.2,2.5,1);
+};
+S.engine = (o,r)=>{ // starter cranking, catch, rev, idle, blip, shut off
+  const t0=0.3, crank=1.15;
+  const st=mix(scale(oscF(t=>175+10*Math.sin(2*Math.PI*5.5*t),crank,'saw'),0.35),noiseBurst(r,crank,null,0,0,0.001,1e9));
+  for(let i=0;i<st.length;i++){ const t=i/SR; st[i]*=0.35+0.65*Math.pow(0.5+0.5*Math.sin(2*Math.PI*5.5*t),2); }
+  filt(st,'bp',900,0.8); gate(st,0.02,0.05); put(o,t0,st,0.8);
+  const len=7.4-crank;
+  const rate=curve([[0,14],[0.3,70],[0.9,34],[1.4,28],[3.0,28],[3.25,58],[3.9,29],[5.2,28],[5.6,8],[len,4]]);
+  const amp=curve([[0,0.6],[0.3,1],[0.9,0.6],[1.4,0.5],[3.0,0.5],[3.25,0.95],[3.9,0.52],[5.2,0.5],[5.6,0.15],[len,0]]);
+  const b=pulseTrain(r,rate,amp,len,5,0.35); filt(b,'lp',900,0.7); filt(b,'hp',35,0.7);
+  const h=filt(Float32Array.from(b),'bp',240,1.5); for(let i=0;i<b.length;i++) b[i]+=1.2*h[i];
+  put(o,t0+crank-0.05,b,1);
+};
+S.hooves = (o,r)=>{ // trotting "clip-clop", hollow and two-toned
+  const hit=(t,f,g)=>{ put(o,t,partials(f,[[1,1,0.03],[2.25,0.35,0.012],[3.9,0.12,0.006]],0.12,0.0004,r),g); put(o,t,noiseBurst(r,0.02,'bp',1800,1.2,0.0002,0.003),g*0.6); };
+  const off=0.15+r()*0.1; for(let k=0;k<30;k++){ const t=off+k*0.255+(r()-0.5)*0.012, sw=0.55+0.45*Math.sin(Math.PI*k/30), hi=k%2===0;
+    hit(t,hi?820:640,sw); hit(t+0.022,hi?760:600,sw*0.45); }
+};
+S.fireworks = (o,r)=>{ // whistle up, boom (+echo), crackle
+  const boom=(t,g)=>{ put(o,t,noiseBurst(r,1.2,'lp',220,0.8,0.002,0.35),g*1.4); put(o,t,glide(90,40,0.25,1,0.35),g*0.7);
+    put(o,t,noiseBurst(r,0.08,'bp',900,0.8,0.0005,0.02),g*0.6); put(o,t+0.32,noiseBurst(r,0.9,'lp',180,0.8,0.01,0.3),g*0.45); };
+  const crackle=(t,len,g)=>{ for(let k=0;k<70;k++){ const d=r()*len; put(o,t+d,noiseBurst(r,0.008,'hp',2500,0.8,0.0001,0.0015),g*(0.4+0.6*r())*(1-0.7*d/len)); } };
+  const launch=(t,len)=>{ const b=oscF(tt=>700+1800*Math.pow(tt/len,0.8)+40*Math.sin(2*Math.PI*9*tt),len);
+    const h=noiseBurst(r,len,'bp',2500,1,0.05,1e9); for(let i=0;i<b.length;i++) b[i]=(b[i]+0.3*h[i])*(0.5+0.5*i/b.length);
+    gate(b,0.08,0.05); put(o,t,b,0.35); };
+  const a=0.2+r()*0.3; launch(a,1.1); boom(a+1.15,1); crackle(a+1.45,1.6,0.6);
+  const b=a+4.1; launch(b,0.9); boom(b+0.95,0.85); boom(b+1.6,0.6); crackle(b+1.2,1.8,0.55);
+};
+S.heartbeat = (o,r)=>{ // lub-dub at 75 bpm
+  // driven hard so the harmonics (150-500 Hz) carry the beat on small speakers too
+  const thump=(t,f0,f1,dec,g)=>{ const b=glide(f0,f1,0.04,0.25,dec,0.004,[[2,0.3],[3,0.15]]);
+    for(let i=0;i<b.length;i++) b[i]=Math.tanh(5*b[i])/Math.tanh(5)*Math.exp(-i/SR/dec);
+    filt(b,'hp',110,0.7); filt(b,'hp',110,0.7); // drop the sub-bass that phones can't play anyway
+    put(o,t,b,g); put(o,t,noiseBurst(r,0.06,'bp',240,1.2,0.002,0.018),g*0.8); };
+  const off=r()*0.2; for(let k=0;k<10;k++){ const t=off+k*0.8; thump(t,70,52,0.07,1); thump(t+0.27,88,64,0.05,0.75); }
+};
+S.register = (o,r)=>{ // keys, "ka-CHING", drawer rolls out and bumps
+  const key=(t)=>{ put(o,t,noiseBurst(r,0.03,'bp',2000,1.5,0.0003,0.004),0.6); put(o,t,glide(300,220,0.01,0.05,0.015),0.3); };
+  const ching=(t)=>{ put(o,t,partials(3150,[[1,1,0.7],[1.006,0.8,0.7],[2.08,0.45,0.35],[3.3,0.25,0.18],[4.6,0.1,0.08]],1.6,0.0008,r),0.7);
+    put(o,t,noiseBurst(r,0.02,'hp',4000,0.7,0.0002,0.003),0.4); };
+  const drawer=(t)=>{ put(o,t,noiseBurst(r,0.35,'bp',500,0.9,0.01,0.05,0.22),0.7);
+    for(let k=0;k<8;k++) put(o,t+k*0.035,noiseBurst(r,0.015,'bp',1200,2,0.0002,0.003),0.3);
+    put(o,t+0.32,glide(160,110,0.02,0.15,0.05),0.9); put(o,t+0.32,noiseBurst(r,0.06,'bp',700,1.5,0.0005,0.015),0.8);
+    put(o,t+0.32,partials(2400,[[1,1,0.05],[2.4,0.4,0.03]],0.2,0.0005,r),0.25); };
+  const sale=(t)=>{ key(t); key(t+0.16); key(t+0.3); ching(t+0.62); drawer(t+0.66); };
+  sale(0.7+r()*0.3); sale(4.6+r()*0.3);
+};
+S.owl = (o,r)=>{ // "hoo ... hoo-hoo ... hoo ... hoo"
+  const hoo=(t,len,f,g)=>{ const b=glide(f*1.03,f*0.95,len,len,1e9,0.05,[[2,0.08],[3,0.03]]); gate(b,0.05,len*0.45);
+    put(o,t,b,g); put(o,t,noiseBurst(r,len,'bp',f*2,1.5,0.04,len*0.4),g*0.08); };
+  const call=(t,f)=>{ hoo(t,0.42,f,1); hoo(t+0.66,0.15,f*1.04,0.8); hoo(t+0.87,0.15,f*1.03,0.8); hoo(t+1.17,0.45,f,1); hoo(t+1.9,0.45,f*0.98,0.95); };
+  const f=350+r()*30; call(0.5+r()*0.3,f); call(4.5+r()*0.3,f);
+};
+S.cuckoo = (o,r)=>{ // clock mechanism click, then "cu-ckoo" pipes (falling minor third)
+  const pipe=(t,f,len,g)=>{ const b=glide(f*1.01,f,0.03,len,1e9,0.015,[[2,0.12],[3,0.05]]); gate(b,0.015,len*0.45);
+    put(o,t,b,g); put(o,t,noiseBurst(r,len,'bp',f*1.5,1.2,0.01,len*0.3),g*0.06); };
+  const cu=(t)=>{ put(o,t-0.06,noiseBurst(r,0.02,'bp',2200,2,0.0002,0.003),0.35); pipe(t,698,0.2,1); pipe(t+0.3,587,0.42,0.9); };
+  const a=0.5+r()*0.3; for(let k=0;k<3;k++) cu(a+k*0.95); for(let k=0;k<2;k++) cu(a+4.3+k*0.95);
+};
+S.dialing = (o,r)=>{ // touch-tone (DTMF) keypad: true row/column frequency pairs
+  const R=[697,770,852,941], C=[1209,1336,1477];
+  const tone=(t,d,len)=>{ const row=d===0?3:Math.floor((d-1)/3), col=d===0?1:(d-1)%3;
+    const b=mix(partials(R[row],[[1,0.8,1e9]],len,0.003),partials(C[col],[[1,1,1e9]],len,0.003)); gate(b,0.004,0.006); put(o,t,b,0.5); };
+  const dial=(t,n)=>{ for(let k=0;k<n;k++){ const len=0.11+r()*0.06; tone(t,Math.floor(r()*10),len); t+=len+0.07+r()*0.1; } };
+  dial(0.4+r()*0.2,7); dial(4.6+r()*0.2,4);
+};
+S.reversing = (o,r)=>{ // backup beeper, once a second, over a low diesel idle
+  const off=r()*0.2; for(let k=0;k<8;k++){ const b=partials(1150,[[1,1,1e9],[3,0.18,1e9],[5,0.06,1e9]],0.5,0.004); gate(b,0.006,0.01); put(o,off+k,b,0.5); }
+  const idle=pulseTrain(r,t=>26+1.5*Math.sin(2*Math.PI*0.4*t),()=>1,LOOP,5,0.35); filt(idle,'lp',600,0.7); filt(idle,'hp',40,0.7);
+  gate(idle,0.3,0.3); put(o,0,idle,0.12);
+};
+S.whistle = (o,r)=>{ // pea whistle: tweet-tweet, then a long blast
+  const blow=(t,len,g)=>{ const L=Math.round(len*SR), b=new Float32Array(L); let ph=0; const tr0=26+r()*6;
+    for(let i=0;i<L;i++){ const tt=i/SR, trill=Math.sin(2*Math.PI*(tr0*tt+0.6*Math.sin(3*tt))); ph+=(3100+130*trill)/SR;
+      b[i]=(Math.sin(2*Math.PI*ph)+0.15*Math.sin(4*Math.PI*ph))*(0.72+0.28*trill); }
+    const n=noiseBurst(r,len,'bp',3100,3,0.01,1e9); for(let i=0;i<L;i++) b[i]+=0.5*n[i];
+    gate(b,0.015,0.05); put(o,t,b,g); };
+  const a=0.6+r()*0.3; blow(a,0.18,0.9); blow(a+0.3,0.18,0.9); blow(a+0.65,1.0,1); blow(a+4.2+r()*0.3,1.2,1);
+};
+S.chimes = (o,r)=>{ // wind chimes: tuned tubes struck at random by two gusts
+  const notes=[1047,1175,1319,1568,1760,2093];
+  const strike=(t,f,g)=>put(o,t,partials(f,[[1,1,1.8],[1.003,0.6,1.8],[2.76,0.35,0.7],[5.4,0.15,0.25]],3.5,0.001,r),g);
+  const gust=(t0,len,n)=>{ for(let k=0;k<n;k++) strike(t0+Math.pow(r(),0.8)*len,notes[Math.floor(r()*notes.length)],0.3+0.7*r()); };
+  gust(0.3,2.4,12); gust(4.4,2.6,10);
+};
+S.creak = (o,r)=>{ // door slowly creaking open, later a shorter creak and the latch
+  const creak=(t,len,rate,g)=>{ const L=Math.round(len*SR), b=new Float32Array(L); let ph=0;
+    for(let i=0;i<L;i++){ ph+=rate(i/L)*(1+0.25*(r()-0.5))/SR; if(ph>=1){ ph-=1; b[i]=0.6+0.4*r(); } }
+    const out=new Float32Array(L);
+    for(const [f,Q,a] of [[520,12,1],[1150,10,0.7],[2300,8,0.35]]){ const x=filt(filt(Float32Array.from(b),'bp',f,Q),'bp',f,Q/2); for(let i=0;i<L;i++) out[i]+=a*x[i]; }
+    let pk=1e-9; for(let i=0;i<L;i++){ out[i]*=Math.pow(Math.sin(Math.PI*i/L),0.6); pk=Math.max(pk,Math.abs(out[i])); }
+    put(o,t,out,g/pk); };
+  const a=0.6+r()*0.3; creak(a,1.7,p=>18+50*Math.sin(Math.PI*p)+12*Math.sin(9*p),1);
+  const b=a+3.9; creak(b,0.9,p=>28+42*p,0.85);
+  put(o,b+0.95,noiseBurst(r,0.03,'bp',2200,1.5,0.0002,0.004),0.5); put(o,b+0.95,glide(240,160,0.02,0.08,0.025),0.35);
+};
+S.chainsaw = (o,r)=>{ // two-stroke idle, revs up and cuts, back to idle, again
+  const rate=curve([[0,45],[1.2,45],[1.6,150],[2.4,128],[3.4,140],[3.9,46],[4.8,45],[5.2,152],[6.0,126],[6.8,138],[7.3,46],[8,45]]);
+  const amp=curve([[0,0.45],[1.2,0.45],[1.6,1],[3.4,1],[3.9,0.45],[4.8,0.45],[5.2,1],[6.8,1],[7.3,0.45],[8,0.45]]);
+  const b=pulseTrain(r,t=>rate(t)*(1+0.03*Math.sin(2*Math.PI*7*t)),amp,LOOP,7,0.4);
+  filt(b,'hp',80,0.7); filt(b,'lp',3500,0.7); const m=filt(Float32Array.from(b),'bp',900,1.2);
+  for(let i=0;i<b.length;i++) b[i]=0.6*b[i]+0.8*m[i]; put(o,0,b,1);
+};
+
 /* ===== library: labels, aliases, families. Two sounds from one family never share a puzzle ===== */
 const LIBRARY = [
  {id:'ice',label:'Ice dropping into a glass',aka:['ice','ice cubes','glass clink','drink','clinking glass'],fam:'clink',lvl:1},
@@ -442,7 +674,7 @@ const LIBRARY = [
  {id:'kettle',label:'Kettle whistling',aka:['tea kettle','teapot','whistling kettle','boiling water','whistle'],fam:'whistle',lvl:0.7},
  {id:'doorbell',label:'Doorbell',aka:['ding dong','door chime','chime'],fam:'bell',lvl:0.85},
  {id:'bikebell',label:'Bicycle bell',aka:['bike bell','bike','bicycle','ring ring'],fam:'bell',lvl:1},
- {id:'phone',label:'Old telephone ringing',aka:['phone','telephone','landline','ringing','rotary phone'],fam:'bell',lvl:0.8},
+ {id:'phone',label:'Old telephone ringing',aka:['phone','telephone','landline','ringing','rotary phone'],fam:['bell','phone'],lvl:0.8},
  {id:'alarm',label:'Alarm clock beeping',aka:['alarm','digital alarm','beeping','alarm clock'],fam:'beep',lvl:0.85},
  {id:'microwave',label:'Microwave beeping',aka:['microwave','microwave done','beeping','oven timer'],fam:'beep',lvl:0.85},
  {id:'carhorn',label:'Car horn',aka:['honk','honking','horn','beep beep'],fam:'horn',lvl:0.9},
@@ -454,6 +686,28 @@ const LIBRARY = [
  {id:'crickets',label:'Crickets',aka:['cricket','insects','bugs','chirping'],fam:'chirp',lvl:0.65,dense:true},
  {id:'popcorn',label:'Popcorn popping',aka:['popcorn','popping','corn'],fam:'pop',lvl:1},
  {id:'clapping',label:'Hands clapping',aka:['clap','clapping','applause','hand clap'],fam:'pop',lvl:1.05},
+ // ---- added Nov 2026 (library 29 -> 50). fam may be a list: a sound clashes with anything sharing ANY family ----
+ {id:'dog',label:'Dog barking',aka:['dog','bark','barking','woof','puppy'],fam:['voice'],lvl:0.9},
+ {id:'cat',label:'Cat meowing',aka:['cat','meow','meowing','kitten','kitty','mew'],fam:['voice','creak'],lvl:0.85},
+ {id:'camera',label:'Camera shutter',aka:['camera','shutter','photo','taking a picture','snapshot','camera click','picture'],fam:['tick','type'],lvl:1},
+ {id:'can',label:'Soda can opening',aka:['can','soda','pop can','beer can','fizz','fizzing','opening a can','soda can','carbonation'],fam:['hiss'],lvl:1},
+ {id:'flush',label:'Toilet flushing',aka:['toilet','flush','flushing','bathroom','restroom'],fam:['drip','hiss'],lvl:0.8},
+ {id:'hammer',label:'Hammering a nail',aka:['hammer','nail','hammering','pounding','carpentry'],fam:['thud','clink'],lvl:1},
+ {id:'saw',label:'Hand saw',aka:['saw','sawing','handsaw','cutting wood','wood saw'],fam:['zip','saw'],lvl:0.9},
+ {id:'blender',label:'Blender',aka:['blender','mixer','food processor','smoothie','blending'],fam:['motor'],lvl:0.75},
+ {id:'engine',label:'Car engine starting',aka:['engine','car','ignition','starting a car','car starting','motor','idling','car engine'],fam:['motor'],lvl:0.95,dense:true},
+ {id:'hooves',label:'Horse hooves',aka:['horse','hooves','hoofbeats','clip clop','trotting','galloping','pony'],fam:['thud'],lvl:0.9,dense:true},
+ {id:'fireworks',label:'Fireworks',aka:['firework','rocket','explosion','boom','fourth of july','new years'],fam:['boom','pop'],lvl:0.9},
+ {id:'heartbeat',label:'Heartbeat',aka:['heart','heart beat','heart beating','pulse','lub dub'],fam:['thud'],lvl:1.4,dense:true},
+ {id:'register',label:'Cash register',aka:['register','till','ka ching','cha ching','checkout','cash'],fam:['bell','coin'],lvl:0.8},
+ {id:'owl',label:'Owl hooting',aka:['owl','hoot','hooting','hoo'],fam:['hoot','chirp'],lvl:0.95},
+ {id:'cuckoo',label:'Cuckoo clock',aka:['cuckoo','cuckoo bird','clock'],fam:['hoot','chirp','bell','tick'],lvl:0.75},
+ {id:'dialing',label:'Phone keypad dialing',aka:['dialing','dial','touch tone','keypad','phone','dialing a number','phone buttons'],fam:['beep','phone'],lvl:0.7},
+ {id:'reversing',label:'Truck backing up',aka:['reverse beep','reversing','backup beeper','backup alarm','truck','beeping','beep'],fam:['beep','motor'],lvl:0.7,dense:true},
+ {id:'whistle',label:'Referee whistle',aka:['whistle','coach whistle','sports whistle','blowing a whistle','ref','referee'],fam:['whistle'],lvl:0.7},
+ {id:'chimes',label:'Wind chimes',aka:['chimes','wind chime','chime','tinkling'],fam:['bell'],lvl:0.6},
+ {id:'creak',label:'Creaky door',aka:['creak','creaking','squeaky door','door','hinge','squeak'],fam:['creak'],lvl:0.7},
+ {id:'chainsaw',label:'Chainsaw',aka:['chain saw','saw','power saw','logging','lumberjack'],fam:['motor','saw'],lvl:0.75,dense:true},
 ];
 
 // render a sound into a normalized 8 s Float32Array
@@ -473,15 +727,50 @@ function renderSound(id, seed){
 // ===== daily puzzle =====
 const EPOCH = new Date(2026,10,5); // Puzzle #1 = Nov 5, 2026
 function puzzleNumber(d=new Date()){ const a=new Date(d.getFullYear(),d.getMonth(),d.getDate()); return Math.round((a-EPOCH)/864e5)+1; }
+const famsOf=l=>Array.isArray(l.fam)?l.fam:[l.fam];
+const BYID={}; for(const l of LIBRARY) BYID[l.id]=l;
+/* v2: pairs where one sound buries the other. Measured offline from these synth sounds: share of a sound's
+   time-frequency cells still audible (3 dB above the other) when the two play together, below 52% (worst: popcorn under rain, 9%). */
+const MASKS=new Set(['alarm|rain','basketball|chainsaw','basketball|rain','blender|clapping','blender|popcorn','blender|rain','blender|saw','blender|zipper','camera|chainsaw','camera|flush','camera|rain','camera|saw','can|saw','carhorn|chainsaw','carhorn|rain','chainsaw|clapping','chainsaw|creak','chainsaw|cuckoo','chainsaw|guitar','chainsaw|knock','chainsaw|piano','chainsaw|popcorn','chimes|rain','clapping|rain','clapping|saw','creak|flush','creak|guitar','creak|rain','cuckoo|rain','dog|rain','doorbell|rain','guitar|rain','phone|rain','piano|rain','popcorn|rain','popcorn|saw','rain|saw','rain|siren','rain|typing','rain|zipper']);
+const masks=(a,b)=>MASKS.has(a.id<b.id?a.id+'|'+b.id:b.id+'|'+a.id);
+// two sounds clash if they share any family, both fill the whole loop, or one buries the other
+function clash(a,b){ const fb=famsOf(b); return famsOf(a).some(f=>fb.includes(f)) || (!!a.dense && !!b.dense) || masks(a,b); }
+// practice mixes: any fair random set
 function pickSounds(seed){
   const r=mulberry32(seed*7919+13); const pool=[...LIBRARY]; const picked=[];
-  while(picked.length<4){ const c=pool.splice(Math.floor(r()*pool.length),1)[0];
-    if(picked.some(p=>p.fam===c.fam)) continue; if(c.dense && picked.some(p=>p.dense)) continue; picked.push(c); }
+  while(picked.length<4 && pool.length){ const c=pool.splice(Math.floor(r()*pool.length),1)[0];
+    if(picked.some(p=>clash(p,c))) continue; picked.push(c); }
   return picked.map(p=>p.id);
 }
-function puzzleFor(num){ if(num===1) return ['ice','zipper','basketball','turnsignal']; return pickSounds(num); }
+/* Daily schedule, built day by day from #1 (deterministic, same for everyone).
+   Hard rules: fair set (no shared family, max one loop-filling sound), no sound more than twice in any
+   14-day window, and the same 4-sound set never within 30 days. Soft: nothing from yesterday, avoid
+   yesterday's families, favour sounds that haven't been heard for longest. */
+const DAY1=['ice','zipper','basketball','turnsignal'];
+const WCAP=40, WPOW=2; // staleness weighting (v2 tested softer weights: less predictable but much less even spacing, so kept)
+const SCHED=[null,DAY1];
+function scheduleDay(n){
+  const r=mulberry32(n*104729+7), prev=SCHED[n-1], count={}, last={}, recent=new Set();
+  for(let d=Math.max(1,n-13);d<n;d++) for(const id of SCHED[d]) count[id]=(count[id]||0)+1;
+  for(let d=Math.max(1,n-60);d<n;d++) for(const id of SCHED[d]) last[id]=d;
+  for(let d=Math.max(1,n-29);d<n;d++) recent.add([...SCHED[d]].sort().join());
+  const prevFams=new Set(prev.flatMap(id=>famsOf(BYID[id])));
+  for(let attempt=0;attempt<200;attempt++){
+    const strict=attempt<100, picked=[];
+    while(picked.length<4){
+      const cands=LIBRARY.filter(l=>!picked.includes(l) && (count[l.id]||0)<2 && !picked.some(p=>clash(p,l)) && !(strict && prev.includes(l.id)));
+      if(!cands.length) break;
+      const w=cands.map(l=>{ let x=Math.min(last[l.id]?n-last[l.id]:WCAP,WCAP)**WPOW; if(strict && famsOf(l).some(f=>prevFams.has(f))) x*=0.2; return x; });
+      let u=r()*w.reduce((a,b)=>a+b,0), i=0; while(i<w.length-1 && u>=w[i]){ u-=w[i]; i++; }
+      picked.push(cands[i]);
+    }
+    if(picked.length===4 && !recent.has(picked.map(p=>p.id).sort().join())) return picked.map(p=>p.id);
+  }
+  return pickSounds(n); // never reached in testing (checked over 10 years)
+}
+function puzzleFor(num){ if(num<1) return pickSounds(num); while(SCHED.length<=num) SCHED.push(scheduleDay(SCHED.length)); return SCHED[num]; }
 
-if(typeof module!=='undefined') module.exports={S,LIBRARY,renderSound,puzzleFor,puzzleNumber,SR,N};
+if(typeof module!=='undefined') module.exports={S,LIBRARY,renderSound,puzzleFor,puzzleNumber,pickSounds,clash,famsOf,SR,N};
 
 </script>
 <script>
@@ -499,14 +788,21 @@ let st; // {solved:[ids in slot order], wrong:[ids], focus:n, revealed:bool, don
 
 /* ---------- audio ---------- */
 let ctx=null, master=null, comp=null, chans=[], playing=false, startAt=0, offset=0, focusUntil=0, focusIdx=-1, vol=0.8;
+let audioFailed=false;
 function ensureCtx(){
-  if(ctx) return;
-  const AC=window.AudioContext||window.webkitAudioContext; ctx=new AC();
+  if(ctx) return true;
+  if(audioFailed) return false;
+  try{
+  const AC=window.AudioContext||window.webkitAudioContext; if(typeof AC!=='function') throw new Error('no audio');
+  ctx=new AC();
   comp=ctx.createDynamicsCompressor(); comp.threshold.value=-10; comp.ratio.value=6; comp.attack.value=0.003; comp.release.value=0.15;
   master=ctx.createGain(); master.gain.value=vol*0.75; master.connect(comp); comp.connect(ctx.destination);
   masterAn=ctx.createAnalyser(); masterAn.fftSize=1024; comp.connect(masterAn);
   buildChannels();
+  return true;
+  }catch(e){ ctx=null; master=null; masterAn=null; chans=[]; audioFailed=true; return false; }
 }
+function noAudio(){ toast("Sound can't play in this browser. Try another browser or device."); }
 let masterAn=null;
 function buildChannels(){
   chans.forEach(c=>{try{c.src&&c.src.stop()}catch(e){} c.gain.disconnect();});
@@ -526,8 +822,11 @@ function startSources(){
 function stopSources(){ chans.forEach(c=>{try{c.src&&c.src.stop()}catch(e){} c.src=null;}); }
 function pos(){ return playing? (offset+ctx.currentTime-startAt)%LOOP : offset%LOOP; }
 async function play(){
-  ensureCtx(); try{await ctx.resume()}catch(e){}
-  if(playing) return; startSources(); playing=true; APP.classList.add('playing'); setIcon();
+  if(!ensureCtx()){ noAudio(); return false; }
+  try{await ctx.resume()}catch(e){}
+  if(playing) return true;
+  try{ startSources(); }catch(e){ stopSources(); noAudio(); return false; }
+  playing=true; APP.classList.add('playing'); setIcon(); return true;
 }
 function pause(){ if(!playing) return; offset=pos(); stopSources(); playing=false; APP.classList.remove('playing'); setIcon(); }
 function setIcon(){ $('playIcon').innerHTML=playing?'<rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/>':'<path fill="currentColor" d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/>'; $('play').setAttribute('aria-label',playing?'Pause':'Play'); }
@@ -561,8 +860,14 @@ function load(m, n){
   const d=new Date(EPOCH); d.setDate(d.getDate()+n-1);
   $('meta').innerHTML = m==='daily' ? `Daily #${n} · ${d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}` : `Unlimited mix<span class="practice-flag">PRACTICE</span>`;
   $('q').value='';
+  const sb=$('sharebox'); sb.style.display='none'; sb.value='';
 }
-function score(){ const un=st.revealed?4-st.solved.length:0; return Math.max(0,100-5*st.wrong.length-10*st.focus-25*un); }
+/* v2: the first 3 wrong answers cost 5 each, every one after that costs 10 (playtest: brute-forcing the library without
+   listening averaged 31/100 and finished 3 days in 4; Focus was never worth it next to guessing). */
+const FREE_WRONG=3;
+const wrongCost=k=>k<FREE_WRONG?5:10;            // cost of the k-th wrong answer (0-based)
+const wrongPenalty=n=>{ let t=0; for(let k=0;k<n;k++) t+=wrongCost(k); return t; };
+function score(){ const un=st.revealed?4-st.solved.length:0; return Math.max(0,100-wrongPenalty(st.wrong.length)-10*st.focus-25*un); }
 function slotOf(id){ return st.solved.indexOf(id); }
 function persist(){ if(mode==='daily'){ store.days[num]=st; save(); } }
 
@@ -574,15 +879,18 @@ function render(){
   const order=[...st.solved]; if(st.revealed) ids.forEach(id=>{ if(!order.includes(id)) order.push(id); });
   for(let s=0;s<4;s++){
     const id=order[s], lib=id&&LIBRARY.find(l=>l.id===id), el=document.createElement('div');
-    el.className='slot'+(id? (s<st.solved.length?' on':' revealed'):'')+(muted[s]?' muted':'');
+    el.className='slot'+(id? (s<st.solved.length?' on':' revealed'):'')+(muted[s]?' muted':'')+(lastSolved!==null&&s===lastSolved?' fresh':'');
     el.style.setProperty('--col',`var(${COLORS[s]})`);
-    el.innerHTML=`<div class="fill"></div><div class="ch">CH ${s+1}</div><div class="name">${lib?lib.label:'· · ·'}</div><div class="bars">${'<i></i>'.repeat(7)}</div>${id?`<button class="mute ${muted[s]?'m':''}" data-s="${s}">${muted[s]?'MUTED':'MUTE'}</button>`:''}`;
+    el.innerHTML=`<div class="fill"></div><div class="ch">CH ${s+1}</div><div class="name">${lib?lib.label:'· · ·'}</div><div class="row"><div class="bars">${'<i></i>'.repeat(7)}</div>${id?`<button class="mute ${muted[s]?'m':''}" data-s="${s}" aria-pressed="${muted[s]}" aria-label="${muted[s]?'Unmute':'Mute'} ${lib.label}">${muted[s]?'MUTED':'MUTE'}</button>`:''}</div>`;
     if(s>=st.solved.length && !st.revealed) el.style.animation='none';
     if(lastSolved!==null && s===lastSolved) {} else if(s<st.solved.length) el.style.animation='none', el.querySelector('.fill').style.animation='none', el.querySelector('.fill').style.transform='scaleX(1)';
     box.appendChild(el);
   }
   lastSolved=null;
-  box.querySelectorAll('.mute').forEach(b=>b.onclick=()=>{ const s=+b.dataset.s; muted[s]=!muted[s]; applyGains(); render(); });
+  box.querySelectorAll('.mute').forEach(b=>b.onclick=()=>{ const s=+b.dataset.s; muted[s]=!muted[s]; if(muted[s]&&!store.mutedOnce){ store.mutedOnce=1; save(); } applyGains(); render(); });
+  const nw=st.wrong.length; $('wcost').textContent = nw<FREE_WRONG ? `Wrong answers cost 5 (10 after your third).` : `Wrong answers now cost 10.`;
+  $('wcost').classList.toggle('hot',nw>=FREE_WRONG);
+  const anyMuted=muted.some(Boolean); $('mutehint').hidden = !(st.solved.length>=1 && st.solved.length<4 && !st.done && !anyMuted && !store.mutedOnce);
   $('focus').disabled = st.done || st.solved.length>=4;
   $('focus').classList.toggle('live',isFocusing());
   APP.classList.toggle('done',st.done);
@@ -605,16 +913,19 @@ function matches(q){
   }
   return out.sort((a,b)=>a.rank-b.rank||a.l.label.localeCompare(b.l.label));
 }
+let flashWrong=null;
 function renderLib(){
   const lib=$('lib'), res=matches($('q').value);
   lib.innerHTML = res.length? '' : '<div class="empty">Nothing by that name in the library — try a broader word like “ball”, “bell” or “water”.</div>';
   for(const {l,via} of res){
     const b=document.createElement('button'); const w=st.wrong.includes(l.id), r=st.solved.includes(l.id);
     b.className='opt'+(w?' wrong':'')+(r?' right':''); b.disabled=w||r||st.done;
-    b.innerHTML=`<span>${l.label}${via?` <span class="via">· “${via}”</span>`:''}</span><span class="tick">${r?'✓ CH '+(slotOf(l.id)+1):w?'−5':''}</span>`;
+    b.innerHTML=`<span>${l.label}${via?` <span class="via">· “${via}”</span>`:''}</span><span class="tick">${r?'✓ CH '+(slotOf(l.id)+1):w?'−'+wrongCost(st.wrong.indexOf(l.id)):''}</span>`;
+    if(flashWrong===l.id){ b.classList.add('flash'); }
     b.onclick=()=>guess(l.id,b);
     lib.appendChild(b);
   }
+  flashWrong=null;
 }
 function guess(id,btn){
   if(st.done||st.solved.includes(id)||st.wrong.includes(id)) return;
@@ -626,7 +937,7 @@ function guess(id,btn){
     $('q').value='';
     if(st.solved.length===4) finish(false);
   } else {
-    st.wrong.push(id); floatText('−5',btn); $('field').classList.remove('shake'); void $('field').offsetWidth; $('field').classList.add('shake');
+    st.wrong.push(id); floatText('−'+wrongCost(st.wrong.length-1),btn); flashWrong=id; $('field').classList.remove('shake'); void $('field').offsetWidth; $('field').classList.add('shake');
     hitScore();
   }
   persist(); render();
@@ -640,7 +951,7 @@ let focusCycle=0;
 $('focus').onclick=async()=>{
   if(st.done||isFocusing()) return;
   const uns=ids.map((id,i)=>i).filter(i=>!st.solved.includes(ids[i])); if(!uns.length) return;
-  await play();
+  if(!(await play())) return;
   focusIdx=uns[focusCycle++ % uns.length]; focusUntil=ctx.currentTime+LOOP;
   st.focus++; persist(); hitScore(); floatText('−10',$('focus')); applyGains(); render();
 };
@@ -666,11 +977,11 @@ function renderResult(){
   $('rtitle').textContent = n===4 ? (score()===100?'Perfect pitch.':score()>=80?'Studio-grade ears.':'All four channels open.') : `${n} of 4 identified`;
   $('rscore').innerHTML=`${score()}<span>/100</span>`;
   const un=st.revealed?4-n:0, parts=[];
-  if(st.wrong.length) parts.push(`${st.wrong.length} wrong (−${st.wrong.length*5})`);
+  if(st.wrong.length) parts.push(`${st.wrong.length} wrong (−${wrongPenalty(st.wrong.length)})`);
   if(st.focus) parts.push(`${st.focus} focus (−${st.focus*10})`);
   if(un) parts.push(`${un} revealed (−${un*25})`);
   $('rbreak').textContent=parts.length?parts.join(' · '):'No wrong answers, no focus. Clean.';
-  $('rgrid').textContent=[0,1,2,3].map(s=>s<n?SQUARES[s]:'⬛').join('');
+  $('rgrid').innerHTML=[0,1,2,3].map(s=>`<span>${s<n?SQUARES[s]:'⬛'}</span>`).join('');
   const S=store.stats;
   $('rstats').innerHTML = mode==='daily' ? `<div><b>${S.played}</b><span>Played</span></div><div><b>${S.streak}</b><span>Streak</span></div><div><b>${S.played?Math.round(S.total/S.played):0}</b><span>Avg</span></div>` : '';
   $('practice').textContent = mode==='daily'?'Practice mix':'New practice mix';
@@ -706,8 +1017,8 @@ let mLevel=0, chLevels=[0,0,0,0], wasFocus=false;
 function rms(an,data){ an.getFloatTimeDomainData(data); let s=0; for(let i=0;i<data.length;i++) s+=data[i]*data[i]; return Math.sqrt(s/data.length); }
 function frame(){
   // waveform
-  const W=cv.clientWidth, H=cv.clientHeight, dpr=window.devicePixelRatio||1;
-  if(cv.width!==W*dpr){ cv.width=W*dpr; cv.height=H*dpr; }
+  const W=cv.clientWidth, H=cv.clientHeight, dpr=window.devicePixelRatio||1, PW=Math.round(W*dpr), PH=Math.round(H*dpr);
+  if(cv.width!==PW||cv.height!==PH){ cv.width=PW; cv.height=PH; }
   g2.setTransform(dpr,0,0,dpr,0,0); g2.clearRect(0,0,W,H);
   if(env.length){
     const B=env[0].length, bw=W/B, p=pos()/LOOP, foc=isFocusing();
@@ -716,8 +1027,10 @@ function frame(){
       const a=Math.min(1,Math.sqrt(s)*3.2), h=Math.max(2,a*(H-14));
       const passed=k/B<p;
       g2.fillStyle = passed ? (foc?'#f3e9d2':'#d9c9a8') : '#4e453d';
-      g2.fillRect(k*bw+1,(H-h)/2,Math.max(1,bw-2),h);
+      const x=k*bw+1, w=Math.max(1,bw-2), y=(H-h)/2;
+      if(g2.roundRect && w>2){ g2.beginPath(); g2.roundRect(x,y,w,h,Math.min(w/2,1.5)); g2.fill(); } else g2.fillRect(x,y,w,h);
     }
+    g2.fillStyle='rgba(233,120,92,.18)'; g2.fillRect(p*W-4,0,8,H);
     g2.fillStyle='rgba(233,120,92,.95)'; g2.fillRect(p*W-1,0,2,H);
   }
   // focus state
@@ -749,8 +1062,8 @@ setInterval(()=>{ if(st&&st.done) updateNext(); },30000);
 /* ---------- go ---------- */
 $('foot2').textContent='';
 load('daily',today);
-// test hooks
-window.__sc={get ids(){return ids}, get st(){return st}, score, guess:(id)=>guess(id,$('q')), load, matches};
+// test hooks (only with ?sctest in the URL, so the answers aren't one console line away)
+if(/[?&]sctest/.test(location.search)) window.__sc={get ids(){return ids}, get st(){return st}, score, guess:(id)=>guess(id,$('q')), load, matches};
 })();
 </script>
 </body>

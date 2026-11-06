@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Today’s Daily Game</title>
+<title>Today&#39;s Daily Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -134,7 +134,7 @@
       <div>
         <div class="eyebrow">New puzzles every midnight</div>
         <h1>A few good games.<br><em>Then get on with your day.</em></h1>
-        <p class="lede">Thirteen small daily games you can actually finish. Same puzzles for everyone, a few minutes each, no endless feed. Pick your favorites, or tell us how long you've got and we'll set up today's games.</p>
+        <p class="lede">Fourteen small daily games you can actually finish. Same puzzles for everyone, a few minutes each, no endless feed. Pick your favorites, or tell us how long you've got and we'll set up today's games.</p>
       </div>
 
       <aside class="planner" aria-labelledby="plan-h">
@@ -189,8 +189,9 @@ const ICONS = {
   missing:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 4h6v2a2 2 0 104 0V4h6v16H4z"/><path d="M10 20v-3a2 2 0 114 0v3" stroke-dasharray="2 2"/></svg>',
   dryrun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 20v-6"/><path d="M9 20h6"/><path d="M12 13c-3-1-5-4-6-7M12 13c3-1 5-4 6-7M12 13V5" stroke-dasharray="1.5 2.2"/></svg>',
   soundcheck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg>',
-  surface:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18M3 15h18M9 3v18M15 3v18" opacity=".4"/><path d="M14 4l5 5M17 4l-1.5 1.5"/><path d="M6 17a3 3 0 016 0" /></svg>',
-  fourbagger:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 3h10l3 18H4z"/><ellipse cx="12" cy="8" rx="2.2" ry="1.4"/><rect x="9" y="13" width="5" height="4" rx="1.3" transform="rotate(-12 11.5 15)"/></svg>',
+  surface:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18"/><path d="M3 10v9h18v-9" stroke-dasharray="2 2.4"/><path d="M8 15a4 4 0 018 0"/><path d="M15 3l-3 5M17 4l-2.5 4.5"/></svg>',
+  fourbagger:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 21L8 4h8l3 17z"/><circle cx="12" cy="8.5" r="2"/><rect x="9" y="14" width="6" height="4" rx="1"/></svg>',
+  righttool:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h9v-3H3z"/><circle cx="5" cy="20" r="1.2"/><circle cx="10" cy="20" r="1.2"/><path d="M10 15l4-7 5 2"/><path d="M19 10l1 4h-3"/></svg>',
   eyewitness:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
 };
 
@@ -219,10 +220,14 @@ const LIVE = [
     url:'/ripple/',
     blurb:'One event. Predict the aftermath. The tray tilts and you mark where the ball, block and puck end up.',
     tags:['3 objects','Physics'] },
-  { id:'surface', name:'Under the Surface', mins:3, cat:'puzzle', color:'#8a5a2b', tint:'#f1e6d2',
+  { id:'surface', name:'Under the Surface', mins:3, cat:'puzzle', color:'#8a5a2b', tint:'#efe2c8',
     url:'/under-the-surface/',
-    blurb:'Something is buried in the dig site. Brush away as few squares as you can, then name the find.',
-    tags:['10 squares','Archaeology'] },
+    blurb:'Something is buried in the trench. Brush as few squares as you can, then name the find before you dig it all up.',
+    tags:['1 dig','Deduction'] },
+  { id:'righttool', name:'Right Tool', mins:4, cat:'puzzle', color:'#b26a12', tint:'#f4e8d2',
+    url:'/right-tool/',
+    blurb:'Today’s backyard dig. Pick the machine, the hauler and the crew, then watch the job play out. Wrong call? The fence finds out.',
+    tags:['1 job site','Equipment'] },
   { id:'eyewitness', name:'Eyewitness', mins:3, cat:'senses', color:'#b3261e', tint:'#f5e6e3',
     url:'/eyewitness/',
     blurb:'You saw it for five seconds. What do you remember? Put the scene back together from memory.',
@@ -239,14 +244,14 @@ const LIVE = [
     url:'/top-shelf/',
     blurb:'Nine hockey shooting drills over three periods. Time your shot around the goalie and defenders and finish under par.',
     tags:['9 drills','Hockey'] },
+  { id:'fourbagger', name:'Four Bagger', mins:4, cat:'skill', color:'#2f6f4f', tint:'#e3eedd',
+    url:'/four-bagger/',
+    blurb:'Three frames of cornhole at dusk. Slide or lob, read the wind, and decide when to risk stacking two bags.',
+    tags:['12 bags','Cornhole'] },
   { id:'breakaway', name:'Breakaway', mins:2, cat:'skill', color:'#c6512f', tint:'#f7e6dc',
     url:'/breakaway/',
     blurb:'Five 3D shots on one goalie. Read the daily scouting report and find the corner he can’t reach.',
-    tags:['5 shots','3D hockey'] },
-  { id:'fourbagger', name:'Four Bagger', mins:4, cat:'skill', color:'#c23a2a', tint:'#f5e2d6',
-    url:'/four-bagger/',
-    blurb:'Three frames of backyard cornhole. Slide or lob, knock their bags off, and stack two bags if you dare.',
-    tags:['12 bags','Cornhole'] }
+    tags:['5 shots','3D hockey'] }
 ];
 const CATNAME = {knowledge:'Knowledge', puzzle:'Puzzle', senses:'Memory & senses', skill:'Skill'};
 
@@ -399,6 +404,33 @@ function scene(g){
     <path d="M30 18h120" stroke="#777" stroke-width="1"/>${[44,70,96,122].map((x,i)=>`<rect x="${x}" y="18" width="16" height="20" fill="${['#e07a7a','#ffffff','#7aa6e0','#f2d16b'][i]}" stroke="#999" stroke-width=".5"/>`).join('')}
     ${[[40,130,-90,0],[150,140,-170,-10],[270,130,180,270]].map(([x,y,a1,a2])=>{const r=58,p=(a)=>[x+r*Math.cos(a*Math.PI/180),y+r*Math.sin(a*Math.PI/180)];const [x1,y1]=p(a1),[x2,y2]=p(a2);return `<path d="M${x} ${y} L${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}z" fill="#3a8fd6" opacity=".28" stroke="#2f78b8" stroke-dasharray="3 3"/><circle cx="${x}" cy="${y}" r="4" fill="#1f5f8b"/>`;}).join('')}
     <ellipse cx="250" cy="40" rx="18" ry="11" fill="#c9a06b"/><circle cx="264" cy="34" r="6" fill="#c9a06b"/>`+'</svg>';
+  if(g.id==='surface') return V+`<rect width="300" height="150" fill="#d3b887"/>
+    <g fill="#a88d63" opacity=".6">${Array.from({length:40},(_,i)=>`<circle cx="${(i*73)%300}" cy="${(i*41)%150}" r="${1+(i%3)}"/>`).join('')}</g>
+    <rect x="120" y="30" width="40" height="40" fill="#4b3725"/><rect x="160" y="30" width="40" height="40" fill="#4b3725"/><rect x="120" y="70" width="40" height="40" fill="#4b3725"/>
+    <path d="M128 110 C128 60 150 46 180 46 C200 46 200 70 200 70" fill="none" stroke="#8b664a" stroke-width="9"/>
+    <path d="M120 70 h40 v40 M160 30 v40 h40" fill="none" stroke="#d3b887" stroke-width="0"/>
+    <rect x="120" y="110" width="40" height="40" fill="none" stroke="#2f2a22" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <g stroke="rgba(255,250,235,.75)" stroke-width="1">${Array.from({length:9},(_,i)=>`<path d="M${i*40} 0V150"/>`).join('')}${Array.from({length:4},(_,i)=>`<path d="M0 ${30+i*40}H300"/>`).join('')}</g>
+    <g transform="translate(232 28)"><path d="M4 6v40" stroke="#5a4630" stroke-width="2.4" stroke-linecap="round"/><path d="M5 6l13 5-13 6z" fill="#d9762b"/></g>
+    <text x="16" y="22" font-family="Inter Tight,sans-serif" font-size="11" font-weight="600" fill="#5a3f22">helmet · pot · wheel?</text>`+'</svg>';
+  if(g.id==='fourbagger') return V+`<rect width="300" height="150" fill="#2b3a4a"/>
+    <path d="M0 18 Q75 32 150 20 T300 22" fill="none" stroke="#c9b27a" stroke-width="1" opacity=".7"/>${[20,60,100,140,180,220,260].map((x,i)=>`<circle cx="${x}" cy="${24+Math.sin(i)*4}" r="3" fill="#f5d27a"/>`).join('')}
+    <rect x="0" y="40" width="300" height="60" fill="#6b4f36"/>${Array.from({length:15},(_,i)=>`<path d="M${i*20} 40v60" stroke="#5a412c" stroke-width="2"/>`).join('')}
+    <rect x="0" y="100" width="300" height="50" fill="#3e6b3a"/>
+    <path d="M110 140 L130 52 H170 L190 140z" fill="#d9b886" stroke="#8a6a44" stroke-width="2"/>
+    <ellipse cx="150" cy="70" rx="9" ry="6" fill="#1f1a14"/>
+    <rect x="137" y="106" width="20" height="13" rx="3" fill="#b8322a" transform="rotate(-8 147 112)"/>
+    <rect x="152" y="82" width="20" height="13" rx="3" fill="#2c6fb7" transform="rotate(10 162 88)"/>
+    <path d="M60 140 Q100 30 146 64" fill="none" stroke="#f3eee4" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <text x="284" y="140" text-anchor="end" font-family="Inter Tight,sans-serif" font-size="12" font-weight="700" fill="#f3eee4">AIRMAIL</text>`+'</svg>';
+  if(g.id==='righttool') return V+`<rect width="300" height="150" fill="#a9c98a"/>
+    <rect x="0" y="0" width="300" height="34" fill="#d6cfbf"/><path d="M0 34h300" stroke="#8b6f4e" stroke-width="4"/>
+    <rect x="128" y="30" width="44" height="8" fill="#a9c98a"/>
+    <rect x="170" y="70" width="90" height="56" rx="4" fill="#7a5a3a" opacity=".85" stroke="#4b3725" stroke-dasharray="4 3"/>
+    <circle cx="120" cy="96" r="44" fill="none" stroke="#c6512f" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <g transform="translate(96 80)"><rect x="0" y="10" width="40" height="20" rx="3" fill="#e0a526" stroke="#1e1c19"/><rect x="4" y="30" width="34" height="6" rx="3" fill="#1e1c19"/><path d="M36 14 L62 0 L76 10" fill="none" stroke="#e0a526" stroke-width="5" stroke-linecap="round"/><path d="M74 8 l6 10 h-8z" fill="#1e1c19"/></g>
+    <path d="M30 140 L130 40" stroke="#f3eee4" stroke-width="2" stroke-dasharray="3 5" opacity=".8"/>
+    <text x="16" y="56" font-family="Inter Tight,sans-serif" font-size="11" font-weight="700" fill="#5a3f22">4 ft gate</text>`+'</svg>';
   if(g.id==='ripple') return V+`<rect width="300" height="150" fill="#eae8f5"/>
     <g transform="translate(150 80) skewX(-12) rotate(-4)"><rect x="-110" y="-55" width="220" height="110" rx="6" fill="#f7f6fb" stroke="#4a3fa0" stroke-width="2"/>
     <g stroke="#d6d2ea" stroke-width=".7">${Array.from({length:11},(_,i)=>`<path d="M${-110+i*20} -55V55"/>`).join('')}${Array.from({length:5},(_,i)=>`<path d="M-110 ${-55+i*22}H110"/>`).join('')}</g>
@@ -408,21 +440,6 @@ function scene(g){
     <circle cx="20" cy="30" r="8" fill="#e2bf3c"/><text x="20" y="34" text-anchor="middle" font-size="10" font-weight="700" fill="#1e1c19" font-family="Inter Tight">3</text>
     <path d="M-70 -20 Q10 -30 70 -30" fill="none" stroke="#4a3fa0" stroke-dasharray="3 3"/><circle cx="70" cy="-30" r="7" fill="none" stroke="#d94a3a" stroke-width="2" stroke-dasharray="2 2"/></g>
     <text x="16" y="22" font-family="Inter Tight,sans-serif" font-size="11" font-weight="600" fill="#4a3fa0">← left side rises</text>`+'</svg>';
-  if(g.id==='surface') return V+`<rect width="300" height="150" fill="#e4cfa4"/>
-    <g stroke="#b99a63" stroke-width=".8">${Array.from({length:9},(_,i)=>`<path d="M${30+i*30} 10V140"/>`).join('')}${Array.from({length:5},(_,i)=>`<path d="M30 ${10+i*32.5}H270"/>`).join('')}</g>
-    ${[[60,42],[90,42],[90,75],[120,75],[150,75],[150,107]].map(([x,y])=>`<rect x="${x}" y="${y}" width="30" height="32.5" fill="#cdb07a"/>`).join('')}
-    <path d="M92 104 Q120 64 168 104" fill="none" stroke="#4d3b2a" stroke-width="5" stroke-linecap="round"/>
-    <path d="M100 100 Q120 76 160 100" fill="none" stroke="#8a6a3a" stroke-width="2" opacity=".7"/>
-    ${[[60,42,1],[90,75,2],[150,107,3]].map(([x,y,n])=>`<circle cx="${x+8}" cy="${y+8}" r="6" fill="#fff8e6" stroke="#b3261e"/><text x="${x+8}" y="${y+11.5}" text-anchor="middle" font-size="8" font-family="Inter Tight" font-weight="700" fill="#b3261e">${n}</text>`).join('')}
-    <path d="M232 26l14 14M240 22l-3 3" stroke="#8a5a2b" stroke-width="3" stroke-linecap="round"/>`+'</svg>';
-  if(g.id==='fourbagger') return V+`<rect width="300" height="150" fill="#3f7a3a"/><rect width="300" height="40" fill="#6b4a2f"/>
-    ${Array.from({length:9},(_,i)=>`<circle cx="${20+i*33}" cy="${12+Math.sin(i/8*Math.PI)*12}" r="2.5" fill="#ffe7a8"/>`).join('')}
-    <path d="M108 52h84l18 92H90z" fill="#e6c48e" stroke="#3a2210" stroke-width="2"/>
-    <path d="M104 72h92M100 94h100" stroke="#fff6de" stroke-width="1.5"/>
-    <ellipse cx="150" cy="64" rx="10" ry="5" fill="#0b0704"/>
-    <rect x="128" y="100" width="20" height="16" rx="5" fill="#c23a2a" transform="rotate(-10 138 108)"/>
-    <rect x="158" y="80" width="18" height="14" rx="5" fill="#2f7fc1" transform="rotate(12 167 87)"/>
-    <path d="M60 140 Q100 20 146 60" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 4" opacity=".8"/>`+'</svg>';
   return '';
 }
 const cap = s => s[0].toUpperCase()+s.slice(1);

@@ -33,45 +33,75 @@ h1 span { color: var(--goal-red); }
 .sub { color: var(--muted); margin: 4px 0 0; font-size: 0.95rem; }
 .top-controls { display: flex; gap: 6px; }
 .chip { font: 700 0.85rem var(--body); text-transform: uppercase; letter-spacing: 0.05em; background: var(--boards); color: var(--muted); border: 1px solid #26324f; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
-.chip[aria-pressed="true"] { color: var(--text); border-color: var(--led); }
+.chip { min-height: 34px; transition: color .15s, border-color .15s, background-color .15s; }
+.chip:hover { color: var(--text); }
+.chip[aria-pressed="true"] { color: var(--text); border-color: var(--led); background: #1d2a48; }
 .chip:focus-visible, .shoot:focus-visible, .btn:focus-visible { outline: 3px solid var(--led); outline-offset: 2px; }
 
 .board { display: grid; grid-template-columns: repeat(5, 1fr); background: #05080f; border: 2px solid #26324f; border-radius: 10px; overflow: hidden; }
 .cell { padding: 6px 4px 7px; text-align: center; border-left: 1px solid #1b2742; }
 .cell:first-child { border-left: 0; }
 .cell .k { font: 700 0.68rem var(--body); letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
+.board { box-shadow: inset 0 0 0 1px #0d1526, 0 6px 18px rgba(0,0,0,.35); }
 .cell .v { font-family: var(--display); font-weight: 800; font-size: 1.7rem; color: var(--led); line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 10px rgba(255,176,32,.35); }
 .cell .v.red { color: #ff5a5f; text-shadow: 0 0 10px rgba(255,90,95,.35); }
+.cell .v.green { color: var(--ok); text-shadow: 0 0 10px rgba(60,207,122,.35); }
+@media (prefers-reduced-motion: no-preference) {
+  .cell .v.bump { animation: bump .45s ease-out; }
+  @keyframes bump { 0% { transform: scale(1.35); filter: brightness(1.6); } 100% { transform: none; } }
+}
 
 .drill-name { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 0.95rem; }
 .drill-name b { color: var(--text); font-weight: 700; }
+/* keep the whole rink plus the Shoot button on screen on short laptop screens */
+.rinkbox { width: 100%; max-width: max(280px, calc((100vh - 400px) * 1.067)); max-width: max(280px, calc((100svh - 400px) * 1.067)); margin: 0 auto; }
 .rinkbox { position: relative; border-radius: 14px; overflow: hidden; background: var(--boards); box-shadow: 0 10px 30px rgba(0,0,0,.4); touch-action: manipulation; }
 canvas { display: block; width: 100%; height: auto; cursor: pointer; }
 .flash { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: 0; }
 .flash.on { opacity: 1; background: radial-gradient(circle at 50% 18%, rgba(227,36,43,.55), rgba(227,36,43,0) 65%); }
-.flash .word { font-family: var(--display); font-weight: 900; font-size: clamp(3rem, 14vw, 5.5rem); color: #fff; text-shadow: 0 0 24px var(--goal-red), 0 4px 0 #8a0f14; letter-spacing: 0.04em; }
+.flash .word { font-family: var(--display); font-weight: 900; font-size: clamp(3rem, 14vw, 5.5rem); color: #fff; text-shadow: 0 0 24px var(--goal-red), 0 0 60px rgba(227,36,43,.6), 0 4px 0 #8a0f14; letter-spacing: 0.04em; -webkit-text-stroke: 1px rgba(138,15,20,.5); }
 @media (prefers-reduced-motion: no-preference) {
   .flash.on { animation: lamp .5s steps(2, end) 3; }
+  .flash.on .word { animation: slam .45s cubic-bezier(.2,1.6,.4,1) both; }
   @keyframes lamp { 50% { opacity: .55; } }
+  @keyframes slam { 0% { transform: scale(2.2) rotate(-4deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  .rinkbox.shake { animation: shake .35s ease-out; }
+  @keyframes shake { 20% { transform: translate(-3px, 1px); } 40% { transform: translate(3px, -1px); } 60% { transform: translate(-2px, 0); } 80% { transform: translate(1px, 0); } }
 }
-.toast { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); background: rgba(5,8,15,.9); color: var(--text); padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; }
-.toast.on { opacity: 1; }
+.toast { position: absolute; left: 50%; bottom: 14%; transform: translate(-50%, 6px); background: rgba(5,8,15,.92); color: var(--text); padding: 7px 16px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; border: 1px solid #26324f; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
 
 .meter { height: 14px; border-radius: 7px; background: #05080f; border: 1px solid #26324f; overflow: hidden; position: relative; }
-.meter .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, #2457c5, #ffb020 70%, #e3242b); }
+.meter .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, #2457c5, #ffb020 70%, #e3242b); background-size: calc(100vw) 100%; box-shadow: 0 0 10px rgba(255,176,32,.45); border-radius: 0 7px 7px 0; }
+.meter::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(233,238,247,.13) calc(10% - 1px) 10%); }
+.meter.live { border-color: #3a4a70; }
 .controls { display: flex; gap: 10px; align-items: center; }
-.shoot { flex: 1; font: 900 1.5rem var(--display); letter-spacing: 0.08em; text-transform: uppercase; padding: 12px; border-radius: 12px; border: 0; cursor: pointer; background: var(--goal-red); color: #fff; box-shadow: 0 4px 0 #8a0f14; }
+.shoot { flex: 1; min-height: 56px; font: 900 1.5rem var(--display); letter-spacing: 0.08em; text-transform: uppercase; padding: 12px; border-radius: 12px; border: 0; cursor: pointer; background: linear-gradient(180deg, #f0343b, var(--goal-red)); color: #fff; box-shadow: 0 4px 0 #8a0f14, 0 8px 20px rgba(227,36,43,.25); transition: transform .06s, box-shadow .06s, background-color .2s; -webkit-tap-highlight-color: transparent; }
+.shoot.power { background: linear-gradient(180deg, #ffc040, var(--led)); color: #1b1300; box-shadow: 0 4px 0 #9a6400, 0 8px 20px rgba(255,176,32,.25); }
 .shoot:active { transform: translateY(2px); box-shadow: 0 2px 0 #8a0f14; }
-.shoot:disabled { background: #3a4561; box-shadow: 0 4px 0 #242c40; cursor: default; }
+.shoot:disabled { background: #3a4561; color: #c3cbe0; box-shadow: 0 4px 0 #242c40; cursor: default; }
 .hint { color: var(--muted); font-size: 0.92rem; margin: 0; min-height: 1.3em; }
 
 .card { background: var(--boards); border: 1px solid #26324f; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-.card h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin: 0; font-size: 1.15rem; }
+.card h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin: 0; font-size: 1.15rem; text-wrap: balance; }
+.card h2 small { font: 500 0.85rem var(--body); letter-spacing: 0.02em; text-transform: none; color: var(--muted); margin-left: 6px; }
 .scorecard { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; text-align: center; font-size: 0.95rem; }
-.scorecard th, .scorecard td { padding: 4px 2px; border-bottom: 1px solid #26324f; }
+.scorecard th, .scorecard td { padding: 5px 2px; border-bottom: 1px solid #26324f; min-width: 1.9em; }
 .scorecard th { color: var(--muted); font-weight: 500; font-size: 0.8rem; }
-.scorecard td.lab { text-align: left; color: var(--muted); }
-.scorecard td.cur { outline: 2px solid var(--led); outline-offset: -2px; border-radius: 4px; }
+.scorecard thead tr:first-child th { font-family: var(--display); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); font-size: 0.82rem; }
+.scorecard tr:last-child td { border-bottom: 0; }
+.scorecard td.lab { text-align: left; color: var(--muted); padding-right: 8px; }
+.scorecard td.cur { box-shadow: inset 0 0 0 2px var(--led); border-radius: 6px; background: rgba(255,176,32,.08); }
+.scorecard td.tot { font-weight: 700; color: var(--text); border-left: 2px solid #33405f; }
+.scorecard td .pip { display: inline-grid; place-items: center; min-width: 1.7em; height: 1.7em; padding: 0 3px; border-radius: 999px; line-height: 1; }
+.scorecard td.s-ace .pip { background: var(--goal-red); color: #fff; box-shadow: 0 0 10px rgba(227,36,43,.5); }
+.scorecard td.s-under .pip { box-shadow: inset 0 0 0 2px #7fb3ff; }
+.scorecard td.s-over .pip { box-shadow: inset 0 0 0 1px rgba(255,176,32,.6); border-radius: 5px; }
+.scorecard td.s-bad .pip { box-shadow: inset 0 0 0 2px rgba(255,122,127,.7); border-radius: 5px; }
+.scorecard tr.sub td { color: var(--muted); font-size: 0.82rem; }
+@media (prefers-reduced-motion: no-preference) { .scorecard td.fresh .pip { animation: pop .5s cubic-bezier(.2,1.6,.4,1); } @keyframes pop { 0% { transform: scale(0); } 100% { transform: none; } } }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; font-size: 0.8rem; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; vertical-align: 0; background: currentColor; }
 .scorecard .per { border-left: 2px solid #33405f; }
 .s-ace { color: var(--goal-red); font-weight: 700; }
 .s-under { color: #7fb3ff; font-weight: 700; }
@@ -81,22 +111,39 @@ canvas { display: block; width: 100%; height: auto; cursor: pointer; }
 .tablewrap { overflow-x: auto; }
 
 .result .big { font-family: var(--display); font-weight: 900; font-size: 3.4rem; line-height: 1; margin: 0; color: var(--led); }
-.grid { font-size: 1.3rem; letter-spacing: 3px; margin: 0; white-space: pre; }
+.grid { font: 700 1.25rem/1.45 var(--body); margin: 0; white-space: pre; }
+.periods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.period { background: #05080f; border-radius: 8px; padding: 8px 6px; text-align: center; border-top: 3px solid #33405f; }
+.period.under { border-top-color: #7fb3ff; } .period.even { border-top-color: var(--ok); } .period.over { border-top-color: var(--led); }
+.period span { display: block; font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.period b { font-family: var(--display); font-size: 1.45rem; font-variant-numeric: tabular-nums; }
+.period small { display: block; color: var(--muted); font-size: 0.78rem; }
+@media (prefers-reduced-motion: no-preference) { .result { animation: rise .4s ease-out both; } @keyframes rise { from { transform: translateY(10px); opacity: .3; } to { transform: none; opacity: 1; } } }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .stat { background: #05080f; border-radius: 8px; padding: 8px 4px; text-align: center; }
 .stat b { display: block; font-family: var(--display); font-size: 1.5rem; color: var(--led); font-variant-numeric: tabular-nums; }
 .stat span { font-size: 0.75rem; color: var(--muted); }
 .row { display: flex; gap: 10px; flex-wrap: wrap; }
-.btn { font: 700 1rem var(--body); border-radius: 10px; padding: 10px 16px; border: 1px solid #33405f; background: transparent; color: var(--text); cursor: pointer; }
+.btn { font: 700 1rem var(--body); min-height: 44px; border-radius: 10px; padding: 10px 16px; border: 1px solid #33405f; background: transparent; color: var(--text); cursor: pointer; transition: background-color .15s, border-color .15s; }
+.btn:hover { border-color: #4a5a82; background: #1d2a48; }
+.btn.primary:hover { background: #ffc040; }
 .btn.primary { background: var(--led); color: #1b1300; border-color: var(--led); }
 .sharebox { width: 100%; min-height: 6rem; background: #05080f; color: var(--text); border: 1px solid #26324f; border-radius: 8px; font: 0.9rem ui-monospace, Menlo, Consolas, monospace; padding: 8px; }
 details { color: var(--muted); font-size: 0.95rem; }
 details summary { cursor: pointer; color: var(--text); font-weight: 700; }
 details ul { padding-left: 1.2rem; margin: 8px 0 0; }
+details summary:focus-visible, .sharebox:focus-visible { outline: 3px solid var(--led); outline-offset: 2px; }
 @media (max-width: 420px) {
+  .wrap { gap: 12px; }
+  h1 { font-size: 2.3rem; }
+  .cell .k { font-size: 0.62rem; letter-spacing: 0.08em; }
   .cell .v { font-size: 1.4rem; }
-  .stats { grid-template-columns: repeat(2, 1fr); }
+  .stat b { font-size: 1.3rem; }
+  .stat span { font-size: 0.7rem; }
+  .row .btn { flex: 1; }
+  .scorecard { font-size: 0.88rem; }
 }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 </style>
 </head>
 <body>
@@ -133,7 +180,7 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   <div class="controls">
     <button class="shoot" id="shootBtn">Lock aim</button>
   </div>
-  <p class="hint" id="hint">The aim line sweeps. Tap once to lock it, then tap again to set power.</p>
+  <p class="hint" id="hint">Tap to lock the sweeping aim line, then tap again to set power. The goalie guards the middle: aim beside him or bank it in.</p>
 
   <section id="resultBox"></section>
 
@@ -147,7 +194,7 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
     <ul>
       <li>Each drill is like a golf hole: score in as few shots as you can. Your total is measured against par.</li>
       <li>Tap, click or press Space to lock the sweeping aim line, then again to stop the power meter.</li>
-      <li>The puck bounces off the boards, defenders and the goalie. From period 2 the defenders skate back and forth. The goalie keeps moving while you aim, so time your release.</li>
+      <li>The puck bounces off the boards, defenders and the goalie. From period 2 the defenders skate back and forth. The goalie keeps moving while you aim and covers the middle of the net, so aim for the side he is leaving.</li>
       <li>A shot that leaves the zone over the blue line costs a one-shot penalty and the puck comes back.</li>
       <li>If the puck stops in the crease, the goalie covers it and play restarts at the nearest faceoff dot.</li>
       <li>Slush patches slow the puck down. After par + 4 shots the drill ends.</li>
@@ -207,10 +254,24 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   function inCrease(x, y) { return y >= GOAL_Y && Math.hypot(x - CX, y - GOAL_Y) < 6; }
 
   // ---------- course generation ----------
-  function makeDay(seed) {
+  const ICES = [{ name: "Fast ice", decel: 13 }, { name: "Normal ice", decel: 17 }, { name: "Soft ice", decel: 22 }];
+  function iceIdx(roll) { return roll < 0.3 ? 0 : roll < 0.75 ? 1 : 2; }
+  // Daily ice: same roll as before, but never the same surface more than 3 days running (walks forward from launch day).
+  function dailyIce(day) {
+    if (!(day >= 0)) return null;
+    const h = [];
+    for (let d = 0; d <= day; d++) {
+      const roll = rng((d * 2654435761) >>> 0)();
+      let k = iceIdx(roll);
+      if (h.length >= 3 && h[h.length - 1] === k && h[h.length - 2] === k && h[h.length - 3] === k) k = (k + 1 + (Math.floor(roll * 1000) % 2)) % 3;
+      h.push(k); if (h.length > 3) h.shift();
+    }
+    return ICES[h[h.length - 1]];
+  }
+  function makeDay(seed, iceOverride) {
     const r = rng(seed);
     const iceRoll = r();
-    const ice = iceRoll < 0.3 ? { name: "Fast ice", decel: 13 } : iceRoll < 0.75 ? { name: "Normal ice", decel: 17 } : { name: "Soft ice", decel: 22 };
+    const ice = iceOverride || ICES[iceIdx(iceRoll)];
     const drills = [];
     for (let i = 0; i < 9; i++) drills.push(makeDrill(r, i));
     return { ice, drills };
@@ -246,7 +307,8 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
         if (insideRink(s.x, s.y) && Math.hypot(s.x - start.x, s.y - start.y) > s.r + 3 && Math.hypot(s.x - CX, s.y - GOAL_Y) > s.r + 6) { slush = s; break; }
       }
     }
-    const goalie = { amp: Math.min(2.2, 0.8 + 0.15 * i), period: Math.max(2.0, 3.0 - 0.11 * i), phase: r() * Math.PI * 2 };
+    // v2: the goalie sways wider from drill 1 (was 0.8 ft, which left drill 1 the hardest of the day); difficulty now ramps through defenders
+    const goalie = { amp: Math.min(2.2, 1.5 + 0.08 * i), period: Math.max(2.0, 3.0 - 0.11 * i), phase: r() * Math.PI * 2 };
     let par = 2;
     if (behind) par = 3;
     else if (defs.some(d => segDist(d.x, d.y, start.x, start.y, CX, GOAL_Y) < DEF_R + PR + 0.3)) par = 3;
@@ -263,31 +325,38 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   let puck = { x: 0, y: 0, vx: 0, vy: 0 };
   let shotFrom = null, aim = 0, power = 0, phaseT0 = 0, aimCenter = 0, movingT = 0, trail = [];
   let clock = 0; // seconds, drives the goalie
+  let acc = 0; const STEP_H = 1 / 480; // physics accumulator and fixed step
+  let hits = {}; // what the current shot touched, for the miss message
   let soundOn = db.sound !== false;
   let restoring = false;
 
   function freshProgress() { return { drill: 0, strokes: 0, pos: null, results: [], done: false }; }
   let gen = 0;
   function startMode(m, restore) {
-    gen++; document.getElementById("flash").classList.remove("on");
+    gen++; hold = null; document.getElementById("flash").classList.remove("on");
     mode = m;
     day = dayIndex();
     const seed = m === "daily" ? (day * 2654435761) >>> 0 : (Math.random() * 4294967296) >>> 0;
-    course = makeDay(seed);
+    course = makeDay(seed, m === "daily" ? dailyIce(day) : null);
     if (restore && restore.mode === m && restore.G && restore.seed === seed) G = restore.G;
+    else if (restore && m === "practice" && restore.mode === m && restore.G && restore.seed != null) { G = restore.G; course = makeDay(restore.seed); }
     else if (m === "daily" && db.daily && db.daily.day === day) G = db.daily.G;
     else G = freshProgress();
     if (m === "daily") persist();
-    G.seed = seed;
+    G.seed = (m === "practice" && restore && restore.G === G) ? restore.seed : seed;
     document.getElementById("modeDaily").setAttribute("aria-pressed", String(m === "daily"));
     document.getElementById("modePractice").setAttribute("aria-pressed", String(m === "practice"));
     document.getElementById("iceName").textContent = course.ice.name;
     document.getElementById("resultBox").replaceChildren();
-    if (G.done) { phase = "done"; placePuck(); renderAll(); restoring = true; showResult(); restoring = false; return; }
-    placePuck(); beginAim(); renderAll();
+    if (G.done) { phase = "done"; placePuck(); renderAll(); restoring = true; showResult(); restoring = false; setButton("Round complete", true); hint(""); return; }
+    placePuck();
+    if (G.shot) { renderAll(); launch(G.shot); toast("Shot already taken. Replaying it"); return; }
+    beginAim(); renderAll();
   }
   function persist() { if (mode === "daily") { db.daily = { day, G }; save(); } }
-  function drill() { return course.drills[Math.min(G.drill, 8)]; }
+  let hold = null; // drill index still on screen while the goal light / between-drill pause plays
+  function viewIdx() { return hold != null ? hold : Math.min(G.drill, 8); }
+  function drill() { return course.drills[viewIdx()]; }
   function placePuck() {
     const d = drill();
     const p = G.pos || d.start;
@@ -298,20 +367,29 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
     const tgt = puck.y < GOAL_Y + 3 ? { x: CX, y: 30 } : { x: CX, y: GOAL_Y };
     aimCenter = Math.atan2(tgt.y - puck.y, tgt.x - puck.x);
     setButton("Lock aim", false);
-    hint("The aim line sweeps. Tap once to lock it, then tap again to set power.");
+    hint("Tap to lock the sweeping aim line, then tap again to set power. The goalie guards the middle: aim beside him or bank it in.");
   }
 
   // ---------- input ----------
   function action() {
     ensureAudio();
-    if (phase === "aim") { phase = "power"; phaseT0 = clock; setButton("Shoot", false); hint("Stop the meter to shoot. More power carries farther and bounces harder."); }
+    if (phase === "aim") { phase = "power"; phaseT0 = clock; setButton("Shoot", false, "power"); hint("Stop the meter to shoot. More power carries farther and bounces harder."); }
     else if (phase === "power") shoot();
   }
+  // The shot is saved the moment it is taken. The physics runs on a fixed time step, so a saved shot
+  // replays exactly the same way after a reload: reloading mid-shot can't cancel or retake it.
   function shoot() {
-    const speed = 8 + 58 * power;
-    shotFrom = { x: puck.x, y: puck.y };
-    puck.vx = Math.cos(aim) * speed; puck.vy = Math.sin(aim) * speed;
-    G.strokes++; phase = "moving"; movingT = 0; trail = [];
+    G.shot = { x: puck.x, y: puck.y, a: aim, p: power, t: clock };
+    G.strokes++;
+    persist();
+    launch(G.shot);
+  }
+  function launch(s) {
+    const speed = 8 + 58 * s.p;
+    shotFrom = { x: s.x, y: s.y };
+    puck = { x: s.x, y: s.y, vx: Math.cos(s.a) * speed, vy: Math.sin(s.a) * speed };
+    clock = s.t; acc = 0;
+    phase = "moving"; movingT = 0; trail = []; hits = {};
     setButton("…", true); hint("");
     renderBoard();
   }
@@ -378,9 +456,9 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
     if (py >= GOAL_Y && puck.y < GOAL_Y && puck.vy < 0 && puck.x > NET_L + POST_R && puck.x < NET_R - POST_R) return "goal";
     for (const s of boards) collideSeg(s);
     for (const s of netSegs) collideSeg(s);
-    for (const p of posts) if (collideCircle(p, p.r, p.e)) sfx("post");
-    for (const df of d.defs) collideCircle(defPos(df, clock), DEF_R, 0.35);
-    if (collideCircle(goaliePos(clock), GOALIE_R, 0.22)) sfx("save");
+    for (const p of posts) if (collideCircle(p, p.r, p.e)) { sfx("post"); hits.post = 1; }
+    for (const df of d.defs) if (collideCircle(defPos(df, clock), DEF_R, 0.35)) hits.def = 1;
+    if (collideCircle(goaliePos(clock), GOALIE_R, 0.22)) { sfx("save"); hits.goalie = 1; }
     if (puck.y > BLUE + PR) return "cleared";
     if (Math.hypot(puck.vx, puck.vy) < 0.4) return "stopped";
     return null;
@@ -388,6 +466,7 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
 
   function resolve(outcome) {
     const d = drill();
+    G.shot = null;
     if (outcome === "goal") {
       phase = "celebrate";
       const n = G.strokes;
@@ -409,15 +488,24 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
         const dot = DOTS.reduce((a, b) => Math.hypot(b.x - puck.x, b.y - puck.y) < Math.hypot(a.x - puck.x, a.y - puck.y) ? b : a);
         puck.x = dot.x; puck.y = dot.y;
         toast("Goalie covers it. Faceoff");
-      }
+      } else toast(missText());
     }
     if (G.strokes >= d.par + 4) { toast("Drill over. Max score"); finishDrill(d.par + 4, true); return; }
     G.pos = { x: puck.x, y: puck.y };
     persist(); renderBoard(); beginAim();
   }
+  // short coaching after a miss; the longer tip only for the first few misses ever
+  function missText() {
+    db.tips = (db.tips || 0) + 1; const teach = db.tips <= 6; save();
+    if (hits.goalie) return teach ? "Saved. Shoot for the side the goalie isn't on" : "Saved";
+    if (hits.post) return "Off the post!";
+    if (hits.def) return teach ? "Blocked. Go around the defender or off the boards" : "Blocked";
+    return "No goal";
+  }
   function finishDrill(n, pulled) {
     if (phase !== "celebrate") phase = "between";
     G.results.push({ s: n, par: drill().par, pulled });
+    hold = Math.min(G.drill, 8); freshCell = G.results.length - 1;
     G.strokes = 0; G.pos = null;
     const last = G.drill >= 8;
     if (!last) G.drill++;
@@ -428,8 +516,10 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
     const myGen = gen;
     setTimeout(() => {
       if (myGen !== gen) return;
+      hold = null;
       document.getElementById("flash").classList.remove("on");
-      if (G.done) { phase = "done"; showResult(); setButton("Round complete", true); hint(""); return; }
+      document.querySelector(".rinkbox").classList.remove("shake");
+      if (G.done) { phase = "done"; renderBoard(); showResult(); setButton("Round complete", true); hint(""); return; }
       placePuck(); beginAim(); renderAll();
     }, phase === "celebrate" ? 1700 : 900);
   }
@@ -463,37 +553,52 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   function sfx(kind) { if (clock - lastSfx < 0.12) return; lastSfx = clock; if (kind === "post") tone([1568, 2093], 0.25, "triangle", 0.05); else tone([140], 0.12, "square", 0.03); }
 
   // ---------- UI helpers ----------
-  function setButton(t, dis) { const b = document.getElementById("shootBtn"); b.textContent = t; b.disabled = dis; }
+  function setButton(t, dis, kind) { const b = document.getElementById("shootBtn"); b.textContent = t; b.disabled = dis; b.classList.toggle("power", kind === "power"); }
   function hint(t) { document.getElementById("hint").textContent = t; }
   let toastTimer;
   function toast(t) { const el = document.getElementById("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("on"), 1600); }
-  function flash(word) { const f = document.getElementById("flash"); f.querySelector(".word").textContent = word; f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
+  function flash(word) {
+    const f = document.getElementById("flash"); f.querySelector(".word").textContent = word; f.classList.remove("on"); void f.offsetWidth; f.classList.add("on");
+    const rb = document.querySelector(".rinkbox"); rb.classList.remove("shake"); void rb.offsetWidth; rb.classList.add("shake");
+    lampT = clock;
+  }
+  let lampT = -99, freshCell = -1;
+  function setV(id, text) { const el = document.getElementById(id); if (el.textContent !== text) { el.textContent = text; el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); } return el; }
   function totalDiff() { return G.results.reduce((a, r) => a + r.s - r.par, 0); }
   function fmtDiff(n) { return n === 0 ? "E" : n > 0 ? "+" + n : String(n); }
   function renderBoard() {
-    const d = drill();
-    document.getElementById("sbPeriod").textContent = String(Math.floor(Math.min(G.drill, 8) / 3) + 1);
-    document.getElementById("sbDrill").textContent = String(Math.min(G.drill, 8) + 1);
-    document.getElementById("sbPar").textContent = String(d.par);
-    document.getElementById("sbShots").textContent = String(G.done ? "–" : G.strokes);
-    const t = totalDiff(); const el = document.getElementById("sbTotal");
-    el.textContent = fmtDiff(t); el.classList.toggle("red", t > 0);
+    const d = drill(), idx = viewIdx();
+    setV("sbPeriod", String(Math.floor(idx / 3) + 1));
+    setV("sbDrill", String(idx + 1));
+    setV("sbPar", String(d.par));
+    const lastR = G.results[G.results.length - 1];
+    setV("sbShots", phase === "done" ? "–" : hold != null && lastR ? String(lastR.s) : String(G.strokes));
+    const t = totalDiff(); const el = setV("sbTotal", fmtDiff(t));
+    el.classList.toggle("red", t > 0); el.classList.toggle("green", t < 0);
     document.getElementById("drillName").innerHTML = "";
-    const b = document.createElement("b"); b.textContent = G.done ? "Final" : d.name;
-    document.getElementById("drillName").append(b, document.createTextNode(G.done ? "" : " · " + (d.defs.length + " defender" + (d.defs.length > 1 ? "s" : "") + (d.defs[0].amp ? " skating" : "")) + (d.slush ? " · slush" : "")));
+    const fin = phase === "done";
+    const b = document.createElement("b"); b.textContent = fin ? "Final" : d.name;
+    const nd = d.defs.length;
+    document.getElementById("drillName").append(b, document.createTextNode(fin ? "" : (nd ? " · " + nd + " defender" + (nd > 1 ? "s" : "") + (d.defs[0].amp ? " skating" : "") : "") + (d.slush ? " · slush" : "")));
   }
   function cls(r) { if (r.s === 1) return "s-ace"; const df = r.s - r.par; return df < 0 ? "s-under" : df === 0 ? "s-par" : df === 1 ? "s-over" : "s-bad"; }
   function renderScorecard() {
     const t = document.getElementById("scorecard");
-    const head = "<tr><th></th>" + [1, 2, 3].map(p => `<th class="per" colspan="3">Period ${p}</th>`).join("") + "<th></th></tr>" +
-      "<tr><th></th>" + course.drills.map((_, i) => `<th class="${i % 3 === 0 ? "per" : ""}">${i + 1}</th>`).join("") + "<th>Tot</th></tr>";
-    const par = "<tr><td class='lab'>Par</td>" + course.drills.map((d, i) => `<td class="${i % 3 === 0 ? "per" : ""}">${d.par}</td>`).join("") + `<td>${course.drills.reduce((a, d) => a + d.par, 0)}</td></tr>`;
+    const head = "<thead><tr><th></th>" + [1, 2, 3].map(p => `<th class="per" colspan="3">Period ${p}</th>`).join("") + "<th></th></tr>" +
+      "<tr><th></th>" + course.drills.map((_, i) => `<th class="${i % 3 === 0 ? "per" : ""}">${i + 1}</th>`).join("") + "<th>Tot</th></tr></thead>";
+    const par = "<tr><td class='lab'>Par</td>" + course.drills.map((d, i) => `<td class="${i % 3 === 0 ? "per" : ""}">${d.par}</td>`).join("") + `<td class="tot">${course.drills.reduce((a, d) => a + d.par, 0)}</td></tr>`;
     const you = "<tr><td class='lab'>You</td>" + course.drills.map((d, i) => {
       const r = G.results[i];
       const cur = !G.done && i === G.drill ? " cur" : "";
-      return `<td class="${i % 3 === 0 ? "per" : ""}${cur} ${r ? cls(r) : ""}">${r ? r.s + (r.pulled ? "*" : "") : ""}</td>`;
-    }).join("") + `<td>${G.results.length ? G.results.reduce((a, r) => a + r.s, 0) : ""}</td></tr>`;
-    t.innerHTML = head + par + you;
+      const fr = i === freshCell ? " fresh" : "";
+      return `<td class="${i % 3 === 0 ? "per" : ""}${cur}${fr} ${r ? cls(r) : ""}"${r && r.pulled ? ' title="Drill ended at par + 4"' : ""}>${r ? `<span class="pip">${r.s}${r.pulled ? "*" : ""}</span>` : ""}</td>`;
+    }).join("") + `<td class="tot">${G.results.length ? G.results.reduce((a, r) => a + r.s, 0) : ""}</td></tr>`;
+    const sub = "<tr class='sub'><td class='lab'>+/−</td>" + [0, 1, 2].map(p => {
+      const rs = G.results.slice(p * 3, p * 3 + 3);
+      return `<td class="per" colspan="3">${rs.length ? fmtDiff(rs.reduce((a, r) => a + r.s - r.par, 0)) + (rs.length < 3 ? " thru " + (p * 3 + rs.length) : "") : ""}</td>`;
+    }).join("") + `<td class="tot">${G.results.length ? fmtDiff(totalDiff()) : ""}</td></tr>`;
+    t.innerHTML = head + "<tbody>" + par + you + sub + "</tbody>";
+    freshCell = -1;
   }
   function renderAll() { renderBoard(); renderScorecard(); }
 
@@ -509,13 +614,15 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
     const text = shareText();
     const snipes = G.results.filter(r => r.s === 1).length;
     const card = document.createElement("div"); card.className = "card result";
-    const verdict = t <= -3 ? "Hat trick of a round." : t <= 0 ? "Clean sheet. Well played." : t <= 4 ? "Solid shift." : t <= 9 ? "Tough night in the barn." : "Back to the practice rink.";
+    const verdict = t <= -3 ? "Hat trick of a round." : t <= 0 ? "Clean sheet. Well played." : t <= 6 ? "Solid shift." : t <= 12 ? "Grinded it out." : t <= 20 ? "Tough night in the barn." : "Back to the practice rink.";
     const st = db.stats;
     card.innerHTML = `
-      <h2>${mode === "daily" ? "Final · Game #" + (day + 1) : "Practice final"}</h2>
+      <h2>${mode === "daily" ? "Final · Game #" + (day + 1) : "Practice final"}<small>${course.ice.name}</small></h2>
       <p class="big">${fmtDiff(t)}</p>
       <p class="hint">${strokes} shots on a par ${course.drills.reduce((a, d) => a + d.par, 0)}. ${snipes ? snipes + " first-shot snipe" + (snipes > 1 ? "s" : "") + ". " : ""}${verdict}</p>
-      <pre class="grid"></pre>
+      <div class="periods">${[0, 1, 2].map(p => { const rs = G.results.slice(p * 3, p * 3 + 3); const df = rs.reduce((a, r) => a + r.s - r.par, 0); const pp = rs.reduce((a, r) => a + r.par, 0); const sh = rs.reduce((a, r) => a + r.s, 0);
+        return `<div class="period ${df < 0 ? "under" : df === 0 ? "even" : "over"}"><span>Period ${p + 1}</span><b>${fmtDiff(df)}</b><small>${sh} shots · par ${pp}</small></div>`; }).join("")}</div>
+      <pre class="grid" aria-label="Result grid"></pre>
       ${mode === "daily" ? `<div class="stats">
         <div class="stat"><b>${st.played}</b><span>Played</span></div>
         <div class="stat"><b>${st.streak}</b><span>Streak</span></div>
@@ -527,7 +634,7 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
     card.querySelector(".grid").textContent = text.split("\n").slice(1).join("\n");
     const ta = card.querySelector("#shareBox"); ta.value = text;
     card.querySelector("#copyBtn").addEventListener("click", async (e) => {
-      try { await navigator.clipboard.writeText(text); e.target.textContent = "Copied"; }
+      try { await navigator.clipboard.writeText(text); e.target.textContent = "Copied ✓"; setTimeout(() => { e.target.textContent = "Copy result"; }, 2000); }
       catch (err) { ta.hidden = false; ta.focus(); ta.select(); e.target.textContent = "Select and copy below"; }
     });
     card.querySelector("#againBtn").addEventListener("click", () => startMode("practice"));
@@ -538,12 +645,13 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   // ---------- drawing ----------
   const cv = document.getElementById("rink"); const ctx = cv.getContext("2d");
   let S = 6, dpr = 1;
+  const LABEL_H = 3.4; // extra room under the boards for the blue-line note
   function resize() {
     dpr = Math.min(2, window.devicePixelRatio || 1);
     const w = cv.parentElement.clientWidth;
     S = w / (W + PAD * 2);
-    cv.width = Math.round(w * dpr); cv.height = Math.round((VIEW_H + PAD) * S * dpr);
-    cv.style.height = (VIEW_H + PAD) * S + "px";
+    cv.width = Math.round(w * dpr); cv.height = Math.round((VIEW_H + PAD + LABEL_H) * S * dpr);
+    cv.style.height = (VIEW_H + PAD + LABEL_H) * S + "px";
   }
   window.addEventListener("resize", resize);
   const X = x => (x + PAD) * S, Y = y => (y + PAD) * S;
@@ -557,103 +665,183 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
     ctx.lineTo(X(W), Y(BLUE + 3));
     ctx.closePath();
   }
+  // fixed skate marks on the ice (decoration only, same every frame)
+  const scuffs = (function () { const r = rng(7331), out = []; for (let i = 0; i < 46; i++) out.push({ x: 4 + r() * 77, y: 6 + r() * 70, a: r() * Math.PI, l: 3 + r() * 9, b: (r() - 0.5) * 0.6 }); return out; })();
+  function lampOn() { const t = clock - lampT; if (t < 0 || t > 2.2) return 0; if (reduceMotion.matches) return 1; return Math.floor(t / 0.25) % 2 === 0 ? 1 : 0.45; }
   function draw() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, cv.width, cv.height);
-    ctx.fillStyle = "#16213a"; ctx.fillRect(0, 0, cv.width, cv.height);
+    const cw = cv.width / dpr, ch = cv.height / dpr;
+    ctx.clearRect(0, 0, cw, ch);
+    const bg = ctx.createLinearGradient(0, 0, 0, ch); bg.addColorStop(0, "#1a2744"); bg.addColorStop(1, "#121b30");
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, cw, ch);
+    const lamp = lampOn();
     // ice
     ctx.save(); rinkPath(); ctx.fillStyle = "#f3f7fb"; ctx.fill(); ctx.clip();
     const grd = ctx.createRadialGradient(X(CX), Y(30), 5, X(CX), Y(30), 60 * S);
-    grd.addColorStop(0, "rgba(255,255,255,0.6)"); grd.addColorStop(1, "rgba(200,215,232,0.35)");
-    ctx.fillStyle = grd; ctx.fillRect(0, 0, cv.width, cv.height);
+    grd.addColorStop(0, "rgba(255,255,255,0.7)"); grd.addColorStop(1, "rgba(196,212,232,0.42)");
+    ctx.fillStyle = grd; ctx.fillRect(0, 0, cw, ch);
+    ctx.strokeStyle = "rgba(150,170,200,0.11)"; ctx.lineWidth = 1;
+    for (const sc of scuffs) { ctx.beginPath(); ctx.moveTo(X(sc.x), Y(sc.y)); ctx.quadraticCurveTo(X(sc.x + Math.cos(sc.a) * sc.l / 2 + sc.b * 3), Y(sc.y + Math.sin(sc.a) * sc.l / 2 - sc.b * 3), X(sc.x + Math.cos(sc.a) * sc.l), Y(sc.y + Math.sin(sc.a) * sc.l)); ctx.stroke(); }
+    if (lamp) { const lg = ctx.createRadialGradient(X(CX), Y(GOAL_Y - 4), 0, X(CX), Y(GOAL_Y - 4), 40 * S); lg.addColorStop(0, `rgba(227,36,43,${0.22 * lamp})`); lg.addColorStop(1, "rgba(227,36,43,0)"); ctx.fillStyle = lg; ctx.fillRect(0, 0, cw, ch); }
     // goal line
     ctx.fillStyle = "#e3242b"; ctx.fillRect(X(0), Y(GOAL_Y) - 0.17 * S, W * S, 0.34 * S);
     // blue line
     ctx.fillStyle = "#2457c5"; ctx.fillRect(X(0), Y(BLUE), W * S, 1 * S);
+    ctx.fillStyle = "rgba(255,255,255,0.35)"; ctx.fillRect(X(0), Y(BLUE), W * S, Math.max(1, 0.15 * S));
     // faceoff circles
-    ctx.strokeStyle = "#e3242b"; ctx.lineWidth = Math.max(1, 0.18 * S);
+    ctx.strokeStyle = "#e3242b"; ctx.lineWidth = Math.max(1, 0.18 * S); ctx.lineCap = "butt";
     for (const d of DOTS) {
       ctx.beginPath(); ctx.arc(X(d.x), Y(d.y), 15 * S, 0, Math.PI * 2); ctx.stroke();
+      // hash marks on the circle
+      for (const sy of [-1, 1]) for (const sx of [-1, 1]) { const hx = d.x + sx * 2.9, hy = d.y + sy * Math.sqrt(225 - 2.9 * 2.9); ctx.beginPath(); ctx.moveTo(X(hx), Y(hy)); ctx.lineTo(X(hx), Y(hy + sy * 2)); ctx.stroke(); }
       ctx.fillStyle = "#e3242b"; ctx.beginPath(); ctx.arc(X(d.x), Y(d.y), 1 * S, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.35)"; ctx.beginPath(); ctx.arc(X(d.x - 0.25), Y(d.y - 0.25), 0.35 * S, 0, Math.PI * 2); ctx.fill();
       for (const sx of [-1, 1]) for (const sy of [-1, 1]) { ctx.beginPath(); ctx.moveTo(X(d.x + sx * 2), Y(d.y + sy * 1)); ctx.lineTo(X(d.x + sx * 2), Y(d.y + sy * 3)); ctx.moveTo(X(d.x + sx * 2), Y(d.y + sy * 1)); ctx.lineTo(X(d.x + sx * 5), Y(d.y + sy * 1)); ctx.stroke(); }
     }
     // crease
     ctx.beginPath(); ctx.moveTo(X(CX - 6), Y(GOAL_Y)); ctx.arc(X(CX), Y(GOAL_Y), 6 * S, 0, Math.PI, false); ctx.closePath();
-    ctx.fillStyle = "rgba(76,140,230,0.35)"; ctx.fill(); ctx.strokeStyle = "#e3242b"; ctx.stroke();
+    const cg = ctx.createLinearGradient(0, Y(GOAL_Y), 0, Y(GOAL_Y + 6)); cg.addColorStop(0, "rgba(76,140,230,0.5)"); cg.addColorStop(1, "rgba(76,140,230,0.28)");
+    ctx.fillStyle = cg; ctx.fill(); ctx.strokeStyle = "#e3242b"; ctx.stroke();
     const d = drill();
     // slush
     if (d.slush) {
       const g = ctx.createRadialGradient(X(d.slush.x), Y(d.slush.y), 0, X(d.slush.x), Y(d.slush.y), d.slush.r * S);
       g.addColorStop(0, "rgba(140,160,185,0.55)"); g.addColorStop(0.75, "rgba(150,170,195,0.35)"); g.addColorStop(1, "rgba(150,170,195,0)");
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(X(d.slush.x), Y(d.slush.y), d.slush.r * S, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.45)";
+      for (let k = 0; k < 9; k++) { const a = k * 2.4, rr = d.slush.r * (0.2 + 0.07 * k); ctx.beginPath(); ctx.arc(X(d.slush.x + Math.cos(a) * rr), Y(d.slush.y + Math.sin(a) * rr), Math.max(1, 0.22 * S), 0, Math.PI * 2); ctx.fill(); }
       ctx.fillStyle = "rgba(60,75,100,0.7)"; ctx.font = `600 ${Math.max(9, 1.6 * S)}px "Barlow Semi Condensed", sans-serif`; ctx.textAlign = "center"; ctx.fillText("SLUSH", X(d.slush.x), Y(d.slush.y) + 0.5 * S);
     }
-    // net
-    ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.fillRect(X(NET_L), Y(NET_BACK), 6 * S, 4 * S);
-    ctx.strokeStyle = "rgba(120,130,150,0.6)"; ctx.lineWidth = 1;
-    for (let gx = NET_L + 0.6; gx < NET_R; gx += 0.6) { ctx.beginPath(); ctx.moveTo(X(gx), Y(NET_BACK)); ctx.lineTo(X(gx), Y(GOAL_Y)); ctx.stroke(); }
-    for (let gy = NET_BACK + 0.6; gy < GOAL_Y; gy += 0.6) { ctx.beginPath(); ctx.moveTo(X(NET_L), Y(gy)); ctx.lineTo(X(NET_R), Y(gy)); ctx.stroke(); }
-    ctx.strokeStyle = "#d1181f"; ctx.lineWidth = Math.max(2, 0.35 * S);
-    ctx.beginPath(); ctx.moveTo(X(NET_L), Y(GOAL_Y)); ctx.lineTo(X(NET_L), Y(NET_BACK)); ctx.lineTo(X(NET_R), Y(NET_BACK)); ctx.lineTo(X(NET_R), Y(GOAL_Y)); ctx.stroke();
-    // defenders
-    for (const df of d.defs) { const q = defPos(df, clock); player(q.x, q.y, DEF_R, "#7a1f2b", Math.atan2(puck.y - q.y, puck.x - q.x)); }
-    // goalie
-    const gp = goaliePos(clock);
-    ctx.save(); ctx.translate(X(gp.x), Y(gp.y));
-    ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.beginPath(); ctx.ellipse(0.3 * S, 0.4 * S, GOALIE_R * S, GOALIE_R * 0.8 * S, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#f2f2f2"; roundRect(-GOALIE_R * S, -0.9 * S, GOALIE_R * 2 * S, 1.8 * S, 0.8 * S); ctx.fill();
-    ctx.strokeStyle = "#7a1f2b"; ctx.lineWidth = Math.max(1.5, 0.25 * S); ctx.stroke();
-    ctx.fillStyle = "#7a1f2b"; ctx.beginPath(); ctx.arc(0, 0, 1.15 * S, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(0, -0.1 * S, 0.55 * S, 0, Math.PI * 2); ctx.fill();
+    // net (shadow, mesh, frame, posts)
+    const inNet = phase !== "done" && puck.y < GOAL_Y && puck.y > NET_BACK - 1 && puck.x > NET_L && puck.x < NET_R;
+    ctx.fillStyle = "rgba(20,30,50,0.18)"; roundRect(X(NET_L - 0.3), Y(NET_BACK - 0.5), 6.9 * S, 4.6 * S, 0.8 * S); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.92)"; ctx.fillRect(X(NET_L), Y(NET_BACK), 6 * S, 4 * S);
+    ctx.save(); ctx.beginPath(); ctx.rect(X(NET_L), Y(NET_BACK), 6 * S, 4 * S); ctx.clip();
+    ctx.strokeStyle = "rgba(110,122,145,0.55)"; ctx.lineWidth = 1;
+    const bx = inNet ? puck.x : 0, by = inNet ? puck.y : 0, bulge = inNet ? 0.35 : 0;
+    const warp = (x, y) => { if (!bulge) return [x, y]; const dd = Math.hypot(x - bx, y - by); const k = Math.max(0, 1 - dd / 2.2) * bulge; return [x + (x - bx) * k, y - k]; };
+    for (let gx = NET_L - 4; gx < NET_R + 4; gx += 0.7) { ctx.beginPath(); for (let t = 0; t <= 6; t++) { const [px, py] = warp(gx + t * 4 / 6 * 0.6, NET_BACK + t * 4 / 6); t ? ctx.lineTo(X(px), Y(py)) : ctx.moveTo(X(px), Y(py)); } ctx.stroke(); }
+    for (let gx = NET_L - 4; gx < NET_R + 4; gx += 0.7) { ctx.beginPath(); for (let t = 0; t <= 6; t++) { const [px, py] = warp(gx - t * 4 / 6 * 0.6, NET_BACK + t * 4 / 6); t ? ctx.lineTo(X(px), Y(py)) : ctx.moveTo(X(px), Y(py)); } ctx.stroke(); }
     ctx.restore();
+    ctx.strokeStyle = "#d1181f"; ctx.lineWidth = Math.max(2, 0.35 * S); ctx.lineJoin = "round";
+    ctx.beginPath(); ctx.moveTo(X(NET_L), Y(GOAL_Y)); ctx.lineTo(X(NET_L), Y(NET_BACK)); ctx.lineTo(X(NET_R), Y(NET_BACK)); ctx.lineTo(X(NET_R), Y(GOAL_Y)); ctx.stroke();
+    for (const pp of posts) { ctx.fillStyle = "#b5121a"; ctx.beginPath(); ctx.arc(X(pp.x), Y(pp.y), pp.r * S * 1.15, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.beginPath(); ctx.arc(X(pp.x - 0.1), Y(pp.y - 0.1), pp.r * S * 0.4, 0, Math.PI * 2); ctx.fill(); }
+    // defenders
+    for (const df of d.defs) { const q = defPos(df, clock); player(q.x, q.y, DEF_R, Math.atan2(puck.y - q.y, puck.x - q.x)); }
+    // goalie
+    goalie(goaliePos(clock));
     // aim
     if (phase === "aim" || phase === "power") {
       const len = 16;
-      ctx.setLineDash([0.9 * S, 0.7 * S]); ctx.lineWidth = Math.max(2, 0.35 * S);
-      ctx.strokeStyle = phase === "power" ? "#e3242b" : "rgba(11,18,32,0.75)";
-      ctx.beginPath(); ctx.moveTo(X(puck.x), Y(puck.y)); ctx.lineTo(X(puck.x + Math.cos(aim) * len), Y(puck.y + Math.sin(aim) * len)); ctx.stroke();
-      ctx.setLineDash([]);
-      const hx = puck.x + Math.cos(aim) * len, hy = puck.y + Math.sin(aim) * len;
-      ctx.fillStyle = ctx.strokeStyle; ctx.beginPath();
-      ctx.moveTo(X(hx + Math.cos(aim) * 1.4), Y(hy + Math.sin(aim) * 1.4));
-      ctx.lineTo(X(hx + Math.cos(aim + 2.5) * 1.2), Y(hy + Math.sin(aim + 2.5) * 1.2));
-      ctx.lineTo(X(hx + Math.cos(aim - 2.5) * 1.2), Y(hy + Math.sin(aim - 2.5) * 1.2)); ctx.fill();
+      const col = phase === "power" ? "227,36,43" : "11,18,32";
+      const ex = puck.x + Math.cos(aim) * len, ey = puck.y + Math.sin(aim) * len;
+      const lg = ctx.createLinearGradient(X(puck.x), Y(puck.y), X(ex), Y(ey)); lg.addColorStop(0, `rgba(${col},0.9)`); lg.addColorStop(1, `rgba(${col},0.45)`);
+      ctx.setLineDash([0.9 * S, 0.7 * S]); ctx.lineWidth = Math.max(2, 0.35 * S); ctx.lineCap = "round";
+      ctx.strokeStyle = lg;
+      ctx.beginPath(); ctx.moveTo(X(puck.x), Y(puck.y)); ctx.lineTo(X(ex), Y(ey)); ctx.stroke();
+      ctx.setLineDash([]); ctx.lineCap = "butt";
+      ctx.fillStyle = `rgba(${col},${phase === "power" ? 1 : 0.8})`; ctx.beginPath();
+      ctx.moveTo(X(ex + Math.cos(aim) * 1.4), Y(ey + Math.sin(aim) * 1.4));
+      ctx.lineTo(X(ex + Math.cos(aim + 2.5) * 1.2), Y(ey + Math.sin(aim + 2.5) * 1.2));
+      ctx.lineTo(X(ex + Math.cos(aim - 2.5) * 1.2), Y(ey + Math.sin(aim - 2.5) * 1.2)); ctx.closePath(); ctx.fill();
     }
     // trail
-    for (let i = 0; i < trail.length; i++) { const t = trail[i]; ctx.fillStyle = `rgba(20,25,40,${0.18 * (i / trail.length)})`; ctx.beginPath(); ctx.arc(X(t.x), Y(t.y), PR * S * 0.8, 0, Math.PI * 2); ctx.fill(); }
+    if (trail.length > 1) {
+      ctx.lineCap = "round";
+      for (let i = 1; i < trail.length; i++) { const a = trail[i - 1], b = trail[i]; ctx.strokeStyle = `rgba(20,25,40,${0.22 * (i / trail.length)})`; ctx.lineWidth = PR * S * 1.5 * (0.4 + 0.6 * i / trail.length); ctx.beginPath(); ctx.moveTo(X(a.x), Y(a.y)); ctx.lineTo(X(b.x), Y(b.y)); ctx.stroke(); }
+      ctx.lineCap = "butt";
+    }
     // puck
     if (phase !== "done") {
-      ctx.fillStyle = "rgba(0,0,0,0.2)"; ctx.beginPath(); ctx.arc(X(puck.x + 0.15), Y(puck.y + 0.2), PR * S, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = "#0b0d12"; ctx.beginPath(); ctx.arc(X(puck.x), Y(puck.y), PR * S, 0, Math.PI * 2); ctx.fill();
-      if (phase === "aim" || phase === "power") { ctx.strokeStyle = "rgba(255,176,32,0.9)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(X(puck.x), Y(puck.y), (PR + 0.9 + 0.3 * Math.sin(clock * 6)) * S, 0, Math.PI * 2); ctx.stroke(); }
+      ctx.fillStyle = "rgba(0,0,0,0.22)"; ctx.beginPath(); ctx.ellipse(X(puck.x + 0.18), Y(puck.y + 0.25), PR * S * 1.05, PR * S * 0.9, 0, 0, Math.PI * 2); ctx.fill();
+      const pg = ctx.createRadialGradient(X(puck.x - PR * 0.35), Y(puck.y - PR * 0.35), 0, X(puck.x), Y(puck.y), PR * S);
+      pg.addColorStop(0, "#3a404d"); pg.addColorStop(0.6, "#12151c"); pg.addColorStop(1, "#050608");
+      ctx.fillStyle = pg; ctx.beginPath(); ctx.arc(X(puck.x), Y(puck.y), PR * S, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.18)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(X(puck.x), Y(puck.y), PR * S * 0.62, 0, Math.PI * 2); ctx.stroke();
+      if (phase === "aim" || phase === "power") {
+        const pulse = reduceMotion.matches ? 0.15 : 0.3 * Math.sin(clock * 6);
+        ctx.strokeStyle = phase === "power" ? "rgba(227,36,43,0.9)" : "rgba(255,176,32,0.95)"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(X(puck.x), Y(puck.y), (PR + 0.9 + pulse) * S, 0, Math.PI * 2); ctx.stroke();
+      }
     }
     ctx.restore();
-    // boards outline
-    rinkPath(); ctx.strokeStyle = "#c9d3e3"; ctx.lineWidth = Math.max(2, 0.5 * S); ctx.stroke();
-    // label below blue line
-    ctx.fillStyle = "rgba(233,238,247,0.55)"; ctx.font = `700 ${Math.max(10, 1.5 * S)}px "Barlow Semi Condensed", sans-serif`; ctx.textAlign = "center";
-    ctx.fillText("BLUE LINE · SHOTS PAST HERE COST +1", X(CX), Y(BLUE + 2.6));
+    // boards: dasher, then the white top rail
+    rinkPath(); ctx.strokeStyle = "#0a101d"; ctx.lineWidth = Math.max(4, 1.1 * S); ctx.stroke();
+    rinkPath(); ctx.strokeStyle = "#e3e9f2"; ctx.lineWidth = Math.max(2, 0.5 * S); ctx.stroke();
+    // goal light above the net
+    const lx = X(CX), ly = Y(-1.1), lr = Math.max(5, 0.9 * S);
+    if (lamp) { const gg = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr * 6); gg.addColorStop(0, `rgba(255,70,70,${0.75 * lamp})`); gg.addColorStop(1, "rgba(255,40,40,0)"); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(lx, ly, lr * 6, 0, Math.PI * 2); ctx.fill(); }
+    ctx.fillStyle = "#2a3550"; roundRect(lx - lr * 1.3, ly + lr * 0.25, lr * 2.6, lr * 0.7, lr * 0.2); ctx.fill();
+    ctx.fillStyle = lamp ? `rgb(${200 + 55 * lamp},${40 + 40 * lamp},${40 + 30 * lamp})` : "#5a1a20";
+    ctx.beginPath(); ctx.arc(lx, ly + lr * 0.3, lr, Math.PI, 0); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.35)"; ctx.beginPath(); ctx.arc(lx - lr * 0.35, ly - lr * 0.15, lr * 0.25, 0, Math.PI * 2); ctx.fill();
+    // label below the blue line
+    ctx.fillStyle = "rgba(233,238,247,0.6)"; ctx.font = `700 ${Math.max(10, 1.5 * S)}px "Barlow Semi Condensed", sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("BLUE LINE · SHOTS PAST HERE COST +1", X(CX), Y(BLUE + 3 + LABEL_H / 2 + 0.4));
+    ctx.textBaseline = "alphabetic";
   }
   function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
-  function player(x, y, r, color, face) {
-    ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.beginPath(); ctx.arc(X(x + 0.3), Y(y + 0.4), r * S, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = "#3b2a1a"; ctx.lineWidth = Math.max(2, 0.3 * S);
-    ctx.beginPath(); ctx.moveTo(X(x + Math.cos(face + 0.5) * r * 0.8), Y(y + Math.sin(face + 0.5) * r * 0.8)); ctx.lineTo(X(x + Math.cos(face + 0.25) * (r + 2.4)), Y(y + Math.sin(face + 0.25) * (r + 2.4))); ctx.stroke();
-    ctx.fillStyle = color; ctx.beginPath(); ctx.arc(X(x), Y(y), r * S, 0, Math.PI * 2); ctx.fill();
+  // defender seen from above: stick, shoulders in the road jersey, helmet. Body circle = collision radius.
+  function player(x, y, r, face) {
+    ctx.save(); ctx.translate(X(x), Y(y)); ctx.rotate(face);
+    ctx.fillStyle = "rgba(10,20,40,0.18)"; ctx.beginPath(); ctx.ellipse(0.25 * S, 0.45 * S, r * S * 1.05, r * S * 0.95, 0, 0, Math.PI * 2); ctx.fill();
+    // stick: shaft from the right hand forward, blade at the end
+    ctx.strokeStyle = "#3b2a1a"; ctx.lineWidth = Math.max(2, 0.28 * S); ctx.lineCap = "round";
+    const hx = r * 0.55, hy = r * 0.55, tx = r + 2.1, ty = r * 0.55 + 0.9;
+    ctx.beginPath(); ctx.moveTo(hx * S, hy * S); ctx.lineTo(tx * S, ty * S); ctx.stroke();
+    ctx.strokeStyle = "#111"; ctx.lineWidth = Math.max(2.5, 0.4 * S);
+    ctx.beginPath(); ctx.moveTo(tx * S, ty * S); ctx.lineTo((tx + 0.25) * S, (ty - 0.9) * S); ctx.stroke(); ctx.lineCap = "butt";
+    // shoulders
+    const jg = ctx.createRadialGradient(-0.4 * r * S, -0.4 * r * S, 0, 0, 0, r * S);
+    jg.addColorStop(0, "#a3313f"); jg.addColorStop(1, "#6a1925");
+    ctx.fillStyle = jg; ctx.beginPath(); ctx.ellipse(0, 0, r * S * 0.82, r * S, 0, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = "#ffffff"; ctx.lineWidth = Math.max(1.5, 0.22 * S); ctx.stroke();
-    ctx.fillStyle = "#0b1220"; ctx.beginPath(); ctx.arc(X(x), Y(y), r * 0.45 * S, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.75)"; ctx.lineWidth = Math.max(1, 0.16 * S);
+    for (const sd of [-1, 1]) { ctx.beginPath(); ctx.arc(0, 0, r * S * 0.7, sd * Math.PI / 2 - 0.45, sd * Math.PI / 2 + 0.45); ctx.stroke(); }
+    // helmet with visor toward the puck
+    ctx.fillStyle = "#0b1220"; ctx.beginPath(); ctx.arc(0, 0, r * 0.45 * S, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "rgba(160,200,255,0.7)"; ctx.lineWidth = Math.max(1, 0.14 * S); ctx.beginPath(); ctx.arc(0, 0, r * 0.32 * S, -0.8, 0.8); ctx.stroke();
+    ctx.restore();
+  }
+  // goalie from above: pads toward the shooter, glove and blocker, mask. Footprint = GOALIE_R wide each side.
+  function goalie(gp) {
+    ctx.save(); ctx.translate(X(gp.x), Y(gp.y));
+    ctx.fillStyle = "rgba(10,20,40,0.18)"; ctx.beginPath(); ctx.ellipse(0.3 * S, 0.45 * S, GOALIE_R * S, GOALIE_R * 0.8 * S, 0, 0, Math.PI * 2); ctx.fill();
+    const lw = Math.max(1.2, 0.18 * S);
+    // pads
+    for (const sd of [-1, 1]) {
+      ctx.fillStyle = "#f4f6fa"; roundRect(sd > 0 ? 0.08 * S : -GOALIE_R * S, -0.2 * S, (GOALIE_R - 0.08) * S, 1.1 * S, 0.35 * S); ctx.fill();
+      ctx.strokeStyle = "#7a1f2b"; ctx.lineWidth = lw; ctx.stroke();
+      ctx.strokeStyle = "rgba(122,31,43,0.5)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(sd * 0.7 * S, 0.05 * S); ctx.lineTo(sd * 0.7 * S, 0.75 * S); ctx.stroke();
+    }
+    // body
+    ctx.fillStyle = "#7a1f2b"; ctx.beginPath(); ctx.ellipse(0, -0.35 * S, 1.05 * S, 0.8 * S, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = lw; ctx.stroke();
+    // glove (catcher) and blocker
+    ctx.fillStyle = "#f4f6fa"; ctx.strokeStyle = "#7a1f2b";
+    ctx.beginPath(); ctx.arc(-1.05 * S, -0.55 * S, 0.42 * S, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    roundRect(0.75 * S, -0.95 * S, 0.6 * S, 0.75 * S, 0.12 * S); ctx.fill(); ctx.stroke();
+    // mask with cage
+    ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(0, -0.35 * S, 0.5 * S, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#7a1f2b"; ctx.lineWidth = Math.max(1, 0.1 * S); ctx.stroke();
+    ctx.strokeStyle = "rgba(30,40,60,0.6)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-0.3 * S, -0.1 * S); ctx.lineTo(0.3 * S, -0.1 * S); ctx.moveTo(-0.22 * S, 0.02 * S); ctx.lineTo(0.22 * S, 0.02 * S); ctx.stroke();
+    ctx.restore();
   }
 
   // ---------- loop ----------
   let last = performance.now();
+  const meterEl = document.querySelector(".meter");
+  const reduceMotion = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
   function frame(now) {
     let dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (phase === "moving") {
-      const sub = 8, h = dt / sub;
-      for (let i = 0; i < sub; i++) {
-        clock += h; movingT += h;
-        const out = step(h);
-        if (out || movingT > 9) { resolve(out === "goal" || out === "cleared" ? out : "stopped"); break; }
+      // fixed 1/480 s steps, independent of frame rate, so every device (and a replay after reload) gets the same result
+      acc += dt;
+      while (acc >= STEP_H - 1e-9) {
+        acc -= STEP_H; clock += STEP_H; movingT += STEP_H;
+        const out = step(STEP_H);
+        if (out || movingT > 9) { acc = 0; resolve(out === "goal" || out === "cleared" ? out : "stopped"); break; }
       }
       trail.push({ x: puck.x, y: puck.y }); if (trail.length > 14) trail.shift();
     } else {
@@ -662,7 +850,8 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
     }
     if (phase === "aim") { const d = drill(); aim = aimCenter + 1.4 * Math.sin(d.sweep * (clock - phaseT0)); }
     if (phase === "power") { const p = ((clock - phaseT0) / 1.7) % 2; power = p < 1 ? p : 2 - p; }
-    document.getElementById("meterFill").style.width = (phase === "power" ? power * 100 : phase === "aim" ? 0 : power * 100) + "%";
+    document.getElementById("meterFill").style.width = (phase === "power" ? power * 100 : phase === "aim" || phase === "done" ? 0 : power * 100) + "%";
+    meterEl.classList.toggle("live", phase === "power");
     draw();
     requestAnimationFrame(frame);
   }
@@ -671,7 +860,7 @@ details ul { padding-left: 1.2rem; margin: 8px 0 0; }
   window.claude?.hot?.snapshot?.(() => ({ mode, G, seed: G && G.seed }));
   function start(data) { resize(); startMode(data && data.mode === "practice" ? "practice" : "daily", data); requestAnimationFrame(frame); }
   // test hooks
-  window.__topshelf = { makeDay, get G() { return G; }, get phase() { return phase; }, get puck() { return puck; }, set aimNow(v) { aim = v; }, set powerNow(v) { power = v; }, shootNow: () => shoot(), get course() { return course; }, freezeGoalieAt: null };
+  window.__topshelf = { makeDay, dailyIce, get G() { return G; }, get phase() { return phase; }, get puck() { return puck; }, get aim() { return aim; }, get power() { return power; }, set aimNow(v) { aim = v; }, set powerNow(v) { power = v; }, shootNow: () => shoot(), get course() { return course; }, freezeGoalieAt: null };
   window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 })();
 </script>

@@ -57,79 +57,121 @@ body {
   background: repeating-linear-gradient(-45deg, var(--mail-red) 0 14px, transparent 14px 22px, var(--accent) 22px 36px, transparent 36px 44px);
 }
 .wrap { max-width: 680px; margin: 0 auto; padding: 20px 16px 48px; display: flex; flex-direction: column; gap: 18px; }
-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+header { display: flex; flex-direction: column; gap: 14px; }
 .brand h1 { font-family: var(--display); font-weight: 400; font-size: 2.2rem; margin: 0; letter-spacing: -0.01em; line-height: 1; }
 .brand h1 .dot { color: var(--mail-red); }
 .brand p { margin: 4px 0 0; color: var(--muted); font-size: 0.92rem; }
 .brand .ipa { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
-.controls { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.controls { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 .seg { display: inline-flex; background: var(--chip); border-radius: 999px; padding: 3px; gap: 2px; }
-.seg button { border: 0; background: transparent; color: var(--muted); font: 600 0.82rem var(--mono); padding: 6px 11px; border-radius: 999px; cursor: pointer; }
-.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.seg button { border: 0; background: transparent; color: var(--muted); font: 600 0.84rem var(--mono); min-height: 38px; min-width: 44px; padding: 0 14px; border-radius: 999px; cursor: pointer; transition: background-color .15s, color .15s, box-shadow .15s; }
+.seg button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12), 0 0 0 1px var(--line); }
+#langSeg button[aria-pressed="true"] { box-shadow: inset 0 -2px 0 var(--mail-red), 0 1px 2px rgba(0,0,0,.12), 0 0 0 1px var(--line); }
 .seg button:focus-visible, .btn:focus-visible, .sense:focus-visible, .linkbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
 .progress { display: flex; gap: 6px; align-items: center; }
-.progress .pip { flex: 1; height: 5px; border-radius: 3px; background: var(--line); }
+.progress .pip { flex: 1; height: 5px; border-radius: 3px; background: var(--line); transition: background-color .25s; }
 .progress .pip.done { background: var(--accent); }
 .progress .pip.cur { background: var(--mail-red); }
 .progress .lbl { font: 500 0.78rem var(--mono); color: var(--muted); margin-left: 6px; white-space: nowrap; }
 
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px 20px; display: flex; flex-direction: column; gap: 16px; }
-.entry-head { display: flex; flex-direction: column; gap: 4px; }
-.headword { font-family: var(--display); font-size: clamp(2.2rem, 7vw, 3.3rem); line-height: 1.05; margin: 0; text-wrap: balance; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px 20px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 1px 0 rgba(21,32,58,.04), 0 8px 24px -16px rgba(21,32,58,.25); }
+.entry-head { display: flex; flex-direction: column; gap: 4px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.headword { font-family: var(--display); font-weight: 400; font-size: clamp(2.2rem, 7vw, 3.3rem); line-height: 1.05; margin: 0; text-wrap: balance; overflow-wrap: anywhere; }
+.headword:focus { outline: none; }
+.ask b { color: var(--ink); font-variant-numeric: tabular-nums; }
 .meta { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+.pack { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--chip); color: var(--muted); font: 500 0.72rem var(--mono); white-space: nowrap; vertical-align: 1px; }
 .ctx { font-style: italic; color: var(--muted); margin: 2px 0 0; }
 .ask { margin: 0; font-size: 0.95rem; color: var(--muted); }
 
 .senses { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; counter-reset: sense; }
-.row { display: grid; grid-template-columns: 2.1rem 1fr; gap: 10px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.row { display: grid; grid-template-columns: 1.9rem 1fr; gap: 10px; padding-top: 14px; border-top: 1px dashed var(--line); }
 .row:first-child { border-top: 0; padding-top: 0; }
 .num { font-family: var(--display); font-size: 1.3rem; color: var(--mail-red); line-height: 1.3; }
 .who { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .cc { font: 600 0.75rem var(--mono); background: var(--ink); color: var(--card); padding: 2px 6px; border-radius: 4px; letter-spacing: 0.04em; }
 .cname { font-weight: 700; }
 .opts { display: flex; flex-wrap: wrap; gap: 6px; }
-.sense { font: 400 0.92rem var(--body); text-align: left; background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; padding: 7px 11px; cursor: pointer; transition: border-color .12s, background .12s; }
+.sense { font: 400 0.95rem var(--body); text-align: left; background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; min-height: 42px; padding: 8px 13px; cursor: pointer; transition: border-color .12s, background-color .12s, color .12s, transform .12s, opacity .2s; }
+.sense:active:not(:disabled) { transform: scale(.97); }
 .sense:hover:not(:disabled) { border-color: var(--accent); }
 .sense[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
 .sense:disabled { cursor: default; }
-.sense.right { background: var(--ok-bg); border-color: var(--ok); color: var(--ink); }
-.sense.wrong { background: var(--bad-bg); border-color: var(--bad); color: var(--ink); text-decoration: line-through; }
+.sense.right { background: var(--ok-bg); border-color: var(--ok); color: var(--ink); font-weight: 700; }
+.sense.right::before { content: "\2713\00a0"; color: var(--ok); }
+.sense.wrong { background: var(--bad-bg); border-color: var(--bad); color: var(--ink); text-decoration: line-through; text-decoration-color: var(--bad); }
 .sense.dim { opacity: .45; }
-.verdict { font: 600 0.75rem var(--mono); margin-left: auto; }
+.verdict { font: 600 0.72rem var(--mono); margin-left: auto; text-transform: uppercase; letter-spacing: .08em; padding: 2px 7px; border: 1.5px solid currentColor; border-radius: 4px; transform: rotate(-4deg); white-space: nowrap; }
 .verdict.ok { color: var(--ok); }
 .verdict.no { color: var(--bad); }
+.who { flex-wrap: wrap; }
 
-.note { background: var(--paper); border-left: 3px solid var(--mail-red); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 0.95rem; }
+.note { background: var(--paper); border-left: 3px solid var(--mail-red); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 0.95rem; max-width: 65ch; }
+.note .decoy { display: block; margin-top: 6px; color: var(--muted); font-size: 0.88rem; }
+.note .tag { display: block; font: 600 0.7rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mail-red); margin-bottom: 2px; }
 .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.btn { font: 700 1rem var(--body); border: 0; border-radius: 10px; padding: 11px 20px; cursor: pointer; background: var(--accent); color: var(--accent-ink); }
+.btn { font: 700 1rem var(--body); border: 1.5px solid transparent; border-radius: 10px; min-height: 46px; padding: 0 22px; cursor: pointer; background: var(--accent); color: var(--accent-ink); transition: filter .15s, transform .12s, background-color .15s, border-color .15s; }
+.btn:hover:not(:disabled) { filter: brightness(1.08); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
-.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--accent); filter: none; }
+.btn.copied { background: var(--ok); color: var(--card); }
 .hint { color: var(--muted); font-size: 0.85rem; }
 
+.result-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .result .big { font-family: var(--display); font-size: 3rem; line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
-.grid { font-size: 1.25rem; line-height: 1.35; letter-spacing: 2px; margin: 0; white-space: pre; font-family: var(--mono); }
+.result .big small { font-size: 1.4rem; color: var(--muted); }
+.postmark { display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; border: 2px solid var(--mail-red); color: var(--mail-red); font: 600 0.62rem/1.15 var(--mono); text-transform: uppercase; letter-spacing: .08em; text-align: center; transform: rotate(-10deg); box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 5px var(--mail-red); padding: 10px; }
+.postmark b { display: block; font-family: var(--display); font-weight: 400; font-size: 1.15rem; letter-spacing: 0; }
+.result-head .ask { flex: 1 1 180px; }
+.cells { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.cell { width: 16px; height: 16px; border-radius: 3px; background: var(--bad); }
+.cell.ok { background: var(--ok); }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .stat { background: var(--paper); border-radius: 10px; padding: 10px 6px; text-align: center; }
 .stat b { display: block; font-family: var(--display); font-size: 1.5rem; font-weight: 400; font-variant-numeric: tabular-nums; }
 .stat span { font-size: 0.74rem; color: var(--muted); }
 .recap { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
-.recap li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+.recap li { display: grid; grid-template-columns: 1fr auto 3.2rem; align-items: center; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+.recap .rs { text-align: right; }
 .recap .rw { font-family: var(--display); }
 .recap .rs { font: 500 0.85rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
 .sharebox { width: 100%; font: 0.85rem var(--mono); min-height: 7rem; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 8px; }
-.howto summary { cursor: pointer; font-weight: 700; }
+.howto summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
+.howto summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .howto { color: var(--muted); font-size: 0.92rem; }
 .howto ol { padding-left: 1.2rem; margin: 8px 0 0; }
 footer { color: var(--muted); font-size: 0.8rem; text-align: center; }
 .linkbtn { background: none; border: 0; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; padding: 0; }
 @media (max-width: 420px) {
+  .wrap { gap: 16px; padding-top: 16px; }
+  .card { padding: 18px 16px; }
+  .seg button { padding: 0 10px; min-width: 40px; }
   .stats { grid-template-columns: repeat(2, 1fr); }
-  .controls { align-items: flex-start; }
+  .actions .btn { flex: 1 1 auto; }
+  .postmark { width: 74px; height: 74px; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .card.enter { animation: slip .28s ease-out; }
   @keyframes slip { from { transform: translateY(6px); opacity: .6; } to { transform: none; opacity: 1; } }
+  .card.revealed .row { animation: reveal .35s ease-out both; }
+  .card.revealed .row:nth-child(2) { animation-delay: .06s; }
+  .card.revealed .row:nth-child(3) { animation-delay: .12s; }
+  .card.revealed .row:nth-child(4) { animation-delay: .18s; }
+  .card.revealed .row:nth-child(5) { animation-delay: .24s; }
+  @keyframes reveal { from { opacity: .55; } to { opacity: 1; } }
+  .card.revealed .verdict { animation: stamp .32s cubic-bezier(.3,1.6,.5,1) both; }
+  @keyframes stamp { from { transform: rotate(-4deg) scale(1.7); opacity: 0; } to { transform: rotate(-4deg) scale(1); opacity: 1; } }
+  .card.revealed .sense.wrong { animation: nudge .3s ease-in-out; }
+  @keyframes nudge { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+  .card.revealed .note { animation: slip .3s ease-out .15s both; }
+  .result.enter .postmark { animation: post .45s cubic-bezier(.3,1.5,.5,1) .1s both; }
+  @keyframes post { from { transform: rotate(-30deg) scale(1.6); opacity: 0; } to { transform: rotate(-10deg) scale(1); opacity: 1; } }
+  .result.enter .cell { animation: pop .25s ease-out both; }
+  @keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
 }
 </style>
 </head>
@@ -166,136 +208,403 @@ footer { color: var(--muted); font-size: 0.8rem; text-align: center; }
 <script>
 // Dialectle word data.
 // Each entry: { w: word, s: {key: sense}, a: {COUNTRY: senseKey}, n: note, c?: context line }
-// Senses not used in `a` are decoys.
+// Senses not used in `a` are decoys. src: source or justification for the meanings. g: topic group (similar words are kept apart in the daily schedule).
+// small: true marks a smaller language pack whose words repeat sooner.
 const COUNTRIES = {
   US: "United States", UK: "United Kingdom", CA: "Canada", AU: "Australia",
   ES: "Spain", MX: "Mexico", AR: "Argentina", CO: "Colombia", CL: "Chile",
   CU: "Cuba", VE: "Venezuela", PE: "Peru", EC: "Ecuador", GT: "Guatemala",
+  PR: "Puerto Rico", DO: "Dominican Republic",
   PT: "Portugal", BR: "Brazil",
   FR: "France", QC: "Québec", BE: "Belgium", CH: "Switzerland"
 };
 
 const LANGS = {
   en: { name: "English", words: [
-    { w: "pants", s: { tr: "Trousers", un: "Underwear", sh: "Shorts" }, a: { US: "tr", UK: "un", CA: "tr", AU: "tr" }, n: "Ask a Brit to admire your new pants and you're showing them your underwear. Trousers are trousers." },
-    { w: "jumper", s: { sw: "Pullover sweater", dr: "Sleeveless pinafore dress", pa: "Parachutist" }, a: { US: "dr", UK: "sw", CA: "dr", AU: "sw" }, n: "In North America a jumper is a sleeveless dress worn over a blouse. In the UK and Australia it's a sweater." },
-    { w: "thongs", s: { fl: "Flip-flops", gs: "G-string underwear", st: "Leather straps" }, a: { US: "gs", UK: "gs", CA: "gs", AU: "fl" }, n: "Australians wear thongs to the beach on their feet." },
-    { w: "chips", s: { cr: "Thin bagged potato snacks", fr: "French fries", po: "Poker tokens" }, a: { US: "cr", UK: "fr", CA: "cr" }, n: "Fish and chips comes with fries. The bagged snack is called crisps in the UK." },
-    { w: "biscuit", s: { co: "Sweet cookie", br: "Soft savory bread roll", cr: "Dry cracker" }, a: { US: "br", UK: "co", AU: "co" }, n: "Biscuits and gravy only makes sense in the US. In Britain a biscuit goes with tea." },
-    { w: "rubber", s: { er: "Pencil eraser", co: "Condom", bo: "Rain boots" }, a: { US: "co", UK: "er", AU: "er" }, n: "A schoolkid in London asking to borrow a rubber gets a very different reaction in Ohio." },
-    { w: "football", s: { am: "American football", so: "Soccer", au: "Australian rules football", ca: "Canadian football" }, a: { US: "am", UK: "so", CA: "ca", AU: "au" }, n: "Four countries, four sports. In New South Wales and Queensland, footy often means rugby league instead." },
-    { w: "entrée", s: { ma: "Main course", st: "Starter or appetizer", si: "Side dish" }, a: { US: "ma", UK: "st", CA: "ma", AU: "st" }, n: "The French meaning is the course that 'enters' the meal first, which Australia and the UK kept. North America moved it to the main dish." },
-    { w: "first floor", s: { gr: "Ground level", up: "One level above the ground", ba: "Basement" }, a: { US: "gr", UK: "up", CA: "gr", AU: "up" }, n: "British and Australian buildings start at the ground floor, so the first floor is one flight up." },
-    { w: "public school", s: { st: "Free, government-run school", pr: "Elite fee-paying private school", un: "Public university" }, a: { US: "st", UK: "pr", CA: "st", AU: "st" }, n: "In England, 'public schools' like Eton charge tens of thousands a year. The name dates back to when they were open to the paying public." },
-    { w: "hockey", s: { ic: "Ice hockey", fi: "Field hockey", ai: "Air hockey" }, a: { US: "ic", UK: "fi", CA: "ic", AU: "fi" }, n: "Outside North America, hockey is played on grass." },
-    { w: "quite good", s: { ve: "Very good", ok: "Fairly good, nothing special", ba: "Not good at all" }, a: { US: "ve", UK: "ok" }, n: "An American hears praise. A Brit hears mild disappointment." },
-    { w: "table (a motion)", s: { po: "Postpone it indefinitely", pr: "Put it forward for discussion", vo: "Vote it down" }, a: { US: "po", UK: "pr", CA: "pr", AU: "pr" }, n: "Famously confused Allied planners in WWII: the Americans wanted to shelve the item, the British wanted to discuss it now." },
-    { w: "homely", s: { pl: "Plain-looking, unattractive", co: "Cozy and welcoming", ho: "Homesick" }, a: { US: "pl", UK: "co", AU: "co" }, n: "Calling a host's house homely is a compliment in Britain and an insult in America." },
-    { w: "dummy", s: { pa: "Baby's pacifier", fo: "Foolish person", ma: "Shop mannequin" }, a: { US: "fo", UK: "pa", CA: "fo", AU: "pa" }, n: "British and Australian babies suck on a dummy. Canadians usually call it a soother." },
-    { w: "suspenders", s: { br: "Straps that hold up trousers", ga: "Garters that hold up stockings", ca: "Bridge cables" }, a: { US: "br", UK: "ga", CA: "br", AU: "ga" }, n: "The trouser straps are braces in the UK and Australia." },
-    { w: "caravan", s: { tr: "Towed camping trailer", co: "Convoy of travelers", va: "Delivery van" }, a: { US: "co", UK: "tr", AU: "tr" }, n: "Americans tow an RV or a camper. Brits and Aussies tow a caravan." },
-    { w: "pavement", s: { si: "Sidewalk", ro: "Road surface", pa: "Patio" }, a: { US: "ro", UK: "si" }, n: "Telling an American kid to stay on the pavement puts them in the street." },
-    { w: "trolley", s: { sh: "Shopping cart", st: "Streetcar or tram", ho: "Hospital stretcher" }, a: { US: "st", UK: "sh", AU: "sh" }, n: "San Francisco's trolleys run on rails. A British trolley gets pushed around the supermarket." },
-    { w: "jelly", s: { ja: "Fruit jam", ge: "Wobbly gelatin dessert", ca: "Gummy candy" }, a: { US: "ja", UK: "ge", AU: "ge" }, n: "A peanut butter and jelly sandwich sounds alarming in the UK, where jelly is Jell-O." },
-    { w: "torch", s: { fl: "Flashlight", fi: "Flaming stick", bl: "Blowtorch" }, a: { US: "fi", UK: "fl", CA: "fi", AU: "fl" }, n: "The battery-powered kind is a torch in the UK and Australia." },
-    { w: "bonnet", s: { ho: "Car hood", ha: "Old-fashioned tie-on hat", te: "Tea cozy" }, a: { US: "ha", UK: "ho", CA: "ha", AU: "ho" }, n: "Pop the bonnet in London to check the engine. In the US that's the hood." },
-    { w: "vest", s: { wa: "Waistcoat worn under a suit jacket", un: "Sleeveless undershirt", li: "Life jacket" }, a: { US: "wa", UK: "un", CA: "wa" }, n: "A British vest is worn under your shirt. The suit piece is a waistcoat." },
-    { w: "runners", s: { sn: "Sneakers", pe: "People who run", ru: "Long hallway rug" }, a: { US: "pe", UK: "pe", CA: "sn", AU: "sn" }, n: "Canadians and Australians lace up their runners. Irish speakers do too." },
-    { w: "pot plant", s: { ho: "Houseplant", ma: "Marijuana plant", ve: "Vegetable patch" }, a: { US: "ma", UK: "ho", AU: "ho" }, n: "In Britain and Australia it's a plant in a pot, nothing more." },
-    { w: "cot", s: { ba: "Baby's crib", ca: "Folding camp bed", gu: "Hospital gurney" }, a: { US: "ca", UK: "ba", CA: "ca", AU: "ba" }, n: "A British baby sleeps in a cot. An American cot is a folding bed for camping or the army." },
-    { w: "chemist", s: { ph: "Pharmacy", sc: "Lab scientist", te: "Chemistry teacher" }, a: { US: "sc", UK: "ph", CA: "sc", AU: "ph" }, n: "You pick up a prescription at the chemist in the UK and Australia." },
-    { w: "rocket", s: { ar: "Arugula (salad leaf)", sp: "Space rocket", fi: "Firework" }, a: { US: "sp", UK: "ar", CA: "sp", AU: "ar" }, n: "A rocket salad in London is arugula." },
-    { w: "mince", s: { gr: "Ground beef", ch: "To chop very finely", wa: "To walk daintily" }, a: { US: "ch", UK: "gr", CA: "ch", AU: "gr" }, n: "In the UK and Australia you buy a pound of mince for spaghetti bolognese." },
-    { w: "tank top", s: { sl: "Sleeveless knitted sweater", sh: "Sleeveless T-shirt", wa: "Water tank lid" }, a: { US: "sh", UK: "sl", CA: "sh" }, n: "The British tank top is the knitted vest your grandad wears over a shirt." },
-    { w: "purse", s: { ha: "Handbag", wa: "Small wallet for coins and cards", pr: "Prize money" }, a: { US: "ha", UK: "wa", CA: "ha", AU: "wa" }, n: "A British purse fits inside a handbag." },
-    { w: "squash", s: { ve: "A gourd vegetable", dr: "Fruit drink concentrate", sp: "A racket sport" }, a: { US: "ve", UK: "dr", CA: "ve", AU: "ve" }, n: "Kids in Britain drink orange squash, diluted with water. Australians call it cordial." },
-    { w: "interstate", s: { hi: "Major highway", ot: "Another state", bo: "A state border" }, a: { US: "hi", AU: "ot" }, c: "“My sister moved ___ last year.”", n: "Australians move interstate. Americans drive on one." },
-    { w: "my shout", s: { tr: "I'm paying for this round", tu: "My turn to yell", id: "My idea" }, a: { US: "tu", UK: "tr", AU: "tr" }, n: "At a pub in Sydney or Manchester, 'my shout' means the drinks are on you." },
-    { w: "sherbet", s: { fr: "Fruity frozen dessert", fi: "Fizzy powdered candy", dr: "Sweet syrup drink" }, a: { US: "fr", UK: "fi", AU: "fi" }, n: "British sherbet comes in a packet and fizzes on your tongue." },
-    { w: "toque", s: { wi: "Knitted winter hat", ch: "Chef's tall white hat", ro: "Ceremonial robe" }, a: { US: "ch", UK: "ch", CA: "wi", AU: "ch" }, n: "Every Canadian owns a toque (also spelled tuque). Everyone else would call it a beanie." },
-    { w: "mickey", s: { bo: "Small bottle of liquor", dr: "A drugged drink", te: "Teasing (as in 'taking the ___')" }, a: { US: "dr", CA: "bo", UK: "te" }, n: "A Canadian mickey is a 375 ml bottle. In the US, 'slipping someone a mickey' means spiking their drink." },
-    { w: "college", s: { un: "University", vo: "Non-degree school after high school", si: "School for ages 16–18" }, a: { US: "un", CA: "vo", UK: "si" }, n: "Americans go to college for a bachelor's degree. In Canada, college means a diploma school, and in the UK it often means sixth-form college." },
-    { w: "pissed", s: { an: "Angry", dr: "Drunk", ti: "Exhausted" }, a: { US: "an", UK: "dr", CA: "an", AU: "dr" }, n: "A Brit who is pissed has had a few too many. An American who is pissed is about to yell." },
-    { w: "scheme", s: { pl: "Sneaky plot", pr: "Official program or plan", co: "Color palette" }, a: { US: "pl", UK: "pr", AU: "pr" }, n: "A government pension scheme sounds shady to Americans and perfectly normal to Brits." },
-    { w: "gas", s: { fu: "Car fuel", na: "Natural gas for heating and cooking", fu2: "A great time ('it was a gas')" }, a: { US: "fu", CA: "fu", UK: "na", AU: "na" }, n: "British and Australian cars run on petrol. Gas is what the stove burns." },
-    { w: "muffin", s: { cu: "Sweet cupcake-like bake", fl: "Flat bread roll you toast" }, a: { US: "cu", CA: "cu", UK: "fl", AU: "cu" }, n: "The traditional British muffin is what Americans call an English muffin." },
-    { w: "pudding", s: { cu: "Creamy custard-style dessert", de: "Any dessert course", br: "Bread roll" }, a: { US: "cu", CA: "cu", UK: "de", AU: "de" }, n: "'What's for pudding?' in Britain just means 'what's for dessert?'" },
-    { w: "holiday", s: { va: "Vacation", pu: "A single public holiday" }, a: { US: "pu", CA: "pu", UK: "va", AU: "va" }, n: "Brits and Aussies go on holiday for two weeks. Americans take vacation." },
-    { w: "athletics", s: { tr: "Track and field", al: "Sports in general" }, a: { US: "al", UK: "tr", AU: "tr" }, n: "A US athletics department runs every sport at a school." },
-    { w: "flannel", s: { wa: "Washcloth", fa: "Soft cotton fabric or shirt", ba: "Bath towel" }, a: { US: "fa", CA: "fa", UK: "wa" }, n: "In Britain you wash your face with a flannel." },
-    { w: "geezer", s: { ol: "Old man", gu: "Any guy, a bloke", ki: "Young child" }, a: { US: "ol", UK: "gu" }, n: "In London a geezer can be any age, often said with approval." },
-    { w: "swimmers", s: { sw: "Swimsuit", pe: "People who swim", go: "Swim goggles" }, a: { US: "pe", UK: "pe", AU: "sw" }, n: "Australians have many words for a swimsuit: swimmers, bathers, cossie and togs, depending on the state." },
-    { w: "chesterfield", s: { so: "Any sofa or couch", le: "Deep-buttoned leather sofa", co: "Overcoat" }, a: { CA: "so", UK: "le" }, n: "Older Canadians call any couch a chesterfield. In Britain it's one specific style." },
-    { w: "lollies", s: { ca: "Any sweets or candy", ic: "Ice pops", ch: "Potato chips" }, a: { AU: "ca", UK: "ic" }, n: "An Australian lolly is any candy. In the UK, ice lollies are popsicles." },
+    { w: "pants", s: { tr: "Trousers", un: "Underwear", sh: "Knee-length shorts" }, a: { US: "tr", UK: "un", CA: "tr", AU: "tr" }, g: "trousers", n: "Ask a Brit to admire your new pants and you're showing them your underwear. Trousers are trousers.", src: "Cambridge Dictionary: pants (UK) underpants; (US) trousers." },
+    { w: "jumper", s: { sw: "Pullover sweater", dr: "Sleeveless pinafore dress", pa: "Parachutist" }, a: { US: "dr", UK: "sw", AU: "sw" }, g: "sweater", n: "In the US a jumper is a sleeveless dress worn over a blouse. In the UK and Australia it's a sweater.", src: "Cambridge/Merriam-Webster: jumper (UK) sweater; (US) pinafore dress. Canada removed: usage is mixed." },
+    { w: "thongs", s: { fl: "Flip-flops", gs: "G-string underwear", st: "Leather straps" }, a: { US: "gs", UK: "gs", CA: "gs", AU: "fl" }, g: "shoes", n: "Australians wear thongs to the beach on their feet.", src: "Wiktionary/Macquarie: thong (Australia, NZ) flip-flop." },
+    { w: "chips", s: { cr: "Thin bagged potato snacks", fr: "French fries", po: "Poker tokens" }, a: { US: "cr", UK: "fr", CA: "cr" }, g: "chips", n: "Fish and chips comes with fries. The bagged snack is called crisps in the UK.", src: "Cambridge: chips (UK) = French fries (US); (US) = crisps (UK)." },
+    { w: "biscuit", s: { co: "Sweet cookie", br: "Soft savory bread roll", cr: "Dry cracker" }, a: { US: "br", UK: "co", AU: "co" }, n: "Biscuits and gravy only makes sense in the US. In Britain a biscuit goes with tea.", src: "Cambridge: biscuit (UK) cookie; (US) small soft bread." },
+    { w: "football", s: { am: "American football", so: "Soccer", au: "Australian rules football", ca: "Canadian football" }, a: { US: "am", UK: "so", CA: "ca", AU: "au" }, n: "Four countries, four sports. In New South Wales and Queensland, footy often means rugby league instead.", src: "Wikipedia 'Football' (names of codes by country)." },
+    { w: "entrée", s: { ma: "Main course", st: "Starter or appetizer", si: "Side dish served with the main" }, a: { US: "ma", UK: "st", CA: "ma", AU: "st" }, n: "The French meaning is the course that 'enters' the meal first, which Australia and the UK kept. North America moved it to the main dish.", src: "Wiktionary: entrée (US, Canada) main course; (UK, Australia) starter." },
+    { w: "first floor", s: { gr: "Ground level", up: "One level above the ground", ba: "The floor below ground level" }, a: { US: "gr", UK: "up", CA: "gr", AU: "up" }, n: "British and Australian buildings start at the ground floor, so the first floor is one flight up.", src: "Cambridge: first floor (UK) one above ground; (US) ground floor." },
+    { w: "public school", s: { st: "Free, government-run school", pr: "Elite fee-paying private school", un: "Public university" }, a: { US: "st", UK: "pr", CA: "st", AU: "st" }, g: "school", n: "In England, 'public schools' like Eton charge tens of thousands a year. The name dates back to when they were open to the paying public.", src: "Cambridge: public school (UK) private fee-paying school; (US, Aus) state school." },
+    { w: "hockey", s: { ic: "Ice hockey", fi: "Field hockey", ai: "Air hockey" }, a: { US: "ic", UK: "fi", CA: "ic", AU: "fi" }, n: "Outside North America, hockey is played on grass.", src: "Cambridge: hockey (UK) field hockey; (US) ice hockey." },
+    { w: "quite good", s: { ve: "Very good, real praise", ok: "Fairly good, nothing special", ba: "Not good at all" }, a: { US: "ve", UK: "ok" }, n: "An American hears praise. A Brit usually hears mild disappointment, since British 'quite' with words like good softens them.", src: "Cambridge Grammar ('quite'): with gradable adjectives, BrE quite = fairly; AmE quite = very. Kept: a widely documented contrast." },
+    { w: "table (a motion)", s: { po: "Postpone it indefinitely", pr: "Put it forward for discussion", vo: "Vote it down straight away" }, a: { US: "po", UK: "pr", AU: "pr" }, n: "Famously confused Allied planners in WWII: the Americans wanted to shelve the item, the British wanted to discuss it now.", src: "Merriam-Webster/Cambridge: table (US) postpone; (UK) present for discussion. Canada removed: both uses occur there." },
+    { w: "homely", s: { pl: "Plain-looking, unattractive", co: "Cozy and welcoming", ho: "Homesick, missing home" }, a: { US: "pl", UK: "co", AU: "co" }, n: "Calling a host's house homely is a compliment in Britain and an insult in America.", src: "Cambridge: homely (UK) comfortable; (US) unattractive." },
+    { w: "dummy", s: { pa: "Baby's pacifier", fo: "Foolish person", ma: "Shop mannequin" }, a: { US: "fo", UK: "pa", CA: "fo", AU: "pa" }, n: "British and Australian babies suck on a dummy. Canadians usually call it a soother.", src: "Cambridge: dummy (UK) pacifier." },
+    { w: "suspenders", s: { br: "Straps that hold up trousers", ga: "Garters that hold up stockings", ca: "Bridge cables" }, a: { US: "br", UK: "ga", CA: "br", AU: "ga" }, n: "The trouser straps are braces in the UK and Australia.", src: "Cambridge: suspenders (UK) garters; (US) braces." },
+    { w: "caravan", s: { tr: "Towed camping trailer", co: "Convoy of travelers", va: "Small delivery van or minibus" }, a: { US: "co", UK: "tr", AU: "tr" }, n: "Americans tow an RV or a camper. Brits and Aussies tow a caravan.", src: "Cambridge: caravan (UK) trailer; (US) group travelling together." },
+    { w: "pavement", s: { si: "Sidewalk", ro: "Road surface", pa: "Paved patio behind a house" }, a: { US: "ro", UK: "si" }, g: "sidewalk", n: "Telling an American kid to stay on the pavement puts them in the street.", src: "Cambridge: pavement (UK) sidewalk; (US) road surface." },
+    { w: "trolley", s: { sh: "Shopping cart", st: "Streetcar or tram", ho: "Hospital stretcher" }, a: { US: "st", UK: "sh", AU: "sh" }, n: "San Francisco's trolleys run on rails. A British trolley gets pushed around the supermarket.", src: "Cambridge: trolley (UK) cart; (US) streetcar." },
+    { w: "jelly", s: { ja: "Fruit jam", ge: "Wobbly gelatin dessert", ca: "Gummy candy" }, a: { US: "ja", UK: "ge", AU: "ge" }, n: "A peanut butter and jelly sandwich sounds alarming in the UK, where jelly is Jell-O.", src: "Cambridge: jelly (UK) gelatin dessert; (US) jam." },
+    { w: "torch", s: { fl: "Flashlight", fi: "Flaming stick", bl: "Blowtorch" }, a: { US: "fi", UK: "fl", CA: "fi", AU: "fl" }, n: "The battery-powered kind is a torch in the UK and Australia.", src: "Cambridge: torch (UK) flashlight." },
+    { w: "bonnet", s: { ho: "Car hood", ha: "Old-fashioned tie-on hat", te: "Tea cozy" }, a: { US: "ha", UK: "ho", CA: "ha", AU: "ho" }, g: "car", n: "Pop the bonnet in London to check the engine. In the US that's the hood.", src: "Cambridge: bonnet (UK) car hood." },
+    { w: "vest", s: { wa: "Waistcoat worn under a suit jacket", un: "Sleeveless undershirt", li: "Life jacket" }, a: { US: "wa", UK: "un", CA: "wa" }, g: "tops", n: "A British vest is worn under your shirt. The suit piece is a waistcoat.", src: "Cambridge: vest (UK) undershirt; (US) waistcoat." },
+    { w: "runners", s: { sn: "Sneakers", pe: "People who run", ru: "Long hallway rug" }, a: { US: "pe", UK: "pe", CA: "sn", AU: "sn" }, g: "shoes", n: "Canadians and Australians lace up their runners. Irish speakers do too.", src: "Wiktionary: runner (Canada, Australia, Ireland) running shoe." },
+    { w: "pot plant", s: { ho: "Houseplant", ma: "Marijuana plant", ve: "Vegetable patch" }, a: { US: "ma", UK: "ho", AU: "ho" }, n: "In Britain and Australia it's a plant in a pot, nothing more.", src: "Cambridge: pot plant (UK, Aus) plant grown in a pot." },
+    { w: "cot", s: { ba: "Baby's crib", ca: "Folding camp bed", gu: "Hospital gurney" }, a: { US: "ca", UK: "ba", CA: "ca", AU: "ba" }, n: "A British baby sleeps in a cot. An American cot is a folding bed for camping or the army.", src: "Cambridge: cot (UK) crib; (US) camp bed." },
+    { w: "chemist", s: { ph: "Pharmacy", sc: "Lab scientist", te: "Chemistry teacher" }, a: { US: "sc", UK: "ph", CA: "sc", AU: "ph" }, n: "You pick up a prescription at the chemist in the UK and Australia.", src: "Cambridge: chemist (UK) pharmacy." },
+    { w: "rocket", s: { ar: "Arugula (salad leaf)", sp: "Space rocket", fi: "Firework" }, a: { US: "sp", UK: "ar", CA: "sp", AU: "ar" }, n: "A rocket salad in London is arugula.", src: "Cambridge: rocket (UK) arugula." },
+    { w: "mince", s: { gr: "Ground beef", ch: "To chop very finely", wa: "To walk daintily" }, a: { US: "ch", UK: "gr", CA: "ch", AU: "gr" }, n: "In the UK and Australia you buy a pound of mince for spaghetti bolognese.", src: "Cambridge: mince (UK) minced meat." },
+    { w: "tank top", s: { sl: "Sleeveless knitted sweater", sh: "Sleeveless T-shirt", wa: "Water tank lid" }, a: { US: "sh", UK: "sl", CA: "sh" }, g: "tops", n: "The British tank top is the knitted vest your grandad wears over a shirt.", src: "Cambridge: tank top (UK) sleeveless sweater; (US) sleeveless shirt." },
+    { w: "purse", s: { ha: "Handbag", wa: "Small wallet for coins and cards", pr: "Prize money" }, a: { US: "ha", UK: "wa", CA: "ha", AU: "wa" }, n: "A British purse fits inside a handbag.", src: "Cambridge: purse (UK) small wallet; (US) handbag." },
+    { w: "squash", s: { ve: "A gourd vegetable", dr: "Fruit drink concentrate", sp: "A racket sport" }, a: { US: "ve", UK: "dr", CA: "ve", AU: "ve" }, g: "drinks", n: "Kids in Britain drink orange squash, diluted with water. Australians call it cordial.", src: "Cambridge: squash (UK) fruit concentrate; (US) vegetable." },
+    { w: "interstate", s: { hi: "Major highway", ot: "Another state", bo: "A state border" }, a: { US: "hi", AU: "ot" }, c: "“My sister moved ___ last year.”", n: "Australians move interstate. Americans drive on one.", src: "Macquarie/Wiktionary: interstate (Australia) to or in another state." },
+    { w: "my shout", s: { tr: "I'm paying for this round", tu: "My turn to yell", id: "It was my idea first" }, a: { US: "tu", UK: "tr", AU: "tr" }, n: "At a pub in Sydney or Manchester, 'my shout' means the drinks are on you.", src: "Cambridge: shout (UK, Aus informal) a round of drinks." },
+    { w: "sherbet", s: { fr: "Fruity frozen dessert", fi: "Fizzy powdered candy", dr: "Sweet rose-flavored syrup drink" }, a: { US: "fr", UK: "fi", AU: "fi" }, n: "British sherbet comes in a packet and fizzes on your tongue.", src: "Cambridge: sherbet (UK) fizzy powder; (US) frozen dessert." },
+    { w: "toque", s: { wi: "Knitted winter hat", ch: "Chef's tall white hat", ro: "Long ceremonial robe" }, a: { US: "ch", UK: "ch", CA: "wi", AU: "ch" }, n: "Every Canadian owns a toque (also spelled tuque). Everyone else would call it a beanie.", src: "Canadian Oxford/Wiktionary: toque (Canada) knitted hat." },
+    { w: "mickey", s: { bo: "Small bottle of liquor", dr: "A drugged drink", te: "Teasing (as in 'taking the ___')" }, a: { US: "dr", CA: "bo", UK: "te" }, n: "A Canadian mickey is a 375 ml bottle. In the US, 'slipping someone a mickey' means spiking their drink.", src: "Wiktionary: mickey (Canada) 375 ml bottle; Mickey Finn (US); take the mickey (UK)." },
+    { w: "college", s: { un: "University (for a bachelor's degree)", vo: "Diploma school, not a university", si: "Sixth-form or further-education college, often from 16" }, a: { US: "un", CA: "vo", UK: "si" }, g: "school", n: "Americans go to college for a bachelor's degree. In Canada, college means a diploma school, and in England it usually means a further-education or sixth-form college.", src: "Cambridge: college (UK) further education; (US) university. Wording tightened in content review." },
+    { w: "gas", s: { fu: "Car fuel", na: "Natural gas for heating and cooking", fu2: "A great time ('it was a gas')" }, a: { US: "fu", CA: "fu", UK: "na", AU: "na" }, n: "British and Australian cars run on petrol. Gas is what the stove burns.", src: "Cambridge: gas (US) = petrol (UK)." },
+    { w: "muffin", s: { cu: "Sweet cupcake-like bake", fl: "Flat bread roll you toast", sp: "Steamed suet pudding with jam" }, a: { US: "cu", CA: "cu", UK: "fl", AU: "cu" }, g: "breakfast", n: "The traditional British muffin is what Americans call an English muffin.", src: "Cambridge: muffin (UK) flat round bread; (US) small cake." },
+    { w: "pudding", s: { cu: "Creamy custard-style dessert", de: "Any dessert course", br: "Soft bread roll eaten at breakfast" }, a: { US: "cu", UK: "de" }, n: "'What's for pudding?' in Britain just means 'what's for dessert?'", src: "Cambridge: pudding (UK) dessert course; (US) soft creamy dessert. Australia and Canada removed: usage is mixed." },
+    { w: "holiday", s: { va: "Vacation", pu: "A single public holiday", sa: "A sabbatical year off work" }, a: { US: "pu", CA: "pu", UK: "va", AU: "va" }, n: "Brits and Aussies go on holiday for two weeks. Americans take vacation.", src: "Cambridge: holiday (UK) = vacation (US)." },
+    { w: "athletics", s: { tr: "Track and field", al: "Sports in general", we: "Weightlifting and bodybuilding" }, a: { US: "al", UK: "tr", AU: "tr" }, n: "A US athletics department runs every sport at a school.", src: "Cambridge: athletics (UK) track and field; (US) sports." },
+    { w: "flannel", s: { wa: "Washcloth", fa: "Soft cotton fabric or shirt", ba: "Bath towel" }, a: { US: "fa", CA: "fa", UK: "wa" }, n: "In Britain you wash your face with a flannel.", src: "Cambridge: flannel (UK) face cloth." },
+    { w: "geezer", s: { ol: "Old man", gu: "Any guy, a bloke", ki: "Young child" }, a: { US: "ol", UK: "gu" }, n: "In London a geezer can be any age, often said with approval.", src: "Cambridge: geezer (UK) man; (US) old man." },
+    { w: "swimmers", s: { sw: "Swimsuit", pe: "People who swim", go: "Swim goggles" }, a: { US: "pe", UK: "pe", AU: "sw" }, n: "Australians have many words for a swimsuit: swimmers, bathers, cossie and togs, depending on the state.", src: "Macquarie/Wiktionary: swimmers (Australia) swimsuit." },
+    { w: "chesterfield", s: { so: "Any sofa or couch", le: "Deep-buttoned leather sofa", co: "Overcoat" }, a: { CA: "so", UK: "le" }, n: "Older Canadians call any couch a chesterfield. In Britain it's one specific style.", src: "Canadian Oxford/Wiktionary: chesterfield (Canada) any sofa." },
+    { w: "lollies", s: { ca: "Any sweets or candy", ic: "Lollipops and ice lollies", ch: "Bagged salty potato chips" }, a: { AU: "ca", UK: "ic" }, n: "An Australian lolly is any candy. In the UK a lolly is on a stick: a lollipop or an ice lolly.", src: "Wiktionary/Collins: lolly (Aus, NZ) any sweet; (UK) lollipop, ice lolly. Senses merged so the UK answer is unambiguous." },
+    { w: "fancy dress", s: { co: "Costume (dressing up as a character)", fo: "Formal evening wear", pa: "Loud patterned fabric" }, a: { US: "fo", UK: "co", AU: "co" }, n: "A British fancy dress party means pirates and superheroes, not tuxedos.", src: "Cambridge: fancy dress (UK) costume." },
+    { w: "lemonade", s: { st: "Still lemon juice, water and sugar", fz: "Clear fizzy lemon-lime soda", cd: "Hot lemon tea with honey" }, a: { US: "st", CA: "st", UK: "fz", AU: "fz" }, g: "drinks", n: "Order lemonade in London or Sydney and you get something like Sprite.", src: "Wikipedia 'Lemonade': in the UK, Ireland, Australia and NZ, lemonade is usually a clear carbonated drink." },
+    { w: "cider", s: { ju: "Cloudy, unfiltered apple juice", al: "Alcoholic apple drink", vi: "Apple vinegar for salad dressing" }, a: { US: "ju", UK: "al", AU: "al" }, g: "drinks", n: "Americans drink hot cider at Halloween with no ID check. The alcoholic kind is 'hard cider' in the US.", src: "Merriam-Webster: cider (US) unfermented apple juice; Cambridge: cider (UK) alcoholic." },
+    { w: "hamper", s: { la: "Laundry basket", fo: "Gift basket of food", pi: "Picnic blanket" }, a: { US: "la", CA: "la", UK: "fo", AU: "fo" }, n: "A Christmas hamper in Britain is full of cheese and wine, not dirty socks.", src: "Cambridge: hamper (UK) food basket; (US) laundry basket." },
+    { w: "trainers", s: { sn: "Sneakers", pe: "Personal fitness coaches", wh: "Training wheels" }, a: { UK: "sn", US: "pe" }, g: "shoes", n: "British kids wear trainers to PE. In the US, trainers are the people at the gym.", src: "Cambridge: trainer (UK) sports shoe." },
+    { w: "joggers", s: { sn: "Running shoes", sw: "Sweatpants (tracksuit bottoms)", pe: "Early-morning walkers" }, a: { AU: "sn", UK: "sw" }, g: "shoes", n: "In parts of Australia joggers go on your feet. British joggers go on your legs.", src: "Wiktionary: jogger (chiefly Australia) running shoe; Cambridge: joggers (UK) tracksuit trousers." },
+    { w: "subway", s: { tr: "Underground train", un: "Pedestrian tunnel under a road", sa: "Sandwich shop" }, a: { US: "tr", CA: "tr", UK: "un", AU: "un" }, n: "A British subway is a walkway under a busy road. The trains are the Underground.", src: "Cambridge: subway (UK) underpass; (US) underground railway." },
+    { w: "surgery", s: { of: "A doctor's office or clinic", op: "An operation", ga: "Garage workshop" }, a: { UK: "of", AU: "of", US: "op", CA: "op" }, n: "Popping into the surgery in Britain means a GP appointment, not going under the knife.", src: "Cambridge: surgery (UK) doctor's office." },
+    { w: "casualty", s: { er: "Hospital emergency room", vi: "Victim of an accident or war", in: "A payout from an insurance claim" }, a: { UK: "er", US: "vi" }, n: "Brits take a broken arm to casualty, or A&E. Americans go to the ER.", src: "Cambridge: casualty (UK) emergency department." },
+    { w: "tuition", s: { fe: "School or college fees", te: "Teaching or private tutoring", di: "Gut feeling, instinct" }, a: { US: "fe", UK: "te" }, g: "school", n: "Americans pay tuition. A British kid gets maths tuition after school.", src: "Cambridge: tuition (UK) teaching; (US) money paid for teaching." },
+    { w: "faculty", s: { st: "A school's teaching staff", de: "A group of university departments", ca: "The campus dining hall for staff" }, a: { US: "st", UK: "de" }, g: "school", n: "An American faculty meeting is for teachers. A British Faculty of Arts is a division of the university.", src: "Cambridge: faculty (US) teaching staff; (UK) university department group." },
+    { w: "revise", s: { st: "Study for an exam", ed: "Edit and correct a text", re: "Repeat a school year" }, a: { UK: "st", AU: "st", US: "ed", CA: "ed" }, g: "school", n: "British students revise the night before an exam. Americans review.", src: "Cambridge: revise (UK) study again for an exam." },
+    { w: "boot", s: { tr: "Car's luggage compartment", cl: "Wheel clamp put on by parking police", sp: "Spare tyre kept under the car" }, a: { UK: "tr", AU: "tr", US: "cl" }, g: "car", c: "Said about a car", n: "Brits load shopping into the boot. In the US, getting a boot on your car means unpaid parking tickets.", src: "Cambridge: boot (UK) = trunk (US); Merriam-Webster: boot (US) Denver boot wheel clamp." },
+    { w: "pickle", s: { cu: "Pickled cucumber", re: "Chunky brown vegetable chutney", sa: "Sauerkraut (pickled cabbage)" }, a: { US: "cu", CA: "cu", UK: "re" }, n: "A cheese and pickle sandwich in Britain is spread with a sweet brown relish like Branston.", src: "Cambridge: pickle (UK) thick cold sauce; (US) pickled cucumber." },
+    { w: "swede", s: { ru: "Rutabaga (root vegetable)", pe: "A person from Sweden", su: "Soft suede leather" }, a: { UK: "ru", AU: "ru", US: "pe" }, n: "Mashed swede is a British Sunday side dish. Americans say rutabaga.", src: "Cambridge: swede (UK) = rutabaga (US)." },
+    { w: "snag", s: { sa: "Sausage", pr: "Unexpected problem", te: "Small tear in a sweater" }, a: { AU: "sa", UK: "pr", US: "pr" }, n: "At an Australian sausage sizzle, you buy a snag in a slice of bread.", src: "Macquarie/Wiktionary: snag (Australia, informal) sausage." },
+    { w: "barbie", s: { bb: "Barbecue grill", do: "Fashion doll", fi: "Bonfire on the beach" }, a: { AU: "bb", US: "do", UK: "do" }, n: "Australians throw shrimp, or more likely sausages, on the barbie.", src: "Wiktionary: barbie (Australia, informal) barbecue." },
+    { w: "footpath", s: { si: "Sidewalk", tr: "Walking trail through fields or woods", st: "Stepping stones" }, a: { AU: "si", US: "tr" }, g: "sidewalk", n: "In Australia the footpath runs alongside the street. In the US it's a trail in the woods.", src: "Wiktionary: footpath (Australia, NZ, Ireland) paved path beside a road." },
+    { w: "verge", s: { gr: "Grass strip between the sidewalk and the road", br: "The brink, as in 'on the ___ of'", ri: "Riverbank" }, a: { AU: "gr", UK: "gr", US: "br" }, g: "sidewalk", n: "Councils in Britain and Australia mow the verge. Americans only use the word for being on the verge of something.", src: "Wiktionary: verge (Australia, NZ, UK) grassy strip by the road." },
+    { w: "paddock", s: { fi: "Any farm field, even a huge one", ho: "Small enclosure for horses", po: "Small duck pond on a farm" }, a: { AU: "fi", UK: "ho", US: "ho" }, n: "An Australian paddock can be thousands of acres.", src: "Wiktionary: paddock (Australia, NZ) any field." },
+    { w: "station", s: { ra: "Huge cattle or sheep ranch", tr: "Place where trains stop", ch: "Police checkpoint on a highway" }, a: { AU: "ra", US: "tr", UK: "tr" }, n: "Australia's biggest cattle stations are bigger than some countries.", src: "Macquarie/Wiktionary: station (Australia) large pastoral property." },
+    { w: "bush", s: { wi: "The wild backcountry", sh: "A shrub", be: "A beard" }, a: { AU: "wi", US: "sh", UK: "sh" }, n: "Australians head out to the bush to get away from the city.", src: "Wiktionary: bush (Australia, NZ, Africa) uncleared land." },
+    { w: "creek", s: { st: "Small freshwater stream", in: "Narrow tidal inlet", ma: "Muddy marsh or swamp" }, a: { US: "st", CA: "st", AU: "st", UK: "in" }, n: "A British creek is salt water from the sea. Elsewhere it's a stream.", src: "Wiktionary: creek (UK) small inlet; (US, Canada, Aus) stream." },
+    { w: "fall", s: { au: "Autumn", tu: "A tumble or trip", ra: "Rainy season" }, a: { US: "au", CA: "au", UK: "tu", AU: "tu" }, n: "Everyone can take a fall, but only North Americans call the season fall.", src: "Cambridge: fall (US) autumn." },
+    { w: "soda", s: { so: "Any sweet fizzy soft drink", wa: "Plain fizzy water", ba: "Baking soda for cooking" }, a: { US: "so", UK: "wa" }, g: "drinks", n: "A whisky and soda in Britain means soda water, not Coke.", src: "Cambridge: soda (US) soft drink; (UK) soda water." },
+    { w: "cordial", s: { sy: "Fruit syrup you dilute with water", li: "Sweet alcoholic liqueur", me: "Sweet cough medicine syrup" }, a: { AU: "sy", UK: "sy", US: "li" }, g: "drinks", n: "Australian kids drink lime cordial. An American cordial is a liqueur.", src: "Cambridge: cordial (UK) concentrated fruit drink; Merriam-Webster: cordial = liqueur." },
+    { w: "dear", s: { ex: "Expensive", lo: "Much loved", ti: "Tired, worn out" }, a: { UK: "ex", AU: "ex", US: "lo" }, n: "'That's a bit dear' in Britain means it costs too much.", src: "Cambridge: dear (UK) expensive." },
+    { w: "brilliant", s: { gr: "Great! (everyday praise)", sm: "Extremely intelligent", fu: "Funny, hilarious" }, a: { UK: "gr", US: "sm" }, n: "Brits say 'brilliant!' about a parking space. Americans save it for geniuses.", src: "Cambridge: brilliant (UK informal) very good." },
+    { w: "smart", s: { dr: "Neatly dressed, well turned out", in: "Intelligent", ch: "Cheeky" }, a: { UK: "dr", US: "in" }, n: "A smart outfit in Britain is a tidy one.", src: "Cambridge: smart (UK) clean, tidy and stylish; (US) intelligent." },
+    { w: "mad", s: { an: "Angry", cr: "Crazy", th: "Thrilled" }, a: { US: "an", CA: "an", UK: "cr" }, n: "An American who is mad at you is angry. A Brit who's mad is a bit crazy.", src: "Cambridge: mad (UK) mentally ill / silly; (US informal) angry." },
+    { w: "sick", s: { il: "Felt unwell", vo: "Threw up", bo: "Got bored" }, a: { US: "il", UK: "vo" }, c: "“I was ___ on the bus.”", n: "In Britain, being sick on the bus means you vomited.", src: "Cambridge: be sick (UK) to vomit; (US) ill." },
+    { w: "nervy", s: { bo: "Bold, cheeky", ne: "Jittery, anxious", st: "Stringy (of meat)" }, a: { US: "bo", UK: "ne" }, n: "A nervy American has nerve. A nervy Brit has nerves.", src: "Wiktionary: nervy (US) bold, brazen; (UK) nervous." },
+    { w: "momentarily", s: { so: "In a moment, very soon", br: "For a moment only", ab: "Abruptly, without warning" }, a: { US: "so", UK: "br" }, c: "“We'll be landing ___.”", n: "An American pilot means 'in a minute'. A Brit hears 'for just a moment'.", src: "Merriam-Webster usage note: momentarily (US) in a moment; (UK) for a moment." },
+    { w: "hire", s: { re: "Rent (a car, a van, equipment)", em: "Employ (a person)", bu: "Buy outright, no rental" }, a: { UK: "re", AU: "re", US: "em" }, n: "Brits hire a car on holiday. Americans rent one and hire people.", src: "Cambridge: hire (UK) pay to use something for a short time." },
+    { w: "stone", s: { we: "Unit of weight (14 pounds)", ro: "A rock", le: "Unit of length" }, a: { UK: "we", US: "ro" }, n: "Brits still give body weight in stone. Twelve stone is 168 pounds.", src: "Cambridge: stone (UK) 6.35 kg." },
+    { w: "pint", s: { im: "About 568 ml (20 fl oz)", us: "About 473 ml (16 fl oz)", li: "Exactly half a litre" }, a: { UK: "im", US: "us" }, g: "units", n: "A British pint of beer is about a fifth bigger than an American one.", src: "NIST Handbook 44 / UK Weights and Measures Act: imperial pint 568.26 ml; US pint 473.18 ml." },
+    { w: "gallon", s: { im: "About 4.5 litres", us: "About 3.8 litres", li: "Exactly 5 litres" }, a: { UK: "im", US: "us" }, g: "units", n: "An imperial gallon is about 4.55 litres. A US gallon is about 3.79.", src: "NIST: US gallon 3.785 L; imperial gallon 4.546 L." },
+    { w: "semi", s: { ho: "Semi-detached house", tr: "Big rig truck", ha: "Half-time" }, a: { UK: "ho", AU: "ho", US: "tr", CA: "tr" }, n: "A British semi is a house joined to the next one. An American semi has eighteen wheels.", src: "Cambridge: semi (UK) semi-detached house; (US) articulated truck." },
+    { w: "plaster", s: { ba: "Adhesive bandage (Band-Aid)", wa: "Wall-coating paste", wp: "Patterned wallpaper" }, a: { UK: "ba", US: "wa" }, n: "A British kid with a grazed knee wants a plaster.", src: "Cambridge: plaster (UK) sticking plaster." },
+    { w: "pumps", s: { hi: "Plain high-heeled shoes", fl: "Flat canvas or ballet shoes", ra: "Rubber rain boots" }, a: { US: "hi", UK: "fl" }, g: "shoes", n: "American pumps have heels. British pumps are flat.", src: "Cambridge: pump (UK) plimsoll / ballet flat; (US) court shoe." },
+    { w: "kit", s: { un: "Sports uniform", se: "Set of parts to build", ba: "School backpack" }, a: { UK: "un", US: "se" }, n: "A British football team has a home kit and an away kit.", src: "Cambridge: kit (UK) sports clothes." },
+    { w: "pitch", s: { fi: "Sports field", th: "Throw to the batter", gr: "Stadium grandstand" }, a: { UK: "fi", AU: "fi", US: "th" }, n: "British football and cricket are played on a pitch.", src: "Cambridge: pitch (UK) sports field." },
+    { w: "fixture", s: { ma: "Scheduled sports match", li: "Built-in fitting, like a light", re: "A quick household repair" }, a: { UK: "ma", US: "li" }, n: "The British fixture list is the season's match schedule.", src: "Cambridge: fixture (UK) sports event arranged for a date." },
+    { w: "riding", s: { el: "Electoral district", ho: "Horseback riding", sk: "Ski slope or trail" }, a: { CA: "el", US: "ho" }, n: "Canadian MPs each represent a riding.", src: "Wiktionary: riding (Canada) electoral district." },
+    { w: "housecoat", s: { ba: "Bathrobe", dr: "Loose dress worn around the house", ap: "Kitchen apron" }, a: { CA: "ba", AU: "dr" }, n: "A Canadian housecoat goes on after a shower. An Australian one is an everyday house dress.", src: "Wiktionary: housecoat (Canada, US) bathrobe; (Australia) dress-like garment worn at home." },
+    { w: "mobile", s: { ph: "Cell phone", ha: "Hanging decoration over a crib", ho: "Trailer home" }, a: { UK: "ph", AU: "ph", US: "ha" }, g: "phone", n: "Brits and Aussies ring you on your mobile.", src: "Cambridge: mobile (UK) mobile phone." },
+    { w: "cell", s: { ph: "Cell phone", pr: "Prison room", ba: "Basement storage room" }, a: { US: "ph", CA: "ph", UK: "pr" }, g: "phone", n: "'Call my cell' is North American. A Brit might wonder which prison you're in.", src: "Cambridge: cell (US) cellphone." },
+    { w: "engaged", s: { bu: "Busy (a phone line or toilet)", be: "Promised to marry", hi: "Hired" }, a: { UK: "bu", US: "be" }, n: "A British phone line or toilet that's in use is engaged.", src: "Cambridge: engaged (UK) busy, in use." },
+    { w: "cheers", s: { th: "Thanks (or bye)", to: "A toast when clinking glasses", ap: "Applause" }, a: { UK: "th", AU: "th", US: "to" }, n: "Brits and Aussies say cheers to the bus driver.", src: "Cambridge: cheers (UK informal) thank you / goodbye." },
+    { w: "redundant", s: { la: "Laid off (your job was cut)", un: "Unnecessary, superfluous", pr: "Promoted to a better job" }, a: { UK: "la", AU: "la", US: "un" }, n: "'He was made redundant' is how Brits say he lost his job.", src: "Cambridge: redundant (UK) having lost your job because you are no longer needed." },
+    { w: "résumé", s: { cv: "Document listing your work history", su: "A summary", rs: "A restart" }, a: { US: "cv", CA: "cv", UK: "su" }, n: "Brits send a CV. A résumé in Britain is a summary.", src: "Collins: résumé (US, Canada) CV; (UK) summary." },
+    { w: "grammar school", s: { se: "Selective academic secondary school", el: "Elementary school", la: "Private language school for adults" }, a: { UK: "se", US: "el" }, g: "school", n: "British grammar schools pick pupils by exam at 11. Older Americans use the term for elementary school.", src: "Merriam-Webster: grammar school (US) elementary school; Cambridge (UK) selective secondary school." },
+    { w: "prep school", s: { se: "Private high school preparing for college", ju: "Private school for ages 8 to 13", co: "Cooking school for chefs" }, a: { US: "se", UK: "ju" }, g: "school", n: "An English prep school prepares younger children for senior schools like Eton.", src: "Cambridge: preparatory school (UK) for ages 7-13; (US) private secondary school." },
+    { w: "primary", s: { el: "Election to choose a party's candidate", sc: "School for children aged about 5 to 11", fa: "First-aid kit" }, a: { US: "el", UK: "sc", AU: "sc" }, g: "school", n: "Americans vote in a primary. Brits and Aussies send their kids to one.", src: "Cambridge: primary (US) primary election; primary school (UK, Aus)." },
+    { w: "lay-by", s: { pu: "Roadside pull-off area", pa: "Paying in instalments before taking goods home", be: "A spare bed" }, a: { UK: "pu", AU: "pa" }, n: "Australian shops let you lay-by a pram and pay it off. In Britain a lay-by is a spot to pull over.", src: "Wiktionary: lay-by (UK) roadside area; (Australia, NZ) layaway." },
+    { w: "oatmeal", s: { po: "Cooked oat porridge", fl: "Ground oats used in baking", co: "Chewy oat cookie" }, a: { US: "po", UK: "fl" }, g: "breakfast", n: "Americans eat a bowl of oatmeal. Brits eat porridge and bake with oatmeal.", src: "Cambridge: oatmeal (UK) crushed oats; (US) porridge." },
+    { w: "cornflour", s: { st: "Cornstarch (fine white thickener)", me: "Finely ground yellow cornmeal", ce: "Corn flakes breakfast cereal" }, a: { UK: "st", AU: "st", US: "me" }, n: "British gravy is thickened with cornflour. American corn flour is yellow and gritty.", src: "Wikipedia 'Corn flour': UK/Aus cornflour = cornstarch; US corn flour = fine cornmeal." },
+    { w: "pancake", s: { th: "Thin, crêpe-like pancake", fl: "Thick, fluffy pancake", po: "Grated potato cake" }, a: { UK: "th", US: "fl", CA: "fl" }, g: "breakfast", n: "British Pancake Day means thin crêpes with lemon and sugar.", src: "Wikipedia 'Pancake': British pancakes are thin; North American pancakes are thick and raised." },
+    { w: "flapjack", s: { ba: "Chewy oat and syrup bar", pa: "A pancake", co: "Makeup compact" }, a: { UK: "ba", US: "pa" }, g: "breakfast", n: "A British flapjack is a golden-syrup oat bar.", src: "Wikipedia 'Flapjack': (UK) oat bar; (US) pancake." },
+    { w: "slice", s: { ba: "Tray-baked dessert bar cut into squares", pi: "Slice of pizza", le: "Wedge of lemon for a drink" }, a: { AU: "ba", US: "pi" }, n: "Caramel slice is a bakery staple in Australia.", src: "Wiktionary: slice (Australia, NZ, UK) tray-baked cake cut into squares." },
+    { w: "supper", s: { ev: "Main evening meal", sn: "Light snack before bed", lu: "Lunch" }, a: { US: "ev", CA: "ev", AU: "sn" }, n: "Supper is dinner in much of North America. In Australia it's a cuppa and biscuit before bed.", src: "Wiktionary: supper (US, Canada) evening meal; light meal before bed (Australian usage per Macquarie)." },
+    { w: "jersey", s: { sw: "Knitted sweater", sp: "Sports team shirt", ra: "Light rain jacket" }, a: { UK: "sw", US: "sp" }, g: "sweater", n: "A British jersey is a wool pullover.", src: "Cambridge: jersey (UK) sweater." },
+    { w: "tin", s: { ca: "A can of food", me: "The metal tin", so: "Tin toy soldier" }, a: { UK: "ca", AU: "ca", US: "me" }, n: "Brits buy tins of beans. Americans buy cans.", src: "Cambridge: tin (UK) = can (US)." },
+    { w: "lounge", s: { so: "Couch, sofa", li: "Living room", ba: "Hotel bar or airport waiting area" }, a: { AU: "so", UK: "li", US: "ba" }, n: "Australians sit on the lounge. Brits sit in it.", src: "Wiktionary: lounge (Australia) couch; (UK) living room." },
+    { w: "bench", s: { co: "Kitchen countertop", se: "Long seat", sh: "Garden shed" }, a: { AU: "co", US: "se" }, n: "An Australian kitchen ad boasts stone benchtops.", src: "Wiktionary: bench (Australia, NZ) kitchen counter." },
+    { w: "manchester", s: { li: "Household linen (sheets, towels)", ci: "A city in England", co: "Corduroy fabric" }, a: { AU: "li", UK: "ci" }, n: "Australian department stores have a manchester section, named after the English cotton city.", src: "Wiktionary: manchester (Australia, NZ) household linen." },
+    { w: "pawpaw", s: { pa: "Papaya", na: "Native custard-like woodland fruit", gr: "Grandpa" }, a: { AU: "pa", US: "na" }, n: "The American pawpaw is a wild fruit of eastern woods, not a papaya.", src: "Wiktionary: pawpaw (Australia) papaya; (US) Asimina triloba." },
+    { w: "singlet", s: { ve: "Sleeveless undershirt or tank top", wr: "Wrestler's one-piece uniform", si: "Single bed for one person" }, a: { AU: "ve", UK: "ve", US: "wr" }, g: "tops", n: "Aussies wear a singlet in summer. In the US the word is mostly used for wrestling.", src: "Wiktionary: singlet (UK, Australia) sleeveless shirt; Merriam-Webster: (US) wrestling singlet." },
+    { w: "loft", s: { at: "Attic, roof space", ap: "Open-plan apartment in an old warehouse", ba: "Balcony overlooking the street" }, a: { UK: "at", US: "ap" }, n: "A British loft conversion turns the attic into a bedroom.", src: "Cambridge: loft (UK) attic; (US) apartment in a converted building." },
+    { w: "hotel", s: { pu: "Pub", lo: "Place to stay the night", re: "Restaurant" }, a: { AU: "pu", US: "lo" }, n: "Many Australian 'hotels' are pubs, with no rooms at all.", src: "Wiktionary: hotel (Australia) pub." },
+    { w: "jug", s: { ke: "Electric kettle", pi: "Pitcher for pouring", bo: "Big narrow-necked bottle" }, a: { AU: "ke", UK: "pi", US: "bo" }, n: "'Put the jug on' in Australia means boil water for tea.", src: "Wiktionary: jug (Australia, NZ) electric kettle." },
+    { w: "crèche", s: { da: "Daycare for babies and toddlers", na: "Nativity scene", cr: "Baby's crib or cot" }, a: { UK: "da", AU: "da", US: "na" }, n: "A British gym crèche minds your toddler. An American crèche has Mary and Joseph.", src: "Merriam-Webster: crèche (US) nativity scene; Cambridge (UK) daycare." },
+    { w: "garden", s: { ya: "The yard around a house", pl: "Flower or vegetable bed", pa: "Public park" }, a: { UK: "ya", US: "pl" }, g: "garden", n: "Brits play football in the back garden, even if it's all lawn.", src: "Cambridge: garden (UK) = yard (US)." },
+    { w: "yard", s: { la: "Lawn and grounds around a house", pa: "Small paved area behind a house", ga: "Garage for two cars" }, a: { US: "la", CA: "la", UK: "pa" }, g: "garden", n: "An American yard is grass. A British yard is concrete.", src: "Cambridge: yard (UK) small enclosed hard area; (US) garden." },
+    { w: "saloon", s: { se: "Sedan car", ba: "Wild West bar", ha: "Hair salon" }, a: { UK: "se", US: "ba" }, g: "car", n: "A four-door British saloon is an American sedan.", src: "Cambridge: saloon (UK) = sedan (US)." },
+    { w: "solicitor", s: { la: "Lawyer", sa: "Door-to-door salesperson", po: "Police officer" }, a: { UK: "la", AU: "la", US: "sa" }, n: "'No solicitors' on an American door is about salespeople, not lawyers.", src: "Cambridge: solicitor (UK) lawyer; (US) person who tries to sell or get support." },
+    { w: "diary", s: { ap: "Appointment calendar", jo: "Private journal", da: "Dairy (milk products)" }, a: { UK: "ap", US: "jo" }, n: "'Let me check my diary' in Britain means your schedule.", src: "Cambridge: diary (UK) book for appointments." },
+    { w: "bureau", s: { de: "Writing desk", dr: "Chest of drawers", wa: "Wardrobe for hanging clothes" }, a: { UK: "de", US: "dr" }, g: "furniture", n: "A British bureau has a fold-down writing flap.", src: "Wiktionary: bureau (chiefly UK) desk; (US) chest of drawers." },
+    { w: "dresser", s: { ch: "Chest of drawers", si: "Kitchen cabinet with open plate shelves", ma: "Makeup artist" }, a: { US: "ch", UK: "si" }, g: "furniture", n: "A Welsh dresser displays plates in a British kitchen.", src: "Cambridge: dresser (UK) kitchen furniture with shelves; (US) chest of drawers." },
+    { w: "grill", s: { br: "The oven's top heating element (broiler)", bb: "Outdoor barbecue", to: "Pop-up toaster" }, a: { UK: "br", US: "bb" }, n: "Brits make cheese on toast under the grill.", src: "Cambridge: grill (UK) = broiler (US)." },
+    { w: "wash up", s: { di: "Wash the dishes", ha: "Wash your hands and face", la: "Do the laundry by hand" }, a: { UK: "di", US: "ha" }, n: "A Brit who offers to wash up is doing the dishes.", src: "Cambridge: wash up (UK) wash dishes; (US) wash hands and face." },
+    { w: "rock", s: { st: "Any stone, even a pebble", ca: "Hard stick candy sold at the seaside", cl: "Steep sea cliff" }, a: { US: "st", UK: "ca" }, n: "Blackpool rock is a candy stick with the town's name running through it.", src: "Cambridge: rock (UK) hard sweet; (US) stone." },
+    { w: "blinkers", s: { tu: "A car's turn signals", ho: "Eye shields for horses", sp: "Handheld sparklers" }, a: { US: "tu", UK: "ho" }, g: "car", n: "Americans flick on the blinker. Brits use the indicator.", src: "Merriam-Webster: blinker (US) turn signal; Cambridge: blinkers (UK) horse blinders." },
+    { w: "sparky", s: { el: "Electrician", li: "Lively, full of spark", fi: "Firework" }, a: { AU: "el", UK: "el", US: "li" }, n: "Call a sparky in Australia to fix the wiring.", src: "Wiktionary: sparky (UK, Australia, NZ) electrician." },
+    { w: "Yankee", s: { am: "Any American", no: "A Northerner, especially from New England", ba: "Baseball fan" }, a: { UK: "am", AU: "am", US: "no" }, n: "To the rest of the world any American is a Yank. In the American South it means a Northerner.", src: "Cambridge: Yankee (UK informal) American; (US) person from the north." },
+    { w: "kiwi", s: { nz: "A New Zealander", fr: "Fuzzy green fruit", pa: "Parrot" }, a: { AU: "nz", US: "fr" }, n: "Australians call their neighbours Kiwis, after New Zealand's national bird.", src: "Wiktionary: Kiwi (informal) New Zealander; kiwi fruit (US)." },
+    { w: "plaid", s: { pa: "Tartan or checked pattern", sh: "Long tartan cloth worn over the shoulder", bl: "Picnic blanket" }, a: { US: "pa", UK: "sh" }, n: "In Scottish dress the plaid is the cloth worn over the shoulder. Americans use the word for the pattern.", src: "Collins: plaid (Scottish) long piece of tartan worn over the shoulder; (US) tartan pattern." },
+    { w: "tomato sauce", s: { ke: "Ketchup", pa: "Pasta sauce made from tomatoes", so: "Tomato soup" }, a: { AU: "ke", UK: "ke", US: "pa" }, n: "Australians put tomato sauce on a meat pie. Americans put it on spaghetti.", src: "Wikipedia 'Ketchup': called tomato sauce in Australia, NZ, UK and South Africa." },
+    { w: "power point", s: { ou: "Wall socket", sl: "Slide presentation", ba: "Battery level" }, a: { AU: "ou", US: "sl" }, n: "Australians plug the kettle into a power point.", src: "Macquarie: power point (Australia) electrical socket." },
+    { w: "globe", s: { bu: "Light bulb", wo: "Model of the Earth", fi: "Round glass fishbowl" }, a: { AU: "bu", US: "wo" }, n: "Australians change a blown globe.", src: "Wiktionary: globe (Australia, South Africa) light bulb." },
+    { w: "aerial", s: { an: "TV antenna", ac: "Acrobatic trick in the air", dr: "Drone photo" }, a: { UK: "an", US: "ac" }, n: "Brits adjust the aerial on the roof. Americans watch skiers do aerials.", src: "Wiktionary: aerial (chiefly UK) antenna." },
+    { w: "series", s: { se: "One season of a TV show", wh: "A whole TV show, all seasons", bo: "Book trilogy" }, a: { UK: "se", US: "wh" }, n: "British TV comes back for 'series 2'. Americans call that season 2.", src: "Wiktionary: series (chiefly UK) season of a show." },
+    { w: "trunk", s: { ca: "Car's luggage compartment", ch: "Large storage chest", sw: "Swimming shorts" }, a: { US: "ca", CA: "ca", UK: "ch" }, g: "car", n: "North Americans load bags into the trunk. Brits pack a trunk for boarding school.", src: "Cambridge: trunk (US) = boot (UK)." },
+    { w: "hood", s: { en: "Car's engine cover", so: "Folding fabric roof of a convertible", hu: "Wheel hubcap" }, a: { US: "en", UK: "so" }, g: "car", n: "On a British convertible you put the hood down for sunshine.", src: "Cambridge: hood (UK) folding cover over a car; (US) = bonnet (UK)." },
+    { w: "crisp", s: { ch: "Potato chip", de: "Baked fruit dessert with crumbly topping", fr: "Morning frost" }, a: { UK: "ch", US: "de" }, g: "chips", n: "A British crisp comes in a bag. An American apple crisp comes out of the oven.", src: "Wiktionary: crisp (UK, Ireland) potato chip; apple crisp (US) dessert." },
+    { w: "skivvy", s: { tu: "Turtleneck top", se: "Lowly household servant", sk: "Padded ski jacket" }, a: { AU: "tu", UK: "se" }, g: "tops", n: "Australian kids wear a skivvy under their school jumper. In Britain a skivvy does the chores.", src: "Wiktionary: skivvy (US, Australia, NZ) turtleneck; Collins (UK) servant." },
+    { w: "sloppy joe", s: { sw: "Loose, baggy sweatshirt", sa: "Ground-beef sandwich in tomato sauce", sl: "Lazy person" }, a: { AU: "sw", US: "sa" }, n: "An Australian sloppy joe is a sweater. An American one drips onto your plate.", src: "Wiktionary: sloppy joe (US) sandwich; Macquarie: (Australia) loose sweater." },
+    { w: "tip", s: { du: "Rubbish dump", gr: "Money left for a waiter", br: "Brim of a hat" }, a: { UK: "du", AU: "du", US: "gr" }, n: "A trip to the tip in Britain or Australia means taking rubbish to the dump.", src: "Wiktionary: tip (UK, Commonwealth) dumping place." },
+    { w: "cobbler", s: { de: "Baked fruit dessert", sh: "Shoe mender", gr: "Horse groomer" }, a: { US: "de", UK: "sh" }, n: "Peach cobbler is a Southern US classic. A British cobbler fixes shoes.", src: "Wiktionary: cobbler (US) fruit pie with biscuit topping." },
+    { w: "fringe", s: { ba: "Hair cut straight across the forehead", ta: "Decorative tassels on clothing", ey: "Eyebrows" }, a: { UK: "ba", AU: "ba", US: "ta" }, n: "Brits get a fringe trim. Americans get their bangs cut.", src: "Wiktionary: fringe (UK) = bangs (US)." },
+    { w: "hydro", s: { el: "Household electricity", sp: "Health spa", hy: "Fast speedboat" }, a: { CA: "el", UK: "sp" }, n: "Canadians pay the hydro bill, since much of their power is hydroelectric.", src: "Wiktionary: hydro (Canada) electricity supply; (UK, dated) spa." },
+    { w: "bachelor", s: { st: "Studio apartment", un: "Unmarried man", gu: "Wedding guest" }, a: { CA: "st", US: "un" }, n: "Canadian rental listings offer a bachelor, meaning a studio.", src: "Wiktionary: bachelor (Canada) bachelor apartment." },
+    { w: "shattered", s: { ex: "Exhausted", br: "Smashed to pieces", th: "Thrilled, overjoyed" }, a: { UK: "ex", US: "br" }, n: "A Brit who's shattered after work just needs a sit-down.", src: "Cambridge: shattered (UK informal) very tired." },
+    { w: "mean", s: { un: "Unkind, nasty", st: "Stingy with money", sh: "Shy and quiet" }, a: { US: "un", UK: "st" }, n: "A mean Brit won't buy a round. A mean American is just unkind.", src: "Cambridge: mean (UK) not generous; (US) unkind." },
   ]},
 
   es: { name: "Español", words: [
-    { w: "carro", s: { ca: "Car", cr: "Cart or wagon", su: "Shopping cart" }, a: { ES: "cr", MX: "ca", CO: "ca", AR: "cr" }, n: "Mexicans and Colombians drive a carro. Spaniards drive a coche and Argentines an auto." },
-    { w: "guagua", s: { bu: "Bus", be: "Baby", tr: "Something free" }, a: { CU: "bu", CL: "be", PE: "be" }, n: "In Cuba and the Canary Islands you ride the guagua. In the Andes a guagua is a baby, from Quechua." },
-    { w: "camión", s: { bu: "City bus", tr: "Truck", tm: "Tram" }, a: { MX: "bu", ES: "tr", AR: "tr", CO: "tr" }, n: "In Mexico you take the camión to work. Everywhere else it hauls freight." },
-    { w: "torta", s: { sa: "Sandwich on a crusty roll", ca: "Cake", om: "Omelette" }, a: { MX: "sa", AR: "ca", CL: "ca", CO: "ca" }, n: "A Mexican torta is a loaded sandwich. Ask for one in Buenos Aires and you get cake." },
-    { w: "tortilla", s: { om: "Potato omelette", fl: "Corn or flour flatbread", cr: "Crepe" }, a: { ES: "om", MX: "fl" }, n: "Spain's tortilla española is a thick egg-and-potato omelette." },
-    { w: "tinto", s: { co: "Small black coffee", wi: "Red wine", in: "Ink" }, a: { CO: "co", ES: "wi", AR: "wi", MX: "wi" }, n: "Offer someone a tinto in Bogotá and they expect coffee." },
-    { w: "bocadillo", s: { ba: "Baguette sandwich", sw: "Guava paste sweet", sn: "Small appetizer" }, a: { ES: "ba", CO: "sw", MX: "sn" }, n: "Colombian bocadillo is a firm guava sweet, often eaten with cheese." },
-    { w: "vereda", s: { si: "Sidewalk", ru: "Rural district", pa: "Footpath or trail" }, a: { AR: "si", CL: "si", PE: "si", CO: "ru", ES: "pa" }, n: "Colombian veredas are rural subdivisions of a municipality." },
-    { w: "banqueta", s: { si: "Sidewalk", st: "Low stool or bench", ba: "Banquet" }, a: { MX: "si", ES: "st" }, n: "In Mexico you walk on the banqueta. In Spain you sit on it." },
-    { w: "alberca", s: { po: "Swimming pool", re: "Irrigation reservoir", ba: "Bathtub" }, a: { MX: "po", ES: "re" }, n: "The word comes from Arabic al-birka, a pool or pond. Spain kept the farm meaning." },
-    { w: "pileta", s: { po: "Swimming pool", si: "Sink or washbasin", ba: "Battery" }, a: { AR: "po", MX: "si" }, n: "Argentines swim in the pileta. Elsewhere it's for washing up." },
-    { w: "saco", s: { bl: "Suit jacket or blazer", sw: "Sweater or cardigan", sa: "Sack or bag" }, a: { MX: "bl", AR: "bl", CO: "sw", ES: "sa" }, n: "Bring a saco to Bogotá and you're bringing a sweater." },
-    { w: "polera", s: { ts: "T-shirt", tu: "Turtleneck sweater", sw: "Sweatshirt or hoodie" }, a: { CL: "ts", AR: "tu", PE: "sw" }, n: "Same word, three neighboring countries, three different garments." },
-    { w: "playera", s: { ts: "T-shirt", sh: "Canvas sneaker", be: "Beach towel" }, a: { MX: "ts", ES: "sh" }, n: "In Spain, playeras are light sports shoes." },
-    { w: "buzo", s: { sw: "Sweatshirt", tr: "Tracksuit", di: "Scuba diver" }, a: { AR: "sw", CL: "tr", ES: "di" }, n: "Chilean schoolkids wear a buzo for gym class." },
-    { w: "mono", s: { cu: "Cute", bl: "Blond", ov: "Overalls" }, a: { ES: "cu", CO: "bl" }, c: "“Tu hermano es muy ___.”", n: "Everywhere it also means monkey, but a Spaniard calling you mono means you're cute." },
-    { w: "pana", s: { bu: "Buddy or pal", co: "Corduroy", br: "Bread" }, a: { VE: "bu", ES: "co" }, n: "Venezuelans call their friends pana. In Spain, pantalones de pana are corduroys." },
-    { w: "plata", s: { mo: "Money", si: "Silver" }, a: { AR: "mo", CO: "mo", CL: "mo", ES: "si" }, n: "Across much of Latin America, plata is everyday slang for money." },
-    { w: "lana", s: { mo: "Money", wo: "Wool" }, a: { MX: "mo", ES: "wo", AR: "wo" }, n: "In Mexico, 'no tengo lana' means you're broke." },
-    { w: "piola", s: { co: "Cool or clever", lo: "Low-key, discreet", ro: "Thin cord" }, a: { AR: "co", CL: "lo", ES: "ro" }, n: "An Argentine who is piola is smart and easygoing. A Chilean who stays piola keeps quiet." },
-    { w: "cachar", s: { un: "To get it, understand", ca: "To catch a ball", br: "To break" }, a: { CL: "un", MX: "ca" }, n: "Chileans constantly ask '¿cachai?', meaning 'you get it?'" },
-    { w: "colectivo", s: { bu: "City bus", sh: "Shared taxi or minivan", gr: "A collective group" }, a: { AR: "bu", CL: "sh", CO: "sh", ES: "gr" }, n: "In Buenos Aires the colectivo is the regular city bus." },
-    { w: "piso", s: { ap: "Apartment", fl: "Floor" }, a: { ES: "ap", MX: "fl", AR: "fl" }, n: "Spaniards rent a piso. Latin Americans rent a departamento or apartamento." },
-    { w: "recámara", s: { be: "Bedroom", ch: "Gun chamber", cl: "Closet" }, a: { MX: "be", ES: "ch" }, n: "A Mexican house listing counts its recámaras." },
-    { w: "vaina", s: { th: "Thing, stuff, situation", po: "Pea pod or sheath", tr: "Trouble" }, a: { CO: "th", VE: "th", ES: "po" }, n: "'¿Qué es esa vaina?' is Colombian and Venezuelan for 'what's that thing?'" },
-    { w: "cuadra", s: { bl: "City block", st: "Horse stable", sq: "Square" }, a: { AR: "bl", MX: "bl", CO: "bl", ES: "st" }, n: "Latin Americans give directions in cuadras. Spaniards say manzanas." },
-    { w: "damasco", s: { ap: "Apricot", fa: "Damask fabric", pl: "Plum" }, a: { AR: "ap", CL: "ap", ES: "fa" }, n: "Spain and Mexico call the fruit albaricoque and chabacano." },
-    { w: "plátano", s: { ba: "Banana", pl: "Plantain (cooking banana)", pa: "Plane tree" }, a: { ES: "ba", MX: "ba", CO: "pl" }, n: "In Colombia a banana is a banano. The plátano gets fried." },
-    { w: "bombilla", s: { li: "Light bulb", ma: "Metal straw for yerba mate", st: "Drinking straw" }, a: { ES: "li", AR: "ma", CL: "st" }, n: "An Argentine bombilla is the filtered metal straw for mate." },
-    { w: "pitillo", s: { st: "Drinking straw", ci: "Cigarette", wh: "Whistle" }, a: { CO: "st", ES: "ci" }, n: "Ask for a pitillo with your juice in Colombia." },
-    { w: "sorbete", s: { st: "Drinking straw", so: "Sorbet" }, a: { AR: "st", ES: "so", MX: "so" }, n: "Argentines drink soda with a sorbete. Mexicans say popote, Spaniards pajita." },
-    { w: "coche", s: { ca: "Car", pi: "Pig", tr: "Train carriage" }, a: { ES: "ca", GT: "pi" }, n: "In Guatemala a coche is a pig, and carne de coche is pork." },
-    { w: "fresa", s: { st: "Strawberry", sn: "Snobby, posh" }, a: { ES: "st", MX: "sn" }, c: "“Esa chica es muy ___.”", n: "Mexicans call preppy, upper-class kids fresas. The fruit is still a fresa too." },
-    { w: "morocho", s: { da: "Dark-haired person", co: "Sweet corn drink", pa: "Bread loaf" }, a: { AR: "da", EC: "co" }, n: "In Argentina, morocho describes someone with dark hair. In Ecuador it's a cinnamon corn drink." },
+    { w: "carro", s: { ca: "Car", cr: "Cart or wagon", bi: "Bicycle" }, a: { ES: "cr", MX: "ca", CO: "ca" }, g: "car", n: "Mexicans and Colombians drive a carro. Spaniards drive a coche and Argentines an auto.", src: "Wiktionary/DLE: carro (Am.) automobile; (general) cart. Argentina removed and shopping-cart decoy replaced (Spain uses carro for that)." },
+    { w: "guagua", s: { bu: "Bus", be: "Baby", tr: "Something free" }, a: { CU: "bu", CL: "be", PE: "be" }, g: "bus", n: "In Cuba and the Canary Islands you ride the guagua. In the Andes a guagua is a baby, from Quechua.", src: "DLE: guagua (Cuba, Canarias) autobús; (Chile, Perú) niño de pecho." },
+    { w: "camión", s: { bu: "City bus", tr: "Truck", tm: "Electric tram" }, a: { MX: "bu", ES: "tr", AR: "tr", CO: "tr" }, g: "bus", n: "In Mexico you take the camión to work. Everywhere else it hauls freight.", src: "DLE: camión (Méx.) autobús." },
+    { w: "torta", s: { sa: "Sandwich on a crusty roll", ca: "Cake", om: "Omelette" }, a: { MX: "sa", AR: "ca", CL: "ca", CO: "ca" }, n: "A Mexican torta is a loaded sandwich. Ask for one in Buenos Aires and you get cake.", src: "DLE: torta (Méx.) sándwich; (Am. Mer.) tarta." },
+    { w: "tortilla", s: { om: "Potato omelette", fl: "Corn or flour flatbread", cr: "Sweet crepe" }, a: { ES: "om", MX: "fl" }, n: "Spain's tortilla española is a thick egg-and-potato omelette.", src: "DLE: tortilla (Esp.) omelette; (Méx.) flatbread." },
+    { w: "tinto", s: { co: "Small black coffee", wi: "Red wine", in: "Black ink" }, a: { CO: "co", ES: "wi", AR: "wi", MX: "wi" }, n: "Offer someone a tinto in Bogotá and they expect coffee.", src: "DLE: tinto (Col.) café negro." },
+    { w: "bocadillo", s: { ba: "Baguette sandwich", sw: "Guava paste sweet", sn: "Small appetizer" }, a: { ES: "ba", CO: "sw", MX: "sn" }, n: "Colombian bocadillo is a firm guava sweet, often eaten with cheese.", src: "DLE: bocadillo (Col.) dulce de guayaba." },
+    { w: "vereda", s: { si: "Sidewalk", ru: "Rural district", pa: "Narrow country path", ri: "Riverbank" }, a: { AR: "si", CL: "si", PE: "si", CO: "ru", ES: "pa" }, g: "sidewalk", n: "Colombian veredas are rural subdivisions of a municipality. In Spain a vereda is a narrow track through the countryside.", src: "Wiktionary: vereda (Lat. Am.) sidewalk; (Colombia) municipal subdivision; path (general). Spain sense reworded and a true decoy added." },
+    { w: "banqueta", s: { si: "Sidewalk", st: "Low stool or bench", ba: "Formal banquet" }, a: { MX: "si", ES: "st" }, g: "sidewalk", n: "In Mexico you walk on the banqueta. In Spain you sit on it.", src: "DLE: banqueta (Méx.) acera." },
+    { w: "alberca", s: { po: "Swimming pool", re: "Irrigation reservoir", ba: "Bathtub with jets" }, a: { MX: "po", ES: "re" }, g: "pool", n: "The word comes from Arabic al-birka, a pool or pond. Spain kept the farm meaning.", src: "DLE: alberca (Méx.) piscina; depósito de agua para riego." },
+    { w: "pileta", s: { po: "Swimming pool", fo: "Small basin, like a holy-water font", ba: "Car battery" }, a: { AR: "po", ES: "fo" }, g: "pool", n: "Argentines swim in the pileta. In Spain a pileta is a small stone basin.", src: "Wiktionary: pileta (Argentina) swimming pool; basin (general). Mexico removed: its 'sink' answer was doubtful." },
+    { w: "saco", s: { bl: "Suit jacket or blazer", sw: "Sweater or cardigan", sa: "Sack or bag" }, a: { MX: "bl", AR: "bl", CO: "sw", ES: "sa" }, g: "jacket", n: "Bring a saco to Bogotá and you're bringing a sweater.", src: "DLE: saco (Am.) chaqueta; Colombian usage for sweater." },
+    { w: "polera", s: { ts: "T-shirt", tu: "Turtleneck sweater", sw: "Sweatshirt or hoodie" }, a: { CL: "ts", AR: "tu", PE: "sw" }, g: "shirts", n: "Same word, three neighboring countries, three different garments.", src: "Diccionario de americanismos: polera (Chile) camiseta; (Arg.) cuello alto; (Perú) sudadera." },
+    { w: "playera", s: { ts: "T-shirt", sh: "Canvas sneaker", be: "Beach towel" }, a: { MX: "ts", ES: "sh" }, g: "shirts", n: "In Spain, playeras are light sports shoes.", src: "DLE: playera (Méx.) camiseta; (Esp.) zapatilla de lona." },
+    { w: "buzo", s: { sw: "Sweatshirt", tr: "Tracksuit", di: "Scuba diver" }, a: { AR: "sw", CL: "tr", ES: "di" }, g: "shirts", n: "Chilean schoolkids wear a buzo for gym class.", src: "DLE: buzo (Arg.) sudadera; (Chile) chándal." },
+    { w: "mono", s: { cu: "Cute", bl: "Blond", ov: "Overalls" }, a: { ES: "cu", CO: "bl" }, c: "“Tu hermano es muy ___.”", n: "Everywhere it also means monkey, but a Spaniard calling you mono means you're cute.", src: "DLE: mono (Esp.) bonito; (Col.) rubio." },
+    { w: "pana", s: { bu: "Buddy or pal", co: "Corduroy", br: "Loaf of bread" }, a: { VE: "bu", ES: "co" }, n: "Venezuelans call their friends pana. In Spain, pantalones de pana are corduroys.", src: "DLE: pana (Ven.) amigo; tela gruesa (corduroy)." },
+    { w: "plata", s: { mo: "Money", si: "Silver", pl: "Platinum" }, a: { AR: "mo", CO: "mo", CL: "mo", ES: "si" }, g: "money", n: "Across much of Latin America, plata is everyday slang for money.", src: "DLE: plata (Am.) dinero." },
+    { w: "lana", s: { mo: "Money", wo: "Wool", co: "Cotton" }, a: { MX: "mo", ES: "wo", AR: "wo" }, g: "money", n: "In Mexico, 'no tengo lana' means you're broke.", src: "DLE: lana (Méx.) dinero." },
+    { w: "piola", s: { co: "Cool or clever", lo: "Low-key, discreet", ro: "Thin cord" }, a: { AR: "co", CL: "lo", ES: "ro" }, n: "An Argentine who is piola is smart and easygoing. A Chilean who stays piola keeps quiet.", src: "Diccionario de americanismos: piola (Arg.) listo, simpático; (Chile) discreto." },
+    { w: "cachar", s: { un: "To get it, understand", ca: "To catch a ball", br: "To break something" }, a: { CL: "un", MX: "ca" }, n: "Chileans constantly ask '¿cachai?', meaning 'you get it?'", src: "DLE: cachar (Chile) entender; (Am.) atrapar al vuelo." },
+    { w: "colectivo", s: { bu: "City bus", sh: "Shared taxi or minivan", gr: "A collective group" }, a: { AR: "bu", CL: "sh", CO: "sh", ES: "gr" }, g: "bus", n: "In Buenos Aires the colectivo is the regular city bus.", src: "DLE: colectivo (Arg.) autobús; (Chile) taxi colectivo." },
+    { w: "piso", s: { ap: "Apartment", fl: "Floor", ce: "Ceiling" }, a: { ES: "ap", MX: "fl", AR: "fl" }, g: "home", n: "Spaniards rent a piso. Latin Americans rent a departamento or apartamento.", src: "DLE: piso (Esp.) vivienda en un edificio." },
+    { w: "recámara", s: { be: "Bedroom", ch: "Gun chamber", cl: "Walk-in closet" }, a: { MX: "be", ES: "ch" }, g: "home", n: "A Mexican house listing counts its recámaras.", src: "DLE: recámara (Méx.) dormitorio." },
+    { w: "vaina", s: { th: "Thing, stuff, situation", po: "Pea pod or sheath", tr: "Trouble" }, a: { CO: "th", VE: "th", ES: "po" }, n: "'¿Qué es esa vaina?' is Colombian and Venezuelan for 'what's that thing?'", src: "DLE: vaina (Col., Ven.) cosa." },
+    { w: "cuadra", s: { bl: "City block", st: "Horse stable", sq: "Town square" }, a: { AR: "bl", MX: "bl", CO: "bl", ES: "st" }, n: "Latin Americans give directions in cuadras. Spaniards say manzanas.", src: "DLE: cuadra (Am.) manzana de casas; caballeriza." },
+    { w: "damasco", s: { ap: "Apricot", fa: "Damask fabric", pl: "Dried plum" }, a: { AR: "ap", CL: "ap", ES: "fa" }, g: "fruit", n: "Spain and Mexico call the fruit albaricoque and chabacano.", src: "DLE: damasco (Arg., Chile) albaricoque." },
+    { w: "plátano", s: { ba: "Banana", pl: "Plantain (cooking banana)", pa: "Plane tree" }, a: { ES: "ba", MX: "ba", CO: "pl" }, g: "banana", n: "In Colombia a banana is a banano. The plátano gets fried.", src: "Diccionario de americanismos: plátano (Col.) plantain." },
+    { w: "bombilla", s: { li: "Light bulb", ma: "Metal straw for drinking mate", ba: "Water balloon" }, a: { ES: "li", AR: "ma" }, g: "straw", n: "An Argentine bombilla is the filtered metal straw for mate.", src: "Wiktionary/DLE: bombilla light bulb; (Am.) tube for sipping mate. Chile removed: there it also means any drinking straw, so the old answer was ambiguous." },
+    { w: "pitillo", s: { st: "Drinking straw", ci: "Cigarette", wh: "Tin whistle" }, a: { CO: "st", ES: "ci" }, g: "straw", n: "Ask for a pitillo with your juice in Colombia.", src: "Wiktionary: pitillo (Colombia, Venezuela) drinking straw; (Spain) cigarette." },
+    { w: "sorbete", s: { st: "Drinking straw", so: "Sorbet", mi: "Milkshake" }, a: { AR: "st", ES: "so", MX: "so" }, g: "straw", n: "Argentines drink soda with a sorbete. Mexicans say popote, Spaniards pajita.", src: "Wiktionary: sorbete (Argentina, Ecuador, Peru) drinking straw." },
+    { w: "coche", s: { ca: "Car", pi: "Pig", tr: "Train carriage" }, a: { ES: "ca", GT: "pi" }, g: "car", n: "In Guatemala a coche is a pig, and carne de coche is pork.", src: "DLE: coche (Guat.) cerdo." },
+    { w: "fresa", s: { st: "Strawberry", sn: "Snobby, posh", co: "Cool and refreshing" }, a: { ES: "st", MX: "sn" }, c: "“Esa chica es muy ___.”", n: "Mexicans call preppy, upper-class kids fresas. The fruit is still a fresa too.", src: "DLE: fresa (Méx.) persona de clase acomodada, remilgada." },
+    { w: "morocho", s: { da: "Dark-haired person", co: "Sweet corn drink", pa: "Loaf of dark bread" }, a: { AR: "da", EC: "co" }, n: "In Argentina, morocho describes someone with dark hair. In Ecuador it's a cinnamon corn drink.", src: "DLE: morocho (Arg.) de pelo oscuro; (Ec.) bebida de maíz." },
+    { w: "chamba", s: { jo: "Job, work", lu: "Lucky fluke", pa: "Big party" }, a: { MX: "jo", PE: "jo", CO: "jo", ES: "lu" }, g: "work", n: "'Tengo mucha chamba' means lots of work in Mexico or Peru. A Spaniard who wins by chamba got lucky.", src: "Wiktionary: chamba (Mexico, Peru, Colombia) work; (Spain) fluke." },
+    { w: "micro", s: { bu: "City bus", mi: "Microphone", mo: "Small moped" }, a: { CL: "bu", ES: "mi" }, g: "bus", n: "In Santiago you catch the micro. In Spain you speak into it.", src: "Wiktionary: micro (Chile) public bus; (Spain) mic." },
+    { w: "lapicero", s: { pe: "Ballpoint pen", pc: "Pencil or pencil holder", sh: "Pencil sharpener" }, a: { PE: "pe", ES: "pc" }, g: "pen", n: "A Peruvian lapicero writes in ink.", src: "Wiktionary: lapicero (Peru, Central America and others) pen; pencil holder / pencil (general)." },
+    { w: "timón", s: { st: "Car steering wheel", he: "Ship's rudder or helm", ho: "Car horn button" }, a: { CO: "st", ES: "he" }, g: "car", n: "Colombian drivers grip the timón. Spaniards say volante.", src: "Wiktionary: timón (Colombia, Cuba) steering wheel." },
+    { w: "grifo", s: { ga: "Gas station", fa: "Faucet (tap)", fo: "Water fountain" }, a: { PE: "ga", ES: "fa" }, g: "gas", n: "In Lima you fill up the car at the grifo.", src: "DLE: grifo (Perú) surtidor de gasolina; llave de cañería." },
+    { w: "canilla", s: { fa: "Faucet (tap)", br: "Long loaf of bread", an: "Ankle" }, a: { AR: "fa", VE: "br" }, n: "Argentines turn on the canilla. Venezuelans buy pan canilla at the bakery.", src: "Wiktionary: canilla (Rioplatense) faucet; (Venezuela) baguette." },
+    { w: "buró", s: { ni: "Bedside table", de: "Writing desk", wa: "Clothes wardrobe" }, a: { MX: "ni", ES: "de" }, g: "furniture", n: "A Mexican buró sits next to the bed.", src: "DLE: buró escritorio; (Méx.) mesa de noche." },
+    { w: "velador", s: { ni: "Bedside table", la: "Bedside lamp", sh: "Window shutter" }, a: { CL: "ni", AR: "la" }, g: "furniture", n: "A Chilean velador is the nightstand. In Argentina it's the lamp on top of it.", src: "Wiktionary: velador (Chile) nightstand; (Rioplatense) bedside lamp." },
+    { w: "estufa", s: { co: "Kitchen stove", he: "Space heater", ov: "Wood-fired pizza oven" }, a: { MX: "co", CO: "co", ES: "he" }, n: "Mexicans cook on the estufa. In Spain it keeps the room warm.", src: "Wiktionary: estufa stove / space heater; Mexican and Colombian estufa = cooking range (cocina in Spain)." },
+    { w: "taco", s: { ta: "Filled tortilla", tr: "Traffic jam", he: "Shoe heel" }, a: { MX: "ta", CL: "tr", AR: "he" }, n: "Stuck in a taco in Santiago means stuck in traffic.", src: "Wiktionary: taco (Chile) traffic jam; (Southern Cone) heel; (Mexico) taco." },
+    { w: "andén", s: { si: "Sidewalk", pl: "Train platform", ba: "Balcony over the street" }, a: { CO: "si", ES: "pl" }, g: "sidewalk", n: "In Colombia you walk on the andén. In Spain you wait there for the train.", src: "Wiktionary: andén (Colombia, Caribbean) sidewalk; platform (general)." },
+    { w: "colonia", s: { ne: "City neighborhood", co: "Eau de cologne", cc: "Private country club" }, a: { MX: "ne", ES: "co" }, n: "Mexican addresses list the colonia, the neighborhood.", src: "Wiktionary: colonia (Mexico) neighbourhood." },
+    { w: "pieza", s: { be: "Room, often a bedroom", pi: "Piece or part", ap: "Whole apartment" }, a: { AR: "be", CL: "be", ES: "pi" }, g: "home", n: "Argentine and Chilean kids get sent to their pieza.", src: "Wiktionary: pieza (Argentina, Chile, Colombia, Paraguay) room." },
+    { w: "población", s: { ne: "Working-class housing district", po: "Population", fe: "Village festival" }, a: { CL: "ne", ES: "po" }, n: "A Chilean población is a low-income neighborhood on the edge of the city.", src: "Wiktionary: población (Chile) modest residential area." },
+    { w: "regio", s: { gr: "Great, excellent", mo: "Someone from Monterrey", ro: "Royal, regal" }, a: { AR: "gr", CL: "gr", MX: "mo", ES: "ro" }, n: "In Mexico, regios are people from Monterrey.", src: "Wiktionary: regio (Argentina, Chile) excellent; (Mexico) from Monterrey." },
+    { w: "chavo", s: { ki: "Kid, young guy", co: "A cent (small coin)", ch: "Cheap, low-cost" }, a: { MX: "ki", CU: "co", PR: "co" }, n: "El Chavo del Ocho is a Mexican TV kid. In Puerto Rico or Cuba, a chavo is a cent.", src: "Wiktionary: chavo (Mexico) boy; (Cuba, Puerto Rico) cent." },
+    { w: "pega", s: { jo: "Job, work", gl: "Glue", sn: "Snag, objection" }, a: { CL: "jo", VE: "gl", ES: "sn" }, g: "work", n: "Chileans head to the pega in the morning. A Spaniard who puts pegas raises objections.", src: "Wiktionary: pega (Chile) work; (Venezuela) glue; DLE pega dificultad (poner pegas)." },
+    { w: "chomba", s: { po: "Polo shirt", sw: "Knitted sweater", ja: "Denim jacket" }, a: { AR: "po", CL: "sw" }, g: "shirts", n: "An Argentine chomba has a collar and buttons. A Chilean one is a woolly sweater.", src: "Wiktionary: chomba (Rioplatense) polo shirt; (Chile) sweater." },
+    { w: "chupete", s: { pa: "Pacifier", lo: "Lollipop", st: "Drinking straw" }, a: { ES: "pa", AR: "pa", CL: "lo" }, n: "In Chile a chupete is a lollipop. Spanish and Argentine babies suck on one.", src: "Wiktionary: chupete pacifier; (Lat. Am.) lollipop." },
+    { w: "polo", s: { ic: "Ice pop", ts: "T-shirt", ca: "Baseball cap" }, a: { ES: "ic", PE: "ts" }, g: "shirts", n: "A Spanish polo melts in summer. A Peruvian polo is a T-shirt.", src: "Wiktionary: polo (Spain) ice lolly; (Peru) T-shirt." },
+    { w: "cruda", s: { ha: "Hangover", ra: "Raw (of food)", co: "Cold weather" }, a: { MX: "ha", ES: "ra" }, g: "hangover", n: "Mexicans nurse la cruda with menudo or chilaquiles.", src: "Wiktionary: crudo/cruda (Mexico) hungover." },
+    { w: "ratón", s: { ha: "Hangover", mo: "Mouse", na: "Short nap" }, a: { VE: "ha", ES: "mo" }, g: "hangover", n: "A Venezuelan with ratón had too much to drink last night.", src: "Wiktionary: ratón (Venezuela) hangover." },
+    { w: "panela", s: { su: "Block of unrefined cane sugar", ch: "Mild fresh white cheese", pa: "Small frying pan" }, a: { CO: "su", MX: "ch" }, n: "Colombians make agua de panela. Mexicans slice queso panela.", src: "Wiktionary: panela unrefined sugar; Mexican fresh cheese." },
+    { w: "manjar", s: { ca: "Milk caramel spread (dulce de leche)", de: "Delicacy, fine dish", ja: "Strawberry jam" }, a: { CL: "ca", ES: "de" }, n: "Chilean manjar is their name for dulce de leche.", src: "Wiktionary: manjar (Chile) dulce de leche; delicacy (general)." },
+    { w: "china", s: { or: "Orange (the fruit)", pe: "Small pebble", sl: "Slingshot" }, a: { PR: "or", ES: "pe", VE: "sl" }, g: "fruit", n: "Puerto Ricans drink jugo de china, orange juice. Venezuelan kids shoot a china.", src: "Wiktionary: china (Puerto Rico) orange; pebble; (Venezuela) slingshot." },
+    { w: "patilla", s: { wa: "Watermelon", si: "Sideburn", sa: "Leather sandal" }, a: { CO: "wa", VE: "wa", ES: "si" }, g: "fruit", n: "Colombian and Venezuelan fruit stands sell patilla. In Spain it grows on your face.", src: "Wiktionary: patilla (Colombia, Venezuela) watermelon; sideburn." },
+    { w: "tuna", s: { pr: "Prickly pear (cactus fruit)", mu: "Student music troupe in capes", fi: "Tuna fish" }, a: { MX: "pr", ES: "mu" }, g: "fruit", n: "The fish is atún in Spanish. A Spanish tuna is a band of students serenading in medieval capes.", src: "Wiktionary: tuna prickly pear; (Spain) student music group." },
+    { w: "pancho", s: { ho: "Hot dog", ca: "Calm, unbothered", po: "Woolen poncho" }, a: { AR: "ho", ES: "ca" }, g: "hotdog", n: "Argentines eat a pancho at the football. A Spaniard who stays tan pancho doesn't care.", src: "Wiktionary: pancho (Rioplatense) hot dog; calm (general Spain)." },
+    { w: "bodega", s: { gr: "Small corner grocery", wi: "Wine cellar or winery", ga: "Garage" }, a: { PE: "gr", VE: "gr", ES: "wi" }, n: "A Peruvian bodega sells bread and milk. A Spanish bodega makes wine.", src: "Wiktionary: bodega (Peru, Venezuela) grocery; wine cellar." },
+    { w: "boliche", s: { cl: "Nightclub", bo: "Bowling alley", cu: "Cup-and-ball toy" }, a: { AR: "cl", MX: "bo", ES: "cu" }, g: "party", n: "Argentines go to the boliche to dance. Mexicans go to bowl.", src: "Wiktionary: boliche (Rioplatense) nightclub; (Mexico) bowling alley; (Spain) cup-and-ball toy." },
+    { w: "antro", s: { cl: "Nightclub", di: "Seedy dive", ca: "Cafeteria" }, a: { MX: "cl", ES: "di" }, g: "party", n: "Mexicans dress up to go to an antro. In Spain an antro is somewhere you'd rather avoid.", src: "Wiktionary: antro (Mexico) club; dive (general)." },
+    { w: "carrete", s: { pa: "Party", sp: "Reel or spool", ca: "Small handcart" }, a: { CL: "pa", ES: "sp" }, g: "party", n: "Chileans plan the carrete for Friday night.", src: "Wiktionary: carrete (Chile) party; reel (general)." },
+    { w: "curado", s: { dr: "Drunk", fu: "Funny, goofy", cu: "Cured (ham, cheese)" }, a: { CL: "dr", MX: "fu", ES: "cu" }, n: "A curado Chilean had too much. A curado Mexican is just funny.", src: "Wiktionary: curado drunk (Chile, Argentina); (Mexico) funny." },
+    { w: "pava", s: { ke: "Kettle", ha: "Straw hat", tu: "Turkey hen" }, a: { AR: "ke", PR: "ha", ES: "tu" }, n: "Argentines heat water for mate in a pava.", src: "Wiktionary: pava (Rioplatense) kettle; (Puerto Rico) straw hat; turkey hen." },
+    { w: "bocina", s: { sp: "Loudspeaker", ho: "Car horn", mi: "Microphone" }, a: { MX: "sp", ES: "ho" }, n: "Mexicans plug their phone into a bocina. Spaniards honk one.", src: "Wiktionary: bocina (Mexico and others) loudspeaker; horn (general)." },
+    { w: "paradero", s: { st: "Bus stop", wh: "Whereabouts", pa: "Parking lot" }, a: { CL: "st", PE: "st", ES: "wh" }, g: "bus", n: "Chileans wait at the paradero. Spanish police search for someone's paradero.", src: "Wiktionary: paradero (Lat. Am.) bus stop; whereabouts." },
+    { w: "mozo", s: { wa: "Waiter", yo: "Young lad", gr: "Groom at a wedding" }, a: { AR: "wa", CL: "wa", PE: "wa", ES: "yo" }, n: "In Buenos Aires you call the mozo for the bill.", src: "Wiktionary: mozo (Argentina, Chile, Colombia, Peru) waiter." },
+    { w: "porteño", s: { ba: "From Buenos Aires", va: "From Valparaíso", pr: "From Puerto Rico" }, a: { AR: "ba", CL: "va" }, n: "Both port cities claim the name. Puerto Ricans are boricuas.", src: "Wiktionary: porteño (Argentina) of Buenos Aires; (Chile) of Valparaíso." },
+    { w: "chapín", s: { gu: "A Guatemalan", cl: "Old cork-soled clog", sh: "Village shoemaker" }, a: { GT: "gu", ES: "cl" }, n: "Guatemalans proudly call themselves chapines.", src: "Wiktionary: chapín (Central America) Guatemalan; clog." },
+    { w: "hamaca", s: { sw: "Playground swing", ha: "Hammock or beach lounger", bl: "Picnic blanket" }, a: { AR: "sw", ES: "ha" }, n: "An Argentine park has hamacas for the kids.", src: "Wiktionary: hamaca (Rioplatense, Cuba and others) swing; hammock." },
+    { w: "once", s: { te: "Afternoon tea with bread and snacks", el: "Eleven", la: "Late lunch" }, a: { CL: "te", ES: "el" }, n: "Chileans 'toman once' in the early evening.", src: "Wiktionary: once (Lat. Am., esp. Chile) afternoon snack." },
+    { w: "arco", s: { go: "Soccer goal", ar: "Archway or bow", br: "Stone bridge" }, a: { AR: "go", ES: "ar" }, n: "An Argentine goalkeeper is the arquero. Spaniards say portería for the goal.", src: "Wiktionary: arco (Lat. Am., sports) goal." },
+    { w: "pena", s: { em: "Embarrassment", so: "Sorrow, pity", pe: "Ballpoint pen" }, a: { MX: "em", CO: "em", ES: "so" }, n: "'Me da pena' in Mexico means I'm embarrassed. In Spain it means it makes me sad.", src: "Wiktionary: pena (Lat. Am.) embarrassment." },
+    { w: "capaz", s: { ma: "Maybe", ca: "Capable", ab: "Absent" }, a: { AR: "ma", ES: "ca" }, n: "'Capaz que llueve' is Argentine for 'it might rain'.", src: "Wiktionary: capaz (Lat. Am.) adv. maybe." },
+    { w: "harto", s: { lo: "A lot, plenty", fe: "Fed up", hu: "Hungry" }, a: { CL: "lo", ES: "fe" }, n: "A Chilean with harto trabajo has a lot of work. A Spaniard who is harto has had enough.", src: "Wiktionary: harto (Lat. Am., esp. Chile) a lot; fed up." },
+    { w: "completo", s: { ho: "Loaded hot dog", fu: "Full, no vacancies", tu: "Black tuxedo" }, a: { CL: "ho", ES: "fu" }, g: "hotdog", n: "A Chilean completo comes piled with avocado, tomato and mayo.", src: "Wiktionary: completo (Chile) hot dog." },
+    { w: "moño", s: { bo: "Ribbon bow or bow tie", bu: "Hair bun", ha: "Wide-brimmed hat" }, a: { MX: "bo", AR: "bo", ES: "bu" }, n: "A Spanish moño is a bun. A Mexican one ties up a present.", src: "Wiktionary: moño bun; (Mexico, South America) bow." },
+    { w: "corchete", s: { st: "Staple (for paper)", br: "Square bracket [ ]", co: "Wine cork" }, a: { CL: "st", ES: "br" }, n: "Chilean offices staple papers with corchetes.", src: "Wiktionary: corchete (Chile) staple; square bracket." },
+    { w: "patente", s: { li: "License plate", pa: "Patent for an invention", dr: "Driver's license" }, a: { AR: "li", CL: "li", ES: "pa" }, g: "plate", n: "Argentine and Chilean cars carry a patente.", src: "Wiktionary: patente (Argentina, Chile, Paraguay) license plate." },
+    { w: "jockey", s: { ca: "Baseball cap", ri: "Racehorse rider", dj: "Nightclub DJ" }, a: { CL: "ca", ES: "ri" }, n: "A Chilean jockey goes on your head, not on a horse.", src: "Wiktionary: jockey (Chile) baseball cap." },
+    { w: "pollera", s: { sk: "Skirt", co: "Chicken coop", ap: "Apron" }, a: { AR: "sk", VE: "co" }, n: "Argentine schoolgirls wear a pollera. In Venezuela it's where the hens live.", src: "Wiktionary: pollera (Southern Cone) skirt; (Venezuela) chicken coop." },
+    { w: "malla", s: { sw: "Swimsuit", me: "Mesh or netting", gl: "Winter gloves" }, a: { AR: "sw", ES: "me" }, n: "Pack your malla for the beach in Mar del Plata.", src: "Wiktionary: malla (South America) swimsuit; mesh." },
+    { w: "vacilar", s: { fu: "To have fun, enjoy yourself", he: "To hesitate", li: "To tell a lie" }, a: { CO: "fu", CU: "fu", ES: "he" }, n: "Colombians go out to vacilar. A Spaniard who vacila is undecided.", src: "Wiktionary: vacilar (Colombia, Cuba and others) to enjoy; hesitate." },
+    { w: "jirón", s: { st: "Street (in city addresses)", sh: "Shred or rag", fl: "Small flag" }, a: { PE: "st", ES: "sh" }, n: "Many Lima addresses start with Jirón.", src: "Wiktionary: jirón (Peru) urban street; shred." },
+    { w: "gacho", s: { me: "Mean, nasty", fe: "Fedora hat", be: "Drooping, bent down" }, a: { MX: "me", AR: "fe", ES: "be" }, n: "'¡Qué gacho!' in Mexico means 'how mean!'", src: "Wiktionary: gacho bent down; (Mexico) mean; (Argentina) fedora." },
+    { w: "codo", s: { st: "Stingy", el: "Elbow", co: "Corner" }, a: { MX: "st", ES: "el" }, n: "A Mexican codo never picks up the check.", src: "Wiktionary: codo (Mexico, Central America) stingy." },
+    { w: "sapo", s: { sn: "Snitch, informer", to: "Toad", fa: "Fat, overweight" }, a: { CO: "sn", VE: "sn", ES: "to" }, n: "Don't be a sapo in Colombia: nobody likes a snitch.", src: "Wiktionary: sapo (Chile, Colombia, Ecuador, Peru, Venezuela) informer." },
+    { w: "foco", s: { bu: "Light bulb", sp: "Stage spotlight", la: "Fabric lampshade" }, a: { MX: "bu", ES: "sp" }, n: "Mexicans change a fundido foco. Spaniards change a bombilla.", src: "Wiktionary: foco (Mexico, Central and South America) light bulb; spotlight." },
+    { w: "tina", s: { ba: "Bathtub", va: "Large vat or tub", sh: "Walk-in shower" }, a: { MX: "ba", ES: "va" }, g: "bath", n: "A Mexican bath is in the tina. Spaniards use the bañera.", src: "Wiktionary: tina (Mexico) bathtub; vat." },
+    { w: "regadera", s: { sh: "Shower", wa: "Watering can", sp: "Garden sprinkler" }, a: { MX: "sh", CO: "sh", ES: "wa" }, g: "bath", n: "In Mexico you shower under the regadera. In Spain you water plants with it.", src: "Wiktionary: regadera (Lat. Am.) shower; watering can." },
+    { w: "remera", s: { ts: "T-shirt", ro: "Female rower", sw: "Swimsuit" }, a: { AR: "ts", ES: "ro" }, g: "shirts", n: "An Argentine remera is a T-shirt.", src: "Wiktionary: remera (Rioplatense) T-shirt; female rower." },
+    { w: "franela", s: { ts: "T-shirt", fl: "Flannel fabric", sc: "Woolen scarf" }, a: { VE: "ts", CO: "ts", ES: "fl" }, g: "shirts", n: "Venezuelans pull on a franela every morning.", src: "Wiktionary: franela (Venezuela, Colombia, Dominican Rep.) T-shirt." },
+    { w: "guineo", s: { ba: "Banana", gu: "From Guinea", gf: "Guinea fowl" }, a: { PR: "ba", DO: "ba", EC: "ba", ES: "gu" }, g: "banana", n: "In Puerto Rico and Ecuador, a guineo is a banana.", src: "Wiktionary: guineo (Puerto Rico, Dominican Rep., Ecuador and others) banana." },
+    { w: "zancudo", s: { mo: "Mosquito", lo: "Long-legged", st: "Stilt walker" }, a: { CO: "mo", MX: "mo", ES: "lo" }, n: "Bring repellent for the zancudos in the Colombian lowlands.", src: "Wiktionary: zancudo (Lat. Am.) mosquito; long-legged." },
+    { w: "joya", s: { gr: "Great! Perfect", je: "Jewel", ri: "Wedding ring" }, a: { AR: "gr", ES: "je" }, n: "'¡Joya!' is how Argentines say 'perfect!'", src: "Wiktionary: joya (Rioplatense) awesome." },
+    { w: "guanaco", s: { wa: "Police water-cannon truck", an: "Wild llama-like animal", sh: "Shepherd" }, a: { CL: "wa", AR: "an" }, n: "Chileans named the police water cannon after the animal, famous for spitting.", src: "Wiktionary: guanaco (Chile) police water cannon vehicle." },
+    { w: "pendientes", s: { ea: "Earrings", to: "To-do items still pending", sl: "Hillside slopes" }, a: { ES: "ea", MX: "to" }, n: "Spaniards wear pendientes in their ears. Mexicans call earrings aretes.", src: "Wiktionary: pendiente (Spain) earring; to-do task." },
+    { w: "cana", s: { ja: "Jail or the police (slang)", gr: "A grey hair", ca: "Walking cane" }, a: { AR: "ja", ES: "gr" }, n: "In Buenos Aires slang, ir en cana means going to jail.", src: "Wiktionary: cana (Rioplatense) police, jail; grey hair." },
+    { w: "caneca", s: { bi: "Trash can", fl: "Stoneware gin bottle", mu: "Coffee mug" }, a: { CO: "bi", ES: "fl" }, n: "Throw it in the caneca, Colombians say.", src: "Wiktionary: caneca (Colombia) trash can; gin flask." },
+    { w: "chabacano", s: { ap: "Apricot", ta: "Tacky, in poor taste", pe: "Ripe peach" }, a: { MX: "ap", ES: "ta" }, g: "fruit", n: "A Mexican chabacano is a fruit. A Spanish one is a tasteless joke.", src: "Wiktionary: chabacano (Mexico) apricot; adj. vulgar, tacky." },
+    { w: "factura", s: { pa: "Sweet breakfast pastries", in: "Invoice", ti: "Waiter's tip" }, a: { AR: "pa", ES: "in", MX: "in" }, n: "Argentines bring a dozen facturas to share with mate.", src: "Wiktionary: factura (Argentina) pastry; invoice." },
+    { w: "cancha", s: { co: "Toasted corn snack", fi: "Sports field or court", be: "Sandy beach" }, a: { PE: "co", AR: "fi" }, n: "Peruvian ceviche comes with a side of cancha.", src: "Wiktionary: cancha (Peru) toasted corn; (Lat. Am.) pitch." },
+    { w: "baúl", s: { tr: "Car trunk", ch: "Storage chest", gl: "Glove box" }, a: { AR: "tr", CO: "tr", ES: "ch" }, g: "car", n: "Argentines put groceries in the baúl of the car.", src: "Wiktionary: baúl (Rioplatense, Colombia and others) car trunk." },
+    { w: "campera", s: { ja: "Jacket", co: "Country-style, like cowboy boots", ca: "Camper van" }, a: { AR: "ja", ES: "co" }, g: "jacket", n: "An Argentine campera keeps out the wind. Spanish botas camperas are cowboy boots.", src: "Wiktionary: campera (Southern Cone) jacket; campero adj. rural." },
+    { w: "llanta", s: { ti: "Tire", ri: "Wheel rim", sp: "Spare part" }, a: { MX: "ti", CO: "ti", ES: "ri" }, g: "car", n: "A flat llanta in Mexico is a flat tire. In Spain the llanta is the metal rim.", src: "Wiktionary: llanta rim; (Lat. Am.) tyre." },
+    { w: "sencillo", s: { ch: "Loose change (coins)", on: "One-way (ticket)", ex: "Expensive" }, a: { MX: "ch", CO: "ch", ES: "on" }, n: "'¿Tienes sencillo?' in Latin America asks for coins. A Spanish billete sencillo is one-way.", src: "Wiktionary: sencillo (Lat. Am.) small change; Spanish 'billete sencillo' = single ticket." },
+    { w: "copete", s: { dr: "An alcoholic drink", qu: "Quiff or tuft of hair", ha: "Little hat" }, a: { CL: "dr", ES: "qu" }, n: "'¿Vamos por un copete?' is a Chilean invitation for a drink.", src: "Wiktionary: copete (Chile) alcoholic drink; tuft of hair." },
+    { w: "acordeón", s: { ch: "Cheat sheet folded up small", ac: "Accordion", fa: "Folding fan" }, a: { MX: "ch", ES: "ac" }, n: "A Mexican student caught with an acordeón was cheating.", src: "Wiktionary: acordeón (Mexico and others) cheat sheet." },
+    { w: "fresco", s: { so: "Soft drink", ch: "Cheeky, shameless", co: "Cold" }, a: { GT: "so", EC: "so", ES: "ch" }, n: "A Guatemalan fresco is a drink. A Spaniard calling you fresco means you have a nerve.", src: "Wiktionary: fresco (Central America, Ecuador, Bolivia) soft drink; cheeky." },
+    { w: "tambo", s: { da: "Dairy farm", ja: "Jail (slang)", tr: "Roadside trading post" }, a: { AR: "da", MX: "ja", PE: "tr" }, n: "An Argentine tambo milks cows. In Mexican slang, landing in the tambo means jail.", src: "Wiktionary: tambo (Rioplatense) dairy farm; (Mexico) prison; (Peru) trading post." },
+    { w: "bomba", s: { ga: "Gas station", bo: "Bomb", fi: "Fire truck" }, a: { VE: "ga", CO: "ga", ES: "bo" }, g: "gas", n: "Venezuelan and Colombian drivers fill up at the bomba.", src: "Wiktionary: bomba (Colombia, Venezuela and others) petrol station." },
+    { w: "concho", s: { ta: "Shared taxi", dr: "Dregs at the bottom of a glass", sh: "Seashell" }, a: { DO: "ta", CL: "dr" }, n: "In Santo Domingo you squeeze into a concho to get across town.", src: "Wiktionary: concho (Dominican Rep.) taxi; (Lat. Am.) dregs." },
+    { w: "mordida", s: { br: "A bribe", bi: "A bite", ki: "A kiss" }, a: { MX: "br", ES: "bi" }, n: "In Mexico, a mordida is a bribe.", src: "Wiktionary: mordida (Mexico) bribe." },
+    { w: "nana", s: { bo: "A little hurt, a boo-boo", lu: "Lullaby", ba: "Ripe banana" }, a: { AR: "bo", ES: "lu" }, n: "Argentine parents kiss a child's nana better.", src: "Wiktionary: nana (Rioplatense, Chile) boo-boo; lullaby." },
+    { w: "pasto", s: { la: "Lawn grass", pa: "Pasture or fodder", no: "Pasta noodles" }, a: { MX: "la", AR: "la", ES: "pa" }, n: "'No pisar el pasto' signs in Mexico mean keep off the grass. Spaniards say césped.", src: "Wiktionary: pasto (Mexico, Colombia, Peru, Southern Cone) grass." },
+    { w: "padre", s: { co: "Cool, great", hu: "Huge, tremendous", pr: "Proud of someone" }, a: { MX: "co", ES: "hu" }, n: "Everywhere it also means father. '¡Qué padre!' in Mexico means 'how cool!'", src: "Wiktionary: padre adj. (Mexico) cool; (Spain) huge." },
+    { w: "tapa", s: { sn: "Small bar snack", do: "Empanada pastry disc", tc: "Tablecloth" }, a: { ES: "sn", AR: "do" }, n: "Argentines buy tapas to fill their own empanadas.", src: "Wiktionary: tapa (Rioplatense, Paraguay) empanada dough; Spanish bar tapa." },
+    { w: "gallego", s: { sp: "Any Spaniard", ga: "Someone from Galicia", po: "Portuguese person" }, a: { AR: "sp", CU: "sp", ES: "ga" }, n: "So many Galicians emigrated to Buenos Aires and Havana that gallego came to mean any Spaniard.", src: "Wiktionary: gallego (Lat. Am.) Spaniard." },
+    { w: "rumba", s: { pa: "Party, night out", da: "Cuban dance and music", sl: "Deep sleep" }, a: { CO: "pa", VE: "pa", CU: "da" }, g: "party", n: "Colombians go de rumba. In Cuba rumba is a music and dance tradition.", src: "Wiktionary: rumba (Colombia, Venezuela) party; Cuban dance." },
+    { w: "bizcocho", s: { sp: "Sponge cake", cr: "Small crisp savory biscuit", ca: "Any cake, like a birthday cake" }, a: { ES: "sp", AR: "cr", PR: "ca" }, n: "Puerto Ricans sing over a bizcocho at birthdays. Argentines dunk crunchy bizcochos in mate.", src: "Wiktionary: bizcocho sponge; (Argentina) crisp biscuit; (Puerto Rico, Dominican Rep.) cake." },
+    { w: "manejar", s: { dr: "To drive a car", ha: "To handle or manage", wa: "To walk somewhere" }, a: { MX: "dr", AR: "dr", ES: "ha" }, g: "car", n: "Latin Americans manejar a car. Spaniards conducir it.", src: "Wiktionary: manejar (Lat. Am.) to drive." },
+    { w: "botar", s: { th: "To throw away", bo: "To bounce (a ball)", vo: "To vote" }, a: { MX: "th", CO: "th", ES: "bo" }, n: "'Bótalo a la basura' is Latin American for throw it out. In Spain a ball bota.", src: "Wiktionary: botar (Lat. Am.) throw away; bounce." },
+    { w: "pararse", s: { st: "To stand up", ha: "To stop", si: "To sit down" }, a: { MX: "st", ES: "ha" }, n: "A Mexican teacher saying 'párense' wants you on your feet.", src: "DLE: parar (Am.) ponerse de pie; detenerse." },
+    { w: "celular", s: { ph: "Cell phone", ce: "Relating to cells (biology)", pr: "Prison cell" }, a: { MX: "ph", AR: "ph", ES: "ce" }, g: "phone", n: "Latin Americans call your celular. Spaniards call your móvil.", src: "DLE: celular (Am.) teléfono móvil." },
+    { w: "móvil", s: { ph: "Cell phone", mo: "Motive (for a crime)", fu: "Furniture" }, a: { ES: "ph", MX: "mo" }, g: "phone", n: "A Spanish móvil rings in your pocket.", src: "DLE: móvil (Esp.) teléfono móvil; motivo." },
+    { w: "papa", s: { po: "Potato", pp: "The Pope", da: "Dad" }, a: { MX: "po", AR: "po", ES: "pp" }, n: "Latin Americans eat papas. Spaniards eat patatas, and el Papa lives in Rome.", src: "DLE: papa (Am., Canarias) patata." },
+    { w: "pluma", s: { pe: "Ballpoint pen", fe: "Feather", pi: "Pillow" }, a: { MX: "pe", ES: "fe" }, g: "pen", n: "A Mexican pluma writes. A Spanish one floats away.", src: "Wiktionary: pluma (Mexico, US) ballpoint pen." },
+    { w: "cofre", s: { ho: "Car hood", ch: "Treasure chest", gl: "Glove box" }, a: { MX: "ho", ES: "ch" }, g: "car", n: "Mexicans open the cofre to check the engine. Spaniards say capó.", src: "Wiktionary: cofre chest; car bonnet (Mexican usage)." },
+    { w: "jersey", s: { sw: "Knitted sweater", sp: "Sports team shirt", co: "Cow breed" }, a: { ES: "sw", MX: "sp" }, g: "shirts", n: "In Spain a jersey keeps you warm. Mexican fans wear their team's jersey.", src: "DLE: jersey prenda de punto (Esp.); Mexican usage: sports shirt." },
+    { w: "limón", s: { li: "Lime (small and green)", le: "Lemon (yellow)", or: "Orange" }, a: { MX: "li", ES: "le" }, g: "fruit", n: "Mexican limones are green limes. The yellow one is a limón amarillo.", src: "Wikipedia 'Lime (fruit)': known as limón in Mexico." },
+    { w: "barbacoa", s: { pi: "Meat slow-cooked in an underground pit", gr: "Barbecue grill or cookout", sa: "Barbecue sauce" }, a: { MX: "pi", ES: "gr" }, n: "Mexican barbacoa is lamb or beef cooked overnight in a pit.", src: "Wikipedia 'Barbacoa'; DLE barbacoa (general) parrilla." },
+    { w: "americana", s: { bl: "Blazer, suit jacket", am: "A woman from the US", pi: "Pickup truck" }, a: { ES: "bl", MX: "am" }, g: "jacket", n: "A Spaniard puts on an americana for the office.", src: "DLE: americana (Esp.) chaqueta de tela." },
+    { w: "tío", s: { gu: "Guy, dude", un: "Uncle", bo: "Boss" }, a: { ES: "gu", MX: "un" }, n: "'¡Tío, qué fuerte!' Spaniards call each other tío like 'dude'.", src: "DLE: tío (Esp. coloq.) persona, individuo." },
+    { w: "departamento", s: { ap: "Apartment", de: "Department of a company or store", di: "District" }, a: { MX: "ap", AR: "ap", ES: "de" }, g: "home", n: "Mexicans and Argentines rent a departamento.", src: "DLE: departamento (Am.) apartamento." },
+    { w: "billete", s: { ti: "Ticket (train, plane)", no: "Banknote", le: "Letter" }, a: { ES: "ti", MX: "no" }, n: "Spaniards buy a billete de tren. Mexicans buy a boleto, and billetes are money.", src: "DLE: billete (Esp.) boleto." },
+    { w: "tenis", s: { sn: "Sneakers", sp: "Tennis (the sport)", sh: "Tennis shorts" }, a: { MX: "sn", ES: "sp" }, g: "shoes", n: "Mexicans lace up their tenis. Spaniards wear zapatillas.", src: "Wiktionary: tenis (Mexico) sneakers." },
+    { w: "vaqueros", s: { je: "Jeans", co: "Cowboys", bo: "Leather boots" }, a: { ES: "je", MX: "co" }, n: "Spaniards wear vaqueros. Mexican vaqueros herd cattle.", src: "DLE: vaquero (Esp.) pantalón tejano." },
+    { w: "cartera", s: { ha: "Handbag", wa: "Wallet", bp: "Backpack" }, a: { AR: "ha", CL: "ha", ES: "wa" }, n: "An Argentine cartera is a woman's handbag. A Spaniard keeps cards in one.", src: "DLE: cartera (Am.) bolso de mujer; billetera." },
+    { w: "droguería", s: { ph: "Pharmacy", cl: "Shop selling cleaning products", ba: "Bakery" }, a: { CO: "ph", ES: "cl" }, n: "Colombians buy aspirin at the droguería. In Spain you buy bleach there.", src: "DLE: droguería (Col.) farmacia; tienda de productos de limpieza." },
+    { w: "hacienda", s: { es: "Large country estate", ta: "The tax office", ha: "Hardware store" }, a: { MX: "es", ES: "ta" }, n: "A Spaniard dealing with Hacienda is doing their taxes.", src: "DLE: hacienda finca agrícola; Ministerio de Hacienda." },
+    { w: "tostada", s: { to: "Slice of toast", tr: "Crispy fried tortilla with toppings", ch: "Tortilla chips" }, a: { ES: "to", MX: "tr" }, n: "Spanish breakfast tostada has tomato and olive oil. A Mexican one is piled with beans and chicken.", src: "Wikipedia 'Tostada'; DLE tostada rebanada de pan tostado." },
+    { w: "guayabo", s: { ha: "Hangover", tr: "Guava tree", ja: "Jam" }, a: { CO: "ha", ES: "tr" }, g: "hangover", n: "A Colombian with guayabo needs a caldo the morning after.", src: "Wiktionary: guayabo (Colombia) hangover; guava tree." },
+    { w: "auto", s: { ca: "Car", ru: "Court ruling", pl: "Religious play" }, a: { AR: "ca", CL: "ca", ES: "ru" }, g: "car", n: "Argentines and Chileans drive an auto. In Spanish news, an auto is a judge's ruling.", src: "DLE: auto (Arg., Chile) automóvil; resolución judicial." },
+    { w: "placa", s: { li: "License plate", pl: "Commemorative plaque", ba: "Police badge" }, a: { MX: "li", ES: "pl" }, g: "plate", n: "A Mexican car's placas are its license plates. Spaniards say matrícula.", src: "DLE: placa (Am.) matrícula de vehículo." },
+    { w: "rentar", s: { re: "To rent (a house or car)", yi: "To yield a profit", re2: "To return" }, a: { MX: "re", ES: "yi" }, n: "Mexicans rentar an apartment. A Spanish investment renta money.", src: "DLE: rentar producir beneficio; (Méx.) alquilar." },
+    { w: "ordenar", s: { or: "To order (at a restaurant)", ti: "To tidy up", pr: "To pray" }, a: { MX: "or", ES: "ti" }, n: "A Mexican waiter asks if you're ready to ordenar. A Spanish parent tells you to ordenar your room.", src: "DLE: ordenar colocar de acuerdo con un plan; (Am.) pedir (en un restaurante)." },
   ]},
 
-  pt: { name: "Português", words: [
-    { w: "propina", s: { tu: "University tuition fee", br: "Bribe", ti: "Tip" }, a: { PT: "tu", BR: "br" }, n: "Portuguese students pay propinas each year. In Brazil a propina is a kickback." },
-    { w: "camisola", s: { sw: "Sweater or sports jersey", ni: "Nightgown", sh: "Shirt" }, a: { PT: "sw", BR: "ni" }, n: "A football shirt is a camisola in Portugal and a camisa in Brazil." },
-    { w: "fato", s: { su: "Suit (clothing)", fa: "Fact", fe: "Party" }, a: { PT: "su", BR: "fa" }, n: "In Portugal you wear a fato to a wedding. Brazilians wear a terno." },
-    { w: "sítio", s: { pl: "Place", fa: "Small farm or country house", ma: "Market" }, a: { PT: "pl", BR: "fa" }, n: "Both use it for website. Otherwise, a Brazilian goes to the sítio for the weekend." },
-    { w: "apelido", s: { su: "Surname", ni: "Nickname", ap: "Appetite" }, a: { PT: "su", BR: "ni" }, n: "A Portuguese form asks for your apelido, meaning your last name." },
-    { w: "cachorro", s: { pu: "Puppy", do: "Dog", ho: "Hot dog" }, a: { PT: "pu", BR: "do" }, n: "Brazilians call any dog cachorro. In Portugal it's a cão, and a cachorro is a young one." },
-    { w: "peão", s: { pe: "Pedestrian", fa: "Farmhand or rodeo cowboy", pi: "Peacock" }, a: { PT: "pe", BR: "fa" }, n: "Portuguese road signs warn about peões crossing." },
-    { w: "miúdos", s: { ki: "Kids", gi: "Giblets", co: "Coins" }, a: { PT: "ki", BR: "gi" }, n: "Os miúdos are the kids in Portugal, and chicken innards in a Brazilian recipe." },
-    { w: "comboio", s: { tr: "Train", co: "Convoy", cr: "Cruise" }, a: { PT: "tr", BR: "co" }, n: "Portugal takes the comboio. Brazil takes the trem." },
-    { w: "bica", s: { es: "Espresso coffee", sp: "Spout or tap", br: "Bread roll" }, a: { PT: "es", BR: "sp" }, n: "In Lisbon, 'uma bica' is how you order an espresso." },
+  pt: { name: "Português", small: true, words: [
+    { w: "propina", s: { tu: "University tuition fee", br: "Bribe", ti: "Waiter's tip" }, a: { PT: "tu", BR: "br" }, n: "Portuguese students pay propinas each year. In Brazil a propina is a kickback.", src: "Priberam: propina (Portugal) quantia paga pela matrícula; (Brasil) suborno." },
+    { w: "camisola", s: { sw: "Sweater or sports jersey", ni: "Nightgown", sh: "Short-sleeved shirt" }, a: { PT: "sw", BR: "ni" }, g: "clothes", n: "A football shirt is a camisola in Portugal and a camisa in Brazil.", src: "Priberam: camisola (Portugal) camisola de malha; (Brasil) camisa de dormir." },
+    { w: "fato", s: { su: "Suit (clothing)", fa: "Fact", fe: "Party" }, a: { PT: "su", BR: "fa" }, g: "suit", n: "In Portugal you wear a fato to a wedding. Brazilians wear a terno.", src: "Priberam: fato (Portugal) vestuário; (Brasil) facto." },
+    { w: "sítio", s: { pl: "Place", fa: "Small farm or country house", ma: "Market" }, a: { PT: "pl", BR: "fa" }, n: "Both use it for website. Otherwise, a Brazilian goes to the sítio for the weekend.", src: "Priberam: sítio (Brasil) pequena propriedade rural." },
+    { w: "apelido", s: { su: "Surname", ni: "Nickname", ap: "Appetite" }, a: { PT: "su", BR: "ni" }, n: "A Portuguese form asks for your apelido, meaning your last name.", src: "Priberam: apelido (Portugal) sobrenome; (Brasil) alcunha." },
+    { w: "cachorro", s: { pu: "Puppy", do: "Dog", ho: "Hot dog" }, a: { PT: "pu", BR: "do" }, n: "Brazilians call any dog cachorro. In Portugal it's a cão, and a cachorro is a young one.", src: "Priberam: cachorro cão novo; (Brasil) cão." },
+    { w: "peão", s: { pe: "Pedestrian", fa: "Farmhand or rodeo cowboy", pi: "Peacock" }, a: { PT: "pe", BR: "fa" }, n: "Portuguese road signs warn about peões crossing.", src: "Priberam: peão (Portugal) pedestre; (Brasil) trabalhador rural." },
+    { w: "miúdos", s: { ki: "Kids", gi: "Giblets", co: "Coins" }, a: { PT: "ki", BR: "gi" }, n: "Os miúdos are the kids in Portugal, and chicken innards in a Brazilian recipe.", src: "Priberam: miúdo (Portugal) criança; miúdos vísceras." },
+    { w: "comboio", s: { tr: "Train", co: "Convoy", cr: "Cruise" }, a: { PT: "tr", BR: "co" }, g: "transport", n: "Portugal takes the comboio. Brazil takes the trem.", src: "Priberam: comboio (Portugal) trem; (Brasil) coluna de veículos." },
+    { w: "bica", s: { es: "Espresso coffee", sp: "Spout or tap", br: "Bread roll with butter" }, a: { PT: "es", BR: "sp" }, g: "coffee", n: "In Lisbon, 'uma bica' is how you order an espresso.", src: "Priberam: bica (Portugal) café expresso." },
+    { w: "elétrico", s: { tr: "Tram (streetcar)", ad: "Electric (only as an adjective)", sc: "Electric scooter" }, a: { PT: "tr", BR: "ad" }, g: "transport", n: "Lisbon's yellow elétrico 28 is a tram. Brazilians call trams bondes.", src: "Wiktionary: elétrico (Portugal) tram; Brazilian synonym bonde." },
+    { w: "talho", s: { bu: "Butcher's shop", cu: "A cut or slash", ta: "Tailor's workshop" }, a: { PT: "bu", BR: "cu" }, n: "Portuguese buy meat at the talho. Brazilians go to the açougue.", src: "Wiktionary: talho (Portugal) butcher's shop; Brazilian synonym açougue." },
+    { w: "frigorífico", s: { fr: "Refrigerator", me: "Meatpacking plant", ai: "Air conditioner" }, a: { PT: "fr", BR: "me" }, n: "A Portuguese frigorífico is in the kitchen. A Brazilian one is a meat plant. The kitchen fridge is a geladeira.", src: "Wiktionary: frigorífico (Portugal) refrigerator; (Brazil) meat-packing facility." },
+    { w: "bala", s: { ca: "Hard candy", bu: "Bullet", ba: "Rubber ball" }, a: { BR: "ca", PT: "bu" }, n: "Brazilian kids suck on balas. In Portugal a sweet is a rebuçado.", src: "Wiktionary: bala (Brazil) candy; bullet (general)." },
+    { w: "giro", s: { co: "Cute, cool, nice", tu: "A spin or quick tour", we: "Weird, strange" }, a: { PT: "co", BR: "tu" }, n: "'Que giro!' in Lisbon means 'how cute!'", src: "Wiktionary: giro (Portugal, colloquial) pretty, nice." },
+    { w: "garoto", s: { co: "Small milky coffee", bo: "Boy, kid", ca: "Candy" }, a: { PT: "co", BR: "bo" }, g: "coffee", n: "Order um garoto in Lisbon and you get a small coffee with milk. In Brazil a garoto is a boy.", src: "Wiktionary: garoto (Portugal, regional) coffee with milk; boy." },
+    { w: "galão", s: { co: "Milky coffee in a tall glass", ju: "Big container, like a water jug", ga: "Garage" }, a: { PT: "co", BR: "ju" }, g: "coffee", n: "A Portuguese galão is a latte in a glass. In Brazil you buy water by the galão.", src: "Wiktionary: galão (Portugal) espresso with milk; (Brazil) large liquid container." },
+    { w: "prego", s: { st: "Steak sandwich", na: "Nail", pi: "Sewing pin" }, a: { PT: "st", BR: "na" }, n: "A Portuguese prego no pão is a garlicky steak roll.", src: "Wiktionary: prego (Portugal, cooking) steak sandwich; nail." },
+    { w: "passadeira", s: { cr: "Zebra crossing", ir: "Woman who irons clothes", hc: "Hair clip" }, a: { PT: "cr", BR: "ir" }, n: "Portuguese drivers stop at the passadeira. Brazilians cross at the faixa.", src: "Wiktionary: passadeira (Portugal) zebra crossing; Brazilian usage: woman who irons (passar roupa)." },
+    { w: "rato", s: { mo: "Computer mouse", ra: "Rat", mi: "Minute" }, a: { PT: "mo", BR: "ra" }, n: "Portuguese click a rato. Brazilians just say mouse.", src: "Wiktionary: rato (Portugal) computer mouse; Brazilian synonym mouse." },
+    { w: "gelado", s: { ic: "Ice cream", co: "Ice-cold", je: "Fruit jelly" }, a: { PT: "ic", BR: "co" }, n: "Portuguese kids want a gelado. Brazilians want a sorvete, and a gelado drink is ice-cold.", src: "Wiktionary: gelado (Portugal) ice cream; adj. frozen, cold." },
+    { w: "constipação", s: { co: "A head cold", cn: "Constipation", fl: "Flu vaccine injection" }, a: { PT: "co", BR: "cn" }, n: "A Portuguese constipação is a runny nose. Brazilians call that a resfriado.", src: "Wiktionary: constipação (Portugal) cold; constipation." },
+    { w: "imperial", s: { be: "Small glass of draft beer", em: "Imperial, of an empire", co: "Fancy cocktail" }, a: { PT: "be", BR: "em" }, n: "In Lisbon, 'uma imperial' gets you a small draft beer. Brazilians order a chope.", src: "Wiktionary: imperial (Portugal, regional) draft beer; Brazilian synonym chope." },
+    { w: "banheiro", s: { li: "Lifeguard", ba: "Bathroom", tu: "Free-standing bathtub" }, a: { PT: "li", BR: "ba" }, n: "On a Portuguese beach the banheiro watches the swimmers. In Brazil it's where you go to the toilet.", src: "Wiktionary: banheiro (Brazil) bathroom; (Portugal) lifeguard." },
+    { w: "terno", s: { su: "Men's suit", te: "Tender, gentle", tu: "Turtleneck" }, a: { BR: "su", PT: "te" }, g: "suit", n: "A Brazilian groom wears a terno. In Portugal terno means tender.", src: "Wiktionary: terno (Brazil) suit; adj. tender." },
+    { w: "ponto", s: { st: "Bus stop", po: "Point or dot", br: "Footbridge" }, a: { BR: "st", PT: "po" },n: "Brazilians wait at the ponto de ônibus. Portuguese wait at the paragem.", src: "Wiktionary: ponto (Brazil) bus stop; Portuguese synonym paragem." },
+    { w: "legal", s: { co: "Cool, nice", la: "Lawful", ad: "Adult" }, a: { BR: "co", PT: "la" }, n: "'Que legal!' is how Brazilians say 'cool!'", src: "Wiktionary: legal (Brazil, colloquial) cool, nice." },
+    { w: "cara", s: { gu: "Guy, dude", fa: "Face", de: "Dear (in letters)" }, a: { BR: "gu", PT: "fa" }, n: "'E aí, cara?' is a Brazilian 'what's up, dude?'", src: "Priberam: cara (Brasil, informal) indivíduo, sujeito; face." },
   ]},
 
-  fr: { name: "Français", words: [
-    { w: "dîner", s: { lu: "Lunch", di: "Evening meal", br: "Breakfast" }, a: { FR: "di", QC: "lu", BE: "lu", CH: "lu" }, n: "Québec, Belgium and Switzerland kept the older meal order: déjeuner, dîner, souper." },
-    { w: "déjeuner", s: { br: "Breakfast", lu: "Lunch", sn: "Afternoon snack" }, a: { FR: "lu", QC: "br", BE: "br", CH: "br" }, n: "In France breakfast is the petit-déjeuner." },
-    { w: "souper", s: { di: "Evening meal", la: "Late-night supper after a show", sn: "Snack" }, a: { QC: "di", BE: "di", CH: "di", FR: "la" }, n: "A Parisian souper comes after the theatre, if at all." },
-    { w: "char", s: { ca: "Car", ta: "Army tank or parade float", ch: "Shopping cart" }, a: { QC: "ca", FR: "ta" }, n: "Québécois drive a char. A French char d'assaut is a battle tank." },
-    { w: "liqueur", s: { so: "Soft drink, soda", li: "Sweet alcoholic liqueur", ju: "Fruit juice" }, a: { QC: "so", FR: "li" }, n: "Short for liqueur douce, Québec slang for soda." },
-    { w: "dépanneur", s: { co: "Corner store", to: "Repairman or tow-truck driver", ph: "Pharmacy" }, a: { QC: "co", FR: "to" }, n: "Montrealers grab milk at the dép. In France the dépanneur fixes your car." },
-    { w: "bas", s: { so: "Socks", st: "Stockings", sh: "Shorts" }, a: { QC: "so", FR: "st" }, n: "French speakers in France say chaussettes for socks." },
-    { w: "barrer", s: { lo: "To lock a door", cr: "To cross out or block", sw: "To sweep" }, a: { QC: "lo", FR: "cr" }, n: "'As-tu barré la porte?' asks whether you locked the door in Québec." },
-    { w: "cartable", s: { bi: "Ring binder", sa: "School bag or satchel", ma: "Map" }, a: { QC: "bi", FR: "sa" }, n: "French kids carry a cartable on their backs. Québec kids put papers in one." },
-    { w: "jaser", s: { ch: "To chat", go: "To gossip", ar: "To argue" }, a: { QC: "ch", FR: "go" }, n: "Jaser is friendly chatting in Québec and gossip in France." },
-    { w: "bienvenue", s: { yo: "You're welcome", we: "Welcome!", go: "Goodbye" }, a: { QC: "yo", FR: "we" }, c: "Reply to “Merci !”", n: "A calque of English 'you're welcome', used everywhere in Québec." },
-    { w: "blonde", s: { gi: "Girlfriend", bl: "Blonde woman or light beer", ca: "Caramel" }, a: { QC: "gi", FR: "bl" }, c: "“Je te présente ma ___.”", n: "In Québec, your blonde is your girlfriend, whatever her hair color. Your boyfriend is your chum." },
-    { w: "s'il vous plaît", s: { he: "Here you go", pl: "Please", ex: "Excuse me" }, a: { BE: "he", FR: "pl" }, c: "Said while handing something over", n: "Belgians say it when giving you something, where the French say voilà." },
-    { w: "cornet", s: { ba: "Plastic shopping bag", ic: "Ice cream cone", tr: "Trumpet" }, a: { CH: "ba", FR: "ic" }, n: "A Swiss shop asks if you want a cornet for your groceries." },
-    { w: "foehn", s: { ha: "Hair dryer", wi: "Warm mountain wind", st: "Heater" }, a: { CH: "ha", FR: "wi" }, n: "From the German Föhn, the brand name that became the Swiss word for a hair dryer." },
-    { w: "linge", s: { to: "Towel", la: "Laundry or linens", sh: "Shirt" }, a: { CH: "to", FR: "la" }, n: "In Switzerland, un linge is a towel." },
+  fr: { name: "Français", small: true, words: [
+    { w: "dîner", s: { lu: "Lunch", di: "Evening meal", br: "Breakfast, the morning meal" }, a: { FR: "di", QC: "lu", BE: "lu", CH: "lu" }, g: "meal", n: "Québec, Belgium and Switzerland kept the older meal order: déjeuner, dîner, souper.", src: "Larousse: dîner (Belgique, Canada, Suisse) repas de midi." },
+    { w: "déjeuner", s: { br: "Breakfast", lu: "Lunch", sn: "Afternoon snack" }, a: { FR: "lu", QC: "br", BE: "br", CH: "br" }, g: "meal", n: "In France breakfast is the petit-déjeuner.", src: "Larousse: déjeuner (Belgique, Canada, Suisse) petit-déjeuner." },
+    { w: "souper", s: { di: "Evening meal", la: "Late-night supper after a show", sn: "Afternoon snack" }, a: { QC: "di", BE: "di", CH: "di", FR: "la" }, g: "meal", n: "A Parisian souper comes after the theatre, if at all.", src: "Larousse: souper repas du soir (Belgique, Canada, Suisse); repas tardif (France)." },
+    { w: "char", s: { ca: "Car", ta: "Army tank or parade float", ch: "Shopping cart" }, a: { QC: "ca", FR: "ta" }, n: "Québécois drive a char. A French char d'assaut is a battle tank.", src: "Usito/OQLF: char (Québec, familier) automobile." },
+    { w: "liqueur", s: { so: "Soft drink, soda", li: "Sweet alcoholic liqueur", ju: "Freshly squeezed fruit juice" }, a: { QC: "so", FR: "li" }, g: "drink", n: "Short for liqueur douce, Québec slang for soda.", src: "Usito: liqueur (Québec) boisson gazeuse." },
+    { w: "dépanneur", s: { co: "Corner store", to: "Repairman or tow-truck driver", ph: "Pharmacy" }, a: { QC: "co", FR: "to" }, g: "shop", n: "Montrealers grab milk at the dép. In France the dépanneur fixes your car.", src: "Usito: dépanneur (Québec) petite épicerie." },
+    { w: "bas", s: { so: "Socks", st: "Stockings", sh: "Shorts" }, a: { QC: "so", FR: "st" }, g: "clothes", n: "French speakers in France say chaussettes for socks.", src: "Usito: bas (Québec) chaussette." },
+    { w: "barrer", s: { lo: "To lock a door", cr: "To cross out or block", sw: "To sweep the floor with a broom" }, a: { QC: "lo", FR: "cr" }, n: "'As-tu barré la porte?' asks whether you locked the door in Québec.", src: "Usito: barrer (Québec) verrouiller." },
+    { w: "cartable", s: { bi: "Ring binder", sa: "School bag or satchel", ma: "Map" }, a: { QC: "bi", FR: "sa" }, g: "school", n: "French kids carry a cartable on their backs. Québec kids put papers in one.", src: "Usito: cartable (Québec) reliure à anneaux." },
+    { w: "jaser", s: { ch: "To chat", go: "To gossip", ar: "To argue loudly" }, a: { QC: "ch", FR: "go" }, n: "Jaser is friendly chatting in Québec and gossip in France.", src: "Usito: jaser (Québec) bavarder." },
+    { w: "bienvenue", s: { yo: "You're welcome", we: "Welcome!", go: "Goodbye, see you later" }, a: { QC: "yo", FR: "we" }, c: "Reply to “Merci !”", g: "greeting", n: "A calque of English 'you're welcome', used everywhere in Québec.", src: "OQLF: bienvenue en réponse à merci (usage québécois)." },
+    { w: "blonde", s: { gi: "Girlfriend", bl: "Blonde woman or light beer", ca: "Toffee" }, a: { QC: "gi", FR: "bl" }, c: "“Je te présente ma ___.”", n: "In Québec, your blonde is your girlfriend, whatever her hair color. Your boyfriend is your chum.", src: "Usito: blonde (Québec) amoureuse." },
+    { w: "s'il vous plaît", s: { he: "Here you go", pl: "Please", ex: "Excuse me" }, a: { BE: "he", FR: "pl" }, c: "Said while handing something over", g: "greeting", n: "Belgians say it when giving you something, where the French say voilà.", src: "Wiktionary/Larousse: s'il vous plaît (Belgique) voici." },
+    { w: "cornet", s: { ba: "Plastic shopping bag", ic: "Ice cream cone", tr: "Trumpet" }, a: { CH: "ba", FR: "ic" }, n: "A Swiss shop asks if you want a cornet for your groceries.", src: "Larousse: cornet (Suisse) sac en papier ou en plastique." },
+    { w: "foehn", s: { ha: "Hair dryer", wi: "Warm mountain wind", st: "Electric space heater" }, a: { CH: "ha", FR: "wi" }, n: "From the German Föhn, the brand name that became the Swiss word for a hair dryer.", src: "Larousse: foehn (Suisse) sèche-cheveux." },
+    { w: "linge", s: { to: "Towel", la: "Laundry or linens", sh: "Shirt, blouse or top" }, a: { CH: "to", FR: "la" }, n: "In Switzerland, un linge is a towel.", src: "Larousse: linge (Suisse) serviette de toilette." },
+    { w: "breuvage", s: { dr: "Any drink", po: "A strange potion", ju: "Juice" }, a: { QC: "dr", FR: "po" }, g: "drink", n: "A Québec menu lists breuvages. In France the word suggests something dubious in a cauldron.", src: "Wiktionary: breuvage (standard in Quebec) beverage; (France, literary) concoction." },
+    { w: "chaudière", s: { bu: "Bucket", bo: "Boiler or furnace", ca: "Large cooking cauldron" }, a: { QC: "bu", FR: "bo" }, n: "In Québec you carry water in a chaudière. In France it heats the house.", src: "Wiktionary: chaudière (Quebec) bucket; boiler." },
+    { w: "plate", s: { bo: "Boring", fl: "Flat", pl: "Plate" }, a: { QC: "bo", FR: "fl" }, n: "'C'est plate' in Québec means it's boring. In France l'eau plate is still water.", src: "Wiktionary: plate (Canada, informal) boring; flat." },
+    { w: "écœurant", s: { aw: "Awesome", di: "Disgusting, sickening", he: "Heartbroken and very sad" }, a: { QC: "aw", FR: "di" }, n: "A Québécois calling a show écœurant loved it. A French person hated it.", src: "Wiktionary: écœurant (Quebec, informal) excellent; disgusting." },
+    { w: "capoter", s: { fr: "To freak out", ca: "To overturn, capsize", sl: "To doze off and fall asleep" }, a: { QC: "fr", FR: "ca" }, n: "'Je capote!' in Québec means 'I'm losing it!' A French car that capote has flipped over.", src: "Wiktionary: capoter (Quebec, colloquial) to freak out; to overturn." },
+    { w: "balayeuse", s: { va: "Vacuum cleaner", sw: "Street-sweeping truck", br: "Push broom" }, a: { QC: "va", FR: "sw" }, n: "Québécois passer la balayeuse in the living room. The French one cleans the streets.", src: "Wiktionary: balayeuse (Quebec) vacuum cleaner; street sweeper." },
+    { w: "gaz", s: { pe: "Gasoline (car fuel)", na: "Natural gas", so: "Soda bubbles" }, a: { QC: "pe", FR: "na" }, n: "Québécois mettre du gaz in the car. In France it's essence.", src: "Wiktionary: gaz (Canada) gasoline." },
+    { w: "bleuet", s: { bb: "Blueberry", cf: "Cornflower", bl: "Little bluebird" }, a: { QC: "bb", FR: "cf" }, n: "Lac-Saint-Jean is famous for bleuets, wild blueberries. In France a bleuet is a blue wildflower.", src: "Wiktionary: bleuet (North America) blueberry; cornflower." },
+    { w: "gomme", s: { ch: "Chewing gum", er: "Eraser", ti: "Tire" }, a: { QC: "ch", FR: "er" }, g: "gum", n: "A Québec kid chews gomme. A French kid rubs out mistakes with it.", src: "Wiktionary: gomme (North America) chewing gum; eraser." },
+    { w: "espadrilles", s: { sn: "Sneakers", ca: "Rope-soled canvas shoes", sl: "Slippers" }, a: { QC: "sn", FR: "ca" }, g: "clothes", n: "Québécois run in espadrilles. In France they're summer shoes with jute soles.", src: "Wiktionary: espadrille (North America) sneaker; (Europe) espadrille." },
+    { w: "mitaines", s: { mi: "Mittens", fi: "Fingerless gloves", sc: "Long woolly winter scarves" }, a: { QC: "mi", FR: "fi" }, g: "clothes", n: "Québec winters call for mitaines with no separate fingers at all.", src: "Wiktionary: mitaine (Canada) mitten; fingerless glove." },
+    { w: "brosser", s: { sk: "To skip class", br: "To brush", fl: "To flatter" }, a: { BE: "sk", FR: "br" }, g: "school", n: "A Belgian student who brosse un cours skipped it.", src: "Wiktionary: brosser (Belgium, informal) to skip class." },
+    { w: "bisser", s: { re: "To repeat a school year", en: "To call for an encore", ki: "To kiss twice, once on each cheek" }, a: { BE: "re", FR: "en" }, g: "school", n: "In Belgium bisser means repeating a year. French audiences bissent a great song.", src: "Wiktionary: bisser (Belgium) to repeat a year; encore." },
+    { w: "pistolet", s: { ro: "Small crusty bread roll", gu: "Pistol", cr: "Croissant" }, a: { BE: "ro", FR: "gu" }, n: "Belgian bakeries sell pistolets for Sunday breakfast.", src: "Wikipedia 'Pistolet (bread)': Belgian bread roll." },
+    { w: "auditoire", s: { le: "University lecture hall", au: "Audience", co: "Concert" }, a: { BE: "le", FR: "au" }, g: "school", n: "Belgian students sit their exams in an auditoire.", src: "Wiktionary: auditoire (Belgium) lecture hall; audience." },
+    { w: "galetas", s: { at: "Attic", ho: "Squalid little room", ba: "Damp basement storage room" }, a: { CH: "at", FR: "ho" }, n: "The Swiss store skis in the galetas.", src: "Wiktionary: galetas (Switzerland) attic; garret." },
+    { w: "action", s: { sa: "Special offer, sale", ac: "Action", lo: "Lottery" }, a: { CH: "sa", FR: "ac" }, g: "shop", n: "A Swiss supermarket sign saying 'Action' means it's on sale.", src: "Wiktionary: action (Switzerland) special offer." },
+    { w: "canot", s: { ca: "Canoe", ro: "Small boat or dinghy", ra: "Raft" }, a: { QC: "ca", FR: "ro" }, n: "Québécois paddle a canot on the lake. A French canot is a dinghy.", src: "Wiktionary: canot (Quebec) canoe; dinghy." },
+    { w: "suisse", s: { ch: "Chipmunk", sw: "Swiss person", sq: "Squirrel" }, a: { QC: "ch", FR: "sw" }, n: "Québec chipmunks are called suisses, possibly for their striped coats like Swiss Guard uniforms.", src: "Wiktionary: suisse (Quebec) chipmunk." },
+    { w: "piastre", s: { do: "Dollar", co: "Old Ottoman coin", pe: "Penny" }, a: { QC: "do", FR: "co" }, n: "Older Québécois still price things in piasses, dollars.", src: "Wiktionary: piastre (North America, colloquial) dollar; historical coin." },
+    { w: "cabaret", s: { tr: "Serving tray", ni: "Cabaret nightclub", cu: "Cupboard" }, a: { QC: "tr", FR: "ni" }, n: "Québec cafeterias hand you a cabaret for your food.", src: "Wiktionary: cabaret (Quebec, Louisiana) tray." },
+    { w: "tabagie", s: { sh: "Corner tobacco and newspaper shop", sm: "Smoke-filled room", ad: "Smoking habit" }, a: { QC: "sh", FR: "sm" }, g: "shop", n: "Québécois buy lottery tickets at the tabagie.", src: "Wiktionary: tabagie (Quebec) tobacco shop; smoky room." },
+    { w: "tanné", s: { fe: "Fed up", ta: "Tanned (leather)", su: "Sunburnt" }, a: { QC: "fe", FR: "ta" }, n: "'Chu tanné!' in Québec means 'I'm sick of it!'", src: "Wiktionary: tanné (Quebec) fed up; tanned." },
+    { w: "allô", s: { hi: "Hi! (said in person)", ph: "Hello? (only when answering the phone)", by: "Bye!" }, a: { QC: "hi", FR: "ph" }, g: "greeting", n: "Québécois say allô face to face. In France it's only for picking up the phone.", src: "Wiktionary: allô (North America) in-person hello." },
+    { w: "praline", s: { ch: "Filled chocolate", al: "Sugar-coated roasted almond", ca: "Caramel sauce poured over desserts" }, a: { BE: "ch", FR: "al" }, n: "Belgians invented the filled chocolate praline. French pralines are crunchy almonds.", src: "Wiktionary: praline (Belgium) chocolate; Wikipedia 'Praline'." },
+    { w: "chique", s: { gu: "Chewing gum", to: "Wad of chewing tobacco", ch: "Chic, stylish" }, a: { BE: "gu", FR: "to" }, g: "gum", n: "Belgian kids chew a chique.", src: "Wiktionary: chique (Belgium) chewing gum." },
+    { w: "tirette", s: { zi: "Zipper", sh: "Pull-out shelf or tab", dr: "Drawer" }, a: { BE: "zi", FR: "sh" }, n: "A Belgian jacket closes with a tirette.", src: "Wiktionary: tirette (Belgium) zipper." },
+    { w: "adieu", s: { hi: "Hello (a greeting)", fa: "Farewell forever", th: "Thank you very much" }, a: { CH: "hi", FR: "fa" }, g: "greeting", n: "In parts of French-speaking Switzerland adieu is a friendly hello. In France it's a final goodbye.", src: "Wiktionary: adieu (Switzerland) hello, goodbye." },
+    { w: "cave", s: { id: "Idiot, dummy", ce: "Cellar", ca: "Cave" }, a: { QC: "id", FR: "ce" }, n: "Calling someone a cave in Québec means they're a dummy. A French cave holds wine. A cave in the rock is a grotte.", src: "Wiktionary: cave (Quebec, slang) idiot; cellar." },
+    { w: "tourtière", s: { me: "Spiced meat pie", di: "Pie dish", ch: "Pastry chef" }, a: { QC: "me", FR: "di" }, n: "Québec families eat tourtière at Christmas. In France it's the dish you bake a tart in.", src: "Wiktionary: tourtière (Quebec) meat pie; pie dish." },
   ]},
 };
 
@@ -305,6 +614,7 @@ const LANGS = {
   const EPOCH = new Date(2026, 10, 5); // puzzle #1
   const PER_DAY = 5;
   const STORE_KEY = "dialectle:v1";
+  const SHARE_URL = "https://todaysdailygame.com/dialectle/";
 
   // ---------- storage (best effort) ----------
   function load() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; } }
@@ -340,14 +650,66 @@ const LANGS = {
     return n;
   }
 
-  // Daily word picks: a fixed permutation per language, walked five at a time.
-  function dailyWordIdx(lang, day) {
-    const n = LANGS[lang].words.length;
-    const perm = shuffle([...Array(n).keys()], rng(hash("perm-" + lang)));
-    const cycle = Math.floor((day * PER_DAY) / n);
-    const p = cycle === 0 ? perm : shuffle(perm, rng(hash("perm-" + lang + "-" + cycle)));
+  // Daily word picks (content v2). Each language gets one fixed, seeded order of its whole
+  // word bank, built so words from the same topic group (g) sit at least GROUP_GAP slots apart.
+  // Day d takes the next PER_DAY words in that order and wraps around at the end, so a word
+  // only comes back after the entire bank has been used: no repeats for floor(n / PER_DAY) days.
+  const CONTENT_V = 2;
+  const GROUP_GAP = 15; // slots, i.e. three days at five words a day
+  const orderCache = {};
+  function buildOrder(lang, attempt) {
+    const words = LANGS[lang].words, n = words.length;
+    const size = {};
+    for (const w of words) if (w.g) size[w.g] = (size[w.g] || 0) + 1;
+    // Small packs cannot keep a big group 15 slots apart, so each group gets the widest gap that fits.
+    const gapOf = g => Math.max(1, Math.min(GROUP_GAP, Math.floor(n / size[g]) - 1));
+    const pool = shuffle([...Array(n).keys()], rng(hash("order-v2-" + lang + "-" + attempt)));
     const out = [];
-    for (let k = 0; k < Math.min(PER_DAY, n); k++) out.push(p[(day * PER_DAY + k) % n]);
+    let forced = 0;
+    const clashes = (i, at) => {
+      const g = words[i].g; if (!g) return false;
+      const gap = gapOf(g);
+      for (let back = 1; back <= gap && at - back >= 0; back++) if (words[out[at - back]].g === g) return true;
+      // the order wraps around, so the last slots must also keep clear of the first ones
+      for (let pos = 0; pos <= at + gap - n && pos < out.length; pos++) if (words[out[pos]].g === g) return true;
+      return false;
+    };
+    const left = Object.assign({}, size);
+    while (pool.length) {
+      const at = out.length, slotsLeft = n - at;
+      let pick = -1, urgent = -1, urgency = 0;
+      for (let k = 0; k < pool.length; k++) {
+        const i = pool[k];
+        if (clashes(i, at)) continue;
+        if (pick < 0) pick = k;
+        const g = words[i].g;
+        // A big group running out of room jumps the queue so the end of the order isn't crowded.
+        if (g) { const u = left[g] * (gapOf(g) + 1) - slotsLeft; if (u >= 0 && (urgent < 0 || u > urgency)) { urgent = k; urgency = u; } }
+      }
+      if (urgent >= 0) pick = urgent;
+      if (pick < 0) { pick = 0; forced++; }
+      const i = pool.splice(pick, 1)[0];
+      if (words[i].g) left[words[i].g]--;
+      out.push(i);
+    }
+    return { out, forced };
+  }
+  function dailyOrder(lang) {
+    if (orderCache[lang]) return orderCache[lang];
+    // Deterministic: try a fixed series of seeds and keep the first order with no forced clashes.
+    let best = null;
+    for (let attempt = 0; attempt < 60; attempt++) {
+      const o = buildOrder(lang, attempt);
+      if (!best || o.forced < best.forced) best = o;
+      if (!o.forced) break;
+    }
+    return (orderCache[lang] = best.out);
+  }
+  function dailyWordIdx(lang, day) {
+    const order = dailyOrder(lang), n = order.length, k = Math.min(PER_DAY, n);
+    const out = [];
+    // Safe modulo, so a device clock set before puzzle #1 still works.
+    for (let i = 0; i < k; i++) out.push(order[(((day * PER_DAY + i) % n) + n) % n]);
     return out;
   }
   function buildQuestion(lang, wi, r) {
@@ -358,15 +720,20 @@ const LANGS = {
     const day = dayIndex();
     if (mode === "daily") {
       const saved = db.daily[lang];
-      if (saved && saved.day === day) return saved;
+      // A game saved by the older word list (no v) may point at different words, so rebuild it.
+      if (saved && saved.day === day && saved.v === CONTENT_V) return saved;
       const r = rng(hash("q-" + lang + "-" + day));
-      const g = { lang, mode, day, cur: 0, done: false, qs: dailyWordIdx(lang, day).map(wi => buildQuestion(lang, wi, r)) };
+      const g = { v: CONTENT_V, lang, mode, day, cur: 0, done: false, qs: dailyWordIdx(lang, day).map(wi => buildQuestion(lang, wi, r)) };
       db.daily[lang] = g; save(db);
       return g;
     }
     const n = LANGS[lang].words.length;
     const r = Math.random;
-    const idx = shuffle([...Array(n).keys()], r).slice(0, PER_DAY);
+    // v2: practice never shows today's or tomorrow's daily words, so it can't be used to peek at the answers.
+    const hold = new Set([...dailyWordIdx(lang, day), ...dailyWordIdx(lang, day + 1)]);
+    let pool = [...Array(n).keys()].filter(i => !hold.has(i));
+    if (pool.length < PER_DAY) pool = [...Array(n).keys()].filter(i => !dailyWordIdx(lang, day).includes(i));
+    const idx = shuffle(pool, r).slice(0, PER_DAY);
     return { lang, mode, day, cur: 0, done: false, qs: idx.map(wi => buildQuestion(lang, wi, r)) };
   }
   function scoreOf(q) {
@@ -382,7 +749,8 @@ const LANGS = {
   }
 
   // ---------- state ----------
-  let lang = "en", mode = "daily", game;
+  // v2: remember the last language picked, so a reload doesn't drop a Spanish player back into English.
+  let lang = (db.lang && LANGS[db.lang]) ? db.lang : "en", mode = "daily", game;
   function persist() { if (game.mode === "daily") { db.daily[game.lang] = game; save(db); } }
 
   // ---------- rendering ----------
@@ -390,12 +758,16 @@ const LANGS = {
   function renderControls() {
     const seg = document.getElementById("langSeg");
     seg.replaceChildren(...Object.keys(LANGS).map(k => el("button", {
-      "aria-pressed": String(k === lang), title: LANGS[k].name,
-      onclick: () => { lang = k; start(); }
+      "aria-pressed": String(k === lang), title: LANGS[k].name + (LANGS[k].small ? " (small pack, repeats sooner)" : ""), "aria-label": LANGS[k].name + (LANGS[k].small ? ", small pack" : ""), lang: k,
+      onclick: () => { lang = k; db.lang = k; save(db); start(); }
     }, k.toUpperCase())));
     for (const b of document.querySelectorAll("#modeSeg button")) b.setAttribute("aria-pressed", String(b.dataset.mode === mode));
     const total = Object.values(LANGS).reduce((a, l) => a + l.words.length, 0);
     document.getElementById("wordcount").textContent = total + " words in " + Object.keys(LANGS).length + " languages";
+  }
+  function packNote(k) {
+    const n = LANGS[k].words.length;
+    return LANGS[k].name + " is a small pack (" + n + " words), so words come back about every " + Math.floor(n / PER_DAY) + " days.";
   }
   function renderProgress() {
     const p = document.getElementById("progress");
@@ -404,7 +776,7 @@ const LANGS = {
     p.replaceChildren(...pips, el("span", { class: "lbl" }, label));
   }
 
-  function renderQuestion(animate, focusId) {
+  function renderQuestion(animate, focusId, revealed) {
     const q = game.qs[game.cur];
     const w = LANGS[game.lang].words[q.wi];
     const rows = q.countries.map((c, i) => {
@@ -431,14 +803,16 @@ const LANGS = {
     const allPicked = q.countries.every(c => q.picks[c]);
     const isLast = game.cur === game.qs.length - 1;
     const s = scoreOf(q);
-    const card = el("section", { class: animate === false ? "card" : "card enter" },
+    const card = el("section", { class: (animate === false ? "card" : "card enter") + (revealed ? " revealed" : "") },
       el("div", { class: "entry-head" },
-        el("span", { class: "meta" }, "Word " + (game.cur + 1) + " of " + game.qs.length + " · " + LANGS[game.lang].name),
-        el("h2", { class: "headword" }, w.w),
+        el("span", { class: "meta" }, "Word " + (game.cur + 1) + " of " + game.qs.length + " · " + LANGS[game.lang].name,
+          LANGS[game.lang].small ? el("span", { class: "pack", title: packNote(game.lang) }, "small pack — repeats sooner") : null),
+        el("h2", { class: "headword", id: "headword", tabindex: "-1", lang: game.lang }, w.w),
         w.c ? el("p", { class: "ctx" }, w.c) : null),
-      el("p", { class: "ask" }, q.checked ? "You got " + s.right + " of " + s.total + "." : "What does a local mean by it?"),
+      el("p", { class: "ask", "aria-live": "polite" }, q.checked ? ["You got ", el("b", {}, s.right + " of " + s.total), "."] : (decoyOf(w, q).length ? "Pick what a local means in each country. One option is a decoy nobody uses." : "Pick what a local means in each country.")),
       el("ol", { class: "senses" }, rows),
-      q.checked ? el("div", { class: "note" }, w.n) : null,
+      q.checked ? el("div", { class: "note" }, el("span", { class: "tag" }, "Usage note"), w.n,
+        decoyOf(w, q).length ? el("span", { class: "decoy" }, "Decoy: " + decoyOf(w, q).map(k => "\u201c" + w.s[k] + "\u201d").join(", ") + " \u2014 none of these countries uses it.") : null) : null,
       el("div", { class: "actions" },
         q.checked
           ? el("button", { class: "btn", id: "nextBtn", onclick: next }, isLast ? "See results" : "Next word")
@@ -449,18 +823,24 @@ const LANGS = {
     if (focusId) { const f = document.getElementById(focusId); if (f) f.focus(); }
   }
 
+  function decoyOf(w, q) { const used = new Set(Object.values(w.a)); return q.order.filter(k => !used.has(k)); }
   function check() {
     const q = game.qs[game.cur];
-    q.checked = true; persist(); renderQuestion(false);
+    q.checked = true; persist(); renderQuestion(false, null, true);
     const b = document.getElementById("nextBtn"); if (b) b.focus();
   }
   function next() {
-    if (game.cur < game.qs.length - 1) { game.cur++; persist(); renderQuestion(); window.scrollTo({ top: 0 }); return; }
+    if (game.cur < game.qs.length - 1) {
+      game.cur++; persist(); renderQuestion(); window.scrollTo({ top: 0 });
+      const h = document.getElementById("headword"); if (h) h.focus({ preventScroll: true });
+      return;
+    }
     finish();
   }
   function finish() {
-    if (!game.done && game.mode === "daily") {
-      const st = db.stats[game.lang] || { played: 0, streak: 0, best: 0, last: null, right: 0, total: 0 };
+    const prev = db.stats[game.lang];
+    if (!game.done && game.mode === "daily" && !(prev && prev.last === game.day)) {
+      const st = prev || { played: 0, streak: 0, best: 0, last: null, right: 0, total: 0 };
       st.played++;
       st.streak = st.last === game.day - 1 ? st.streak + 1 : 1;
       st.best = Math.max(st.best, st.streak);
@@ -479,7 +859,7 @@ const LANGS = {
       const w = LANGS[game.lang].words[q.wi];
       return q.countries.map(c => q.picks[c] === w.a[c] ? "🟩" : "🟥").join("");
     });
-    return head + "\n" + lines.join("\n");
+    return head + "\n" + lines.join("\n") + "\n" + SHARE_URL;
   }
   function countdown() {
     const now = new Date();
@@ -488,47 +868,73 @@ const LANGS = {
     const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
     return h + "h " + String(m).padStart(2, "0") + "m";
   }
+  let tick = null;
+  function shownStreak(st) {
+    // Display only: a streak that was broken by a missed day shows as 0 until the next finished puzzle.
+    return st.last != null && st.last >= dayIndex() - 1 ? st.streak : 0;
+  }
   function renderResult() {
+    clearInterval(tick);
     const t = totals(game);
     const st = db.stats[game.lang];
     const text = shareText();
     const box = el("textarea", { class: "sharebox", id: "shareBox", readonly: true, "aria-label": "Your result to share" });
     box.value = text;
     const copyBtn = el("button", { class: "btn", id: "copyBtn", onclick: async () => {
-      try { await navigator.clipboard.writeText(text); copyBtn.textContent = "Copied"; }
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = "Copied"; copyBtn.classList.add("copied");
+        setTimeout(() => { copyBtn.textContent = "Copy result"; copyBtn.classList.remove("copied"); }, 2000);
+      }
       catch (e) { box.hidden = false; box.focus(); box.select(); copyBtn.textContent = "Select and copy below"; }
     } }, "Copy result");
     box.hidden = true;
     const recap = el("ul", { class: "recap" }, game.qs.map(q => {
       const s = scoreOf(q); const w = LANGS[game.lang].words[q.wi];
-      return el("li", {}, el("span", { class: "rw" }, w.w), el("span", { class: "rs" }, s.right + "/" + s.total));
+      const cells = el("span", { class: "cells", "aria-hidden": "true" }, q.countries.map((c, i) =>
+        el("span", { class: "cell" + (q.picks[c] === w.a[c] ? " ok" : ""), style: "animation-delay:" + (0.15 + i * 0.04).toFixed(2) + "s" })));
+      return el("li", {}, el("span", { class: "rw", lang: game.lang }, w.w), cells, el("span", { class: "rs" }, s.right + "/" + s.total));
     }));
     const pct = t.total ? Math.round((t.right / t.total) * 100) : 0;
     const card = el("section", { class: "card result enter" },
       el("span", { class: "meta" }, game.mode === "daily" ? LANGS[game.lang].name + " · puzzle #" + (game.day + 1) : LANGS[game.lang].name + " · practice round"),
-      el("p", { class: "big" }, t.right + "/" + t.total),
-      el("p", { class: "ask" }, pct >= 90 ? "Fluent in every accent." : pct >= 70 ? "Well traveled." : pct >= 50 ? "You'd get by with a phrasebook." : "Lost in translation, for now."),
-      el("pre", { class: "grid", "aria-label": "Result grid" }, text.split("\n").slice(1).join("\n")),
+      el("div", { class: "result-head" },
+        el("div", { class: "postmark", "aria-hidden": "true" }, game.mode === "daily" ? [el("b", {}, "#" + (game.day + 1)), LANGS[game.lang].name] : [el("b", {}, pct + "%"), "Practice"]),
+        el("div", {},
+          el("p", { class: "big" }, String(t.right), el("small", {}, " / " + t.total)),
+          el("p", { class: "ask" }, pct >= 90 ? "Fluent in every accent." : pct >= 70 ? "Well traveled." : pct >= 50 ? "You'd get by with a phrasebook." : "Lost in translation, for now."))),
       game.mode === "daily" && st ? el("div", { class: "stats" },
         el("div", { class: "stat" }, el("b", {}, String(st.played)), el("span", {}, "Played")),
-        el("div", { class: "stat" }, el("b", {}, String(st.streak)), el("span", {}, "Streak")),
+        el("div", { class: "stat" }, el("b", {}, String(shownStreak(st))), el("span", {}, "Streak")),
         el("div", { class: "stat" }, el("b", {}, String(st.best)), el("span", {}, "Best streak")),
         el("div", { class: "stat" }, el("b", {}, (st.total ? Math.round(st.right / st.total * 100) : 0) + "%"), el("span", {}, "Accuracy"))) : null,
       recap,
       el("div", { class: "actions" }, copyBtn,
         el("button", { class: "btn ghost", onclick: () => { mode = "practice"; start(); } }, game.mode === "daily" ? "Practice more" : "Another round")),
       box,
-      game.mode === "daily" ? el("p", { class: "hint" }, "Next " + LANGS[game.lang].name + " puzzle in " + countdown() + ". Other languages have their own daily puzzle.") : null);
+      game.mode === "daily" ? el("p", { class: "hint", id: "nextHint" }, "Next " + LANGS[game.lang].name + " puzzle in " + countdown() + ". Other languages have their own daily puzzle.") : null,
+      LANGS[game.lang].small ? el("p", { class: "hint" }, packNote(game.lang)) : null);
     main.replaceChildren(card);
     renderProgress();
+    if (game.mode === "daily") tick = setInterval(() => {
+      const h = document.getElementById("nextHint");
+      if (!h) { clearInterval(tick); return; }
+      if (dayIndex() !== game.day) { start(); return; }
+      h.textContent = "Next " + LANGS[game.lang].name + " puzzle in " + countdown() + ". Other languages have their own daily puzzle.";
+    }, 30000);
   }
 
   function start(data) {
     if (data && data.lang && LANGS[data.lang]) { lang = data.lang; mode = data.mode === "practice" ? "practice" : "daily"; }
     game = (data && data.game && data.game.lang === lang && data.game.mode === mode) ? data.game : newGame(lang, mode);
     renderControls();
+    clearInterval(tick);
     if (game.done) renderResult(); else renderQuestion();
   }
+  // If the tab was left open past midnight, load the new day's puzzle when the player comes back.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && game && game.mode === "daily" && dayIndex() !== game.day) start();
+  });
   document.getElementById("modeSeg").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     mode = b.dataset.mode; start();
