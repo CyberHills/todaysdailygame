@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Under the Surface</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f3ebd9;--card:#fbf6ea;--ink:#2f2a22;--ink2:#6b5f4c;--red:#b23a2a;--flag:#d9762b;--line:#d5c7a6;--green:#4f7a4a}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background-color:var(--paper);background-image:linear-gradient(rgba(110,130,160,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(110,130,160,.10) 1px,transparent 1px);background-size:22px 22px;font-family:Spectral,Georgia,serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1060px;margin:0 auto;padding:18px 16px 48px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1.5px solid var(--ink);padding-bottom:10px}
+.title{font-style:italic;font-weight:600;font-size:32px;line-height:1;margin:0}
+.sub{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink2);letter-spacing:.04em;margin-top:6px}
+.sub .practice{background:var(--ink);color:var(--paper);padding:1px 6px;border-radius:2px;margin-right:6px}
+.hbtns{display:flex;gap:6px;flex-wrap:wrap}
+.pill{border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer}
+.pill:hover{background:var(--ink);color:var(--paper)}
+main{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:22px;margin-top:16px;align-items:start}
+@media(max-width:840px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);box-shadow:0 1px 0 #fff inset,0 10px 26px -16px rgba(60,40,10,.45);border-radius:4px;padding:14px}
+.cardhead{display:flex;justify-content:space-between;align-items:baseline;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+#site svg{width:100%;height:auto;display:block;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.status{font-family:Caveat,cursive;font-size:23px;text-align:center;min-height:30px;line-height:1.15;margin-top:4px}
+.pegrow{display:flex;justify-content:center;align-items:flex-end;gap:3px;margin-top:6px}
+.pegrow svg{width:22px;height:40px}
+.pegcap{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink2);margin-top:2px}
+.brushbar{display:none;justify-content:center;margin-top:8px}
+.brushbar.on{display:flex}
+.note-title{font-family:Caveat,cursive;font-size:28px;line-height:1;margin:2px 0 2px}
+.note-sub{font-size:14px;color:var(--ink2);margin-bottom:10px;font-style:italic}
+.cands{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cand{position:relative;border:1px dashed #bfae8a;background:#fffaf0;border-radius:3px;padding:6px 4px 6px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s;font:inherit;color:inherit}
+.cand:hover{transform:translateY(-1px);border-color:var(--ink)}
+.cand svg.sk{width:100%;aspect-ratio:1;display:block}
+.cand .lbl{font-family:Caveat,cursive;font-size:21px;line-height:1;margin-top:2px}
+.cand.sel{border:2px solid var(--ink);background:#fff;padding:5px 3px 5px}
+.cand.struck{cursor:default;opacity:.6}
+.cand.struck:hover{transform:none;border-color:#bfae8a}
+.cand .x{position:absolute;inset:6px;width:calc(100% - 12px);height:calc(100% - 12px);pointer-events:none}
+.cand.answer{border:2px solid var(--green);background:#f3f7ea}
+.confirm{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{font-family:'IBM Plex Mono',monospace;font-size:13px;padding:10px 14px;border-radius:3px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:disabled{opacity:.35;cursor:default}
+.hint{font-size:13px;color:var(--ink2);font-style:italic}
+.log{margin-top:14px;border-top:1px dashed #c9b993;padding-top:8px;font-family:Caveat,cursive;font-size:19px;color:#4a3f30;line-height:1.25;min-height:30px}
+.log span{display:inline-block;margin-right:12px}
+.log .w{color:var(--red);text-decoration:line-through}
+.modal{position:fixed;inset:0;background:rgba(40,30,15,.5);display:none;align-items:center;justify-content:center;padding:14px;z-index:20}
+.modal.on{display:flex}
+.sheet{background:var(--card);max-width:540px;width:100%;max-height:92vh;overflow:auto;border-radius:4px;padding:20px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);position:relative}
+.sheet h2{margin:0;font-weight:600;font-size:26px;line-height:1.1}
+.close{position:absolute;right:10px;top:8px;background:none;border:none;font-size:26px;cursor:pointer;color:var(--ink2)}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--ink2);text-transform:uppercase}
+.entry{display:grid;grid-template-columns:150px 1fr;gap:16px;border:1.5px solid var(--ink);background:#fffdf6;padding:14px;margin:12px 0}
+@media(max-width:460px){.entry{grid-template-columns:1fr}}
+.entry .img{background:radial-gradient(circle at 50% 40%,#3d3a33,#1f1d19);border-radius:2px;display:flex;align-items:center;justify-content:center;padding:10px;aspect-ratio:1}
+.entry .img svg{width:100%;height:100%}
+.entry .meta{font-style:italic;color:var(--ink2);margin:4px 0 8px;font-size:15px}
+.entry p{margin:0;font-size:15px;line-height:1.4}
+.verdict{font-size:18px;margin:6px 0}
+.verdict b{font-size:22px}
+.share{font-family:'IBM Plex Mono',monospace;font-size:13px;background:#f1e8d2;border:1px solid var(--line);padding:10px;white-space:pre-wrap;margin:8px 0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0;text-align:center}
+.stats div{border:1px solid var(--line);background:#fffaf0;padding:8px 2px}
+.stats b{display:block;font-size:22px;font-weight:600}
+.stats span{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.cabinet h3{font-family:Caveat,cursive;font-size:24px;margin:14px 0 6px;font-weight:700}
+.drawer{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.tile{border:1px solid var(--line);background:#fffaf0;padding:6px;text-align:center;border-radius:2px}
+.tile .box{aspect-ratio:1;background:radial-gradient(circle at 50% 40%,#3d3a33,#1f1d19);border-radius:2px;display:flex;align-items:center;justify-content:center;padding:6px}
+.tile .box svg{width:100%;height:100%}
+.tile.miss .box{background:repeating-linear-gradient(45deg,#efe5cc,#efe5cc 6px,#e8dcbf 6px,#e8dcbf 12px);font-family:Caveat,cursive;font-size:34px;color:#a8977a}
+.tile .nm{font-family:Caveat,cursive;font-size:17px;line-height:1.05;margin-top:4px}
+.tile .dt{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink2)}
+.howto ol{padding-left:20px;margin:10px 0;line-height:1.45}
+.howto li{margin-bottom:6px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:9px 14px;border-radius:3px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.riser{transition:transform 1.3s cubic-bezier(.2,.8,.2,1),filter 1.3s;transform-box:fill-box;transform-origin:center}
+.riser.up{transform:translateY(-7px) scale(1.06);filter:drop-shadow(0 12px 8px rgba(20,10,0,.55))}
+.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+footer{margin-top:22px;text-align:center;font-size:13px;color:var(--ink2);font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 class="title">Under the Surface</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <div class="hbtns">
+      <button class="pill" id="bHow">How to dig</button>
+      <button class="pill" id="bCab">Collection</button>
+      <button class="pill" id="bPrac">Practice</button>
+      <button class="pill" id="bSnd">Sound on</button>
+    </div>
+  </header>
+  <main>
+    <section class="card" id="siteCard">
+      <div class="cardhead"><span id="siteName"></span><span id="siteCtx"></span></div>
+      <div id="site"></div>
+      <div class="brushbar" id="brushbar"><button class="btn" id="bBrush" disabled>Brush square</button></div>
+      <div class="status" id="status"></div>
+      <div class="pegrow" id="pegs"></div>
+      <div class="pegcap" id="pegcap"></div>
+    </section>
+    <section class="card">
+      <div class="note-title">Possible identifications</div>
+      <div class="note-sub" id="noteSub">It's one of these. It may be turned or flipped in the ground.</div>
+      <div class="cands" id="cands"></div>
+      <div class="confirm">
+        <button class="btn" id="bId" disabled>Identify…</button>
+        <span class="hint" id="idHint">A wrong identification costs 2 squares.</span>
+      </div>
+      <div class="log" id="log"></div>
+    </section>
+  </main>
+  <footer>Brush only — core samples and scans may come later.</footer>
+</div>
+
+<div class="modal" id="mResult"><div class="sheet" id="resultSheet"></div></div>
+<div class="modal" id="mCab"><div class="sheet cabinet" id="cabSheet"></div></div>
+<div class="modal" id="mHow"><div class="sheet howto">
+  <button class="close" data-close>×</button>
+  <div class="mono">Field instructions</div>
+  <h2>Choose where to excavate</h2>
+  <ol>
+    <li>A small patch of ground hides one object. The survey team has already opened one square (marked <b>0</b>).</li>
+    <li>Tap a square to brush it. You have <b>10 squares</b> a day.</li>
+    <li>Compare what you uncover with the sketches in your notebook. The object may be turned or flipped.</li>
+    <li>Identify it whenever you're sure. A wrong identification costs <b>2 squares</b>.</li>
+    <li>The fewer squares you use, the better. Every find you identify goes into your collection.</li>
+  </ol>
+  <p class="hint">Tip: brush where the possibilities differ — a handle, a hole, a hub — not where they all look the same.</p>
+  <div class="row"><button class="btn" data-close>Start digging</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+'use strict';
+// ---------- shape helpers ----------
+const f1=n=>+(+n).toFixed(2);
+const P={
+  c:(x,y,r)=>`M${f1(x-r)},${f1(y)}a${r},${r} 0 1,0 ${f1(2*r)},0a${r},${r} 0 1,0 ${f1(-2*r)},0Z`,
+  e:(x,y,rx,ry)=>`M${f1(x-rx)},${f1(y)}a${rx},${ry} 0 1,0 ${f1(2*rx)},0a${rx},${ry} 0 1,0 ${f1(-2*rx)},0Z`,
+  r:(x,y,w,h,q=0)=>q?`M${x+q},${y}h${w-2*q}a${q},${q} 0 0 1 ${q},${q}v${h-2*q}a${q},${q} 0 0 1 ${-q},${q}h${-(w-2*q)}a${q},${q} 0 0 1 ${-q},${-q}v${-(h-2*q)}a${q},${q} 0 0 1 ${q},${-q}Z`:`M${x},${y}h${w}v${h}h${-w}Z`,
+  ring:(x,y,R,r)=>P.c(x,y,R)+P.c(x,y,r)
+};
+const dots=(cx,cy,r,n,s,off=0)=>{let d='';for(let i=0;i<n;i++){const a=off+i*2*Math.PI/n;d+=P.c(cx+r*Math.cos(a),cy+r*Math.sin(a),s);}return d;};
+const radial=(cx,cy,r1,r2,n,off=0)=>{let d='';for(let i=0;i<n;i++){const a=off+i*2*Math.PI/n;d+=`M${f1(cx+r1*Math.cos(a))},${f1(cy+r1*Math.sin(a))}L${f1(cx+r2*Math.cos(a))},${f1(cy+r2*Math.sin(a))}`;}return d;};
+const F=(d,m,eo)=>({t:'f',d,m,eo}), S=(d,m,w)=>({t:'s',d,m,w}), L=(d,c,w=2,dash)=>({t:'l',d,c,w,dash});
+
+const MAT={
+  iron:{f:'#8b664a',s:'#33241a'}, ironDk:{f:'#4c392c',s:'#2c1f17'}, ironHi:{f:'#a08268',s:'#a08268'},
+  wood:{f:'#8d6a44',s:'#4e3820'}, woodDk:{f:'#5e452b',s:'#3a2a18'}, leather:{f:'#5c3f2c',s:'#2e1f15'},
+  ceramic:{f:'#bd6a40',s:'#6e3a1e'}, ceramicDk:{f:'#8d4826',s:'#5a2c14'}, slip:{f:'#dfae82',s:'#8a5a37'}, paint:{f:'#33251f',s:'#33251f'},
+  bone:{f:'#e4d7b3',s:'#8f7d55'}, boneDk:{f:'#c9b585',s:'#7f6d47'}, boneLn:{f:'#8f7d55',s:'#8f7d55'},
+  gilt:{f:'#c19a3e',s:'#6c5219'}, giltDk:{f:'#957129',s:'#5a4313'}, garnet:{f:'#7d2b3a',s:'#3e1119'}, garnetHi:{f:'#c26a78',s:'#c26a78'},
+  hole:{f:'#271c14',s:'#271c14'}
+};
+const INK='#3a3127';
+
+// ---------- the finds ----------
+let rv='';for(let x=36;x<=164;x+=16)rv+=P.c(x,130,3);
+let planks='';for(const x of [40,60,80,120,140,160]){const h=Math.sqrt(88*88-(x-100)*(x-100));planks+=`M${x},${f1(100-h)}L${x},${f1(100+h)}`;}
+let teeth='';for(let x=16;x<=180;x+=9)teeth+=P.r(x,28,5,58,1.5)+P.r(x,114,5,58,1.5);
+let combDots='',combRings='';for(const x of [24,62,100,138,176])combDots+=P.c(x,100,3.5);for(const x of [43,81,119,157])combRings+=P.c(x,100,6);
+
+const GROUPS=[
+ {id:'iron',title:'Iron finds',items:[
+  {id:'helmet',name:'Helmet',mat:'Iron',period:'Early medieval',size:'c. 22 cm tall',
+   note:'A conical cap raised from iron, with a riveted brow band and a nasal bar to protect the face.',
+   parts:[F('M28,128 C28,52 60,24 100,22 C140,24 172,52 172,128 Z','iron'),L('M100,26 L100,120','ironDk',3),L('M48,64 C66,40 84,32 100,30','ironHi',2),F(P.r(91,138,18,50,5),'iron'),F(P.r(22,118,156,24,5),'iron'),F(rv,'ironDk')]},
+  {id:'cauldron',name:'Cauldron',mat:'Iron',period:'Medieval',size:'c. 40 cm across',
+   note:'A three-legged cooking pot. The bail handle let it hang over the fire; the side loops took a pole for lifting.',
+   parts:[S('M22,64 C22,4 178,4 178,64','iron',7),F(P.r(50,140,12,44,3),'iron'),F(P.r(138,140,12,44,3),'iron'),F(P.ring(20,76,14,7),'iron',1),F(P.ring(180,76,14,7),'iron',1),F('M34,72 L166,72 C166,140 140,172 100,172 C60,172 34,140 34,72 Z','iron'),L('M40,102 C80,110 120,110 160,102','ironDk',2),F(P.r(26,62,148,14,5),'iron')]},
+  {id:'wheel',name:'Cart wheel',mat:'Wood and iron',period:'Iron Age',size:'c. 90 cm across',
+   note:'Eight wooden spokes in a turned hub, with an iron tyre shrunk on hot so it gripped the rim as it cooled.',
+   parts:[F(P.ring(100,100,94,84),'iron',1),F(dots(100,100,89,12,2.2),'ironDk'),F(P.ring(100,100,84,71),'wood',1),L('M100,16L100,29M184,100L171,100M100,184L100,171M16,100L29,100','woodDk',2),S(radial(100,100,17,74,8,Math.PI/8),'wood',10),F(P.c(100,100,21),'wood'),F(P.ring(100,100,21,14),'iron',1),F(P.c(100,100,7),'hole')]},
+  {id:'shield',name:'Round shield',mat:'Wood and iron',period:'Viking Age',size:'c. 85 cm across',
+   note:'Planks glued edge to edge behind an iron boss that covered the hand grip. The rim was often bound in leather or iron.',
+   parts:[F(P.c(100,100,90),'wood'),L(planks,'woodDk',1.6),F(dots(100,100,80,16,2.6),'ironDk'),F(P.ring(100,100,94,88),'iron',1),F(P.c(100,100,30),'iron'),F(dots(100,100,25,6,2,Math.PI/6),'ironDk'),F(P.c(100,100,18),'iron'),F(P.e(94,94,6,4),'ironHi')]},
+  {id:'skillet',name:'Skillet',mat:'Iron',period:'Post-medieval',size:'c. 45 cm long',
+   note:'A shallow frying pan with a long handle, pierced at the end so it could hang by the hearth.',
+   parts:[F(P.r(92,128,16,68,6),'iron'),F(P.c(100,186,4),'hole'),F(P.c(100,72,66),'iron'),F(P.c(100,72,55),'ironDk'),L('M62,50 C72,36 86,30 100,29','ironHi',2)]},
+  {id:'horseshoe',name:'Horseshoe',mat:'Iron',period:'Medieval',size:'c. 12 cm long',
+   note:'Eight nail holes and thickened heels (calkins) for grip on wet or icy ground.',
+   parts:[F('M40,190 L40,95 C40,40 68,12 100,12 C132,12 160,40 160,95 L160,190 L124,190 L124,98 C124,72 114,52 100,52 C86,52 76,72 76,98 L76,190 Z','iron'),F(P.r(36,180,44,14,3),'iron'),F(P.r(120,180,44,14,3),'iron'),F(P.r(55,150,5,10)+P.r(53,118,5,10)+P.r(58,86,5,10)+P.r(70,58,5,10)+P.r(140,150,5,10)+P.r(142,118,5,10)+P.r(137,86,5,10)+P.r(125,58,5,10),'hole')]}
+ ]},
+ {id:'pottery',title:'Pottery',items:[
+  {id:'amphora',name:'Amphora',mat:'Fired clay',period:'Roman',size:'c. 1 m tall',
+   note:'A transport jar for wine or oil. The pointed toe could be pushed into sand or stacked in a ship’s hold.',
+   parts:[S('M84,32 C54,30 50,56 62,74','ceramic',9),S('M116,32 C146,30 150,56 138,74','ceramic',9),F('M84,58 C40,66 38,110 58,148 C70,170 88,186 100,196 C112,186 130,170 142,148 C162,110 160,66 116,58 Z','ceramic'),F(P.r(84,22,32,42,3),'ceramic'),F(P.r(77,12,46,14,6),'ceramic'),L('M50,100 C80,105 120,105 150,100','paint',5),L('M54,114 C84,119 116,119 146,114','paint',2.5),L('M70,74 C90,78 110,78 130,74','paint',2)]},
+  {id:'jug',name:'Wine jug',mat:'Fired clay',period:'Classical Greek',size:'c. 25 cm tall',
+   note:'An oinochoe: one tall handle and a pinched spout for pouring wine into cups.',
+   parts:[S('M122,52 C170,44 178,98 148,126','ceramic',10),F(P.r(64,170,72,14,3),'ceramic'),F('M72,72 C28,84 26,150 62,174 L138,174 C174,150 172,84 128,72 Z','ceramic'),F(P.r(80,36,40,42,4),'ceramic'),F('M82,38 L46,28 L56,48 L82,54 Z','ceramic'),L('M44,118 C80,125 120,125 156,118','paint',5),L('M50,102 L60,94 L70,102 L80,94 L90,102 L100,94 L110,102 L120,94 L130,102 L140,94 L150,102','paint',2)]},
+  {id:'lamp',name:'Oil lamp',mat:'Fired clay',period:'Roman',size:'c. 10 cm long',
+   note:'Filled through the central hole; a wick in the nozzle burned olive oil. Seen here from above.',
+   parts:[F(P.ring(22,100,16,8),'ceramic',1),F(P.r(28,92,18,16,2),'ceramic'),F('M118,74 L170,86 C194,90 194,110 170,114 L118,126 Z','ceramic'),F(P.c(88,100,62),'ceramic'),L(P.c(88,100,36),'slip',3),L(radial(88,100,13,30,8),'ceramicDk',1.8),F(P.c(88,100,8),'hole'),F(P.c(176,100,8),'hole'),L('M138,86 c6,-9 15,-2 8,5 M138,114 c6,9 15,2 8,-5','ceramicDk',1.8)]},
+  {id:'bowl',name:'Bowl',mat:'Fired clay',period:'Roman',size:'c. 20 cm across',
+   note:'A deep serving bowl on a low foot ring, with a painted band and wave pattern.',
+   parts:[F(P.r(68,146,64,18,3),'ceramic'),F('M14,72 L186,72 C182,122 150,152 100,154 C50,152 18,122 14,72 Z','ceramic'),F(P.r(10,62,180,14,7),'ceramic'),L('M22,98 C70,108 130,108 178,98','paint',7),L('M46,124 Q54,116 62,124 T78,124 T94,124 T110,124 T126,124 T142,124 T158,124','paint',2)]},
+  {id:'kylix',name:'Drinking cup',mat:'Fired clay',period:'Classical Greek',size:'c. 25 cm across',
+   note:'A kylix: a wide, shallow cup on a stem with two side handles, passed around at banquets.',
+   parts:[F(P.e(100,176,44,10),'ceramic'),F(P.r(92,120,16,56,3),'ceramic'),S('M32,92 C6,100 0,74 18,70','ceramic',7),S('M168,92 C194,100 200,74 182,70','ceramic',7),F('M18,80 L182,80 C176,108 146,124 100,126 C54,124 24,108 18,80 Z','ceramic'),F(P.r(14,72,172,12,6),'ceramic'),L('M30,96 C70,106 130,106 170,96','paint',6)]},
+  {id:'plate',name:'Plate',mat:'Fired clay',period:'Medieval',size:'c. 24 cm across',
+   note:'A glazed dish with a painted rim and a spiral in the well. Seen here from above.',
+   parts:[F(P.c(100,100,92),'ceramic'),F(P.ring(100,100,92,82),'paint',1),L(P.c(100,100,58),'slip',3),L(radial(100,100,62,78,16),'paint',2),L('M100,100 m-4,0 a4,4 0 1,1 8,0 a8,8 0 1,1 -16,0 a12,12 0 1,1 24,0 a16,16 0 1,1 -32,0 a20,20 0 1,1 40,0','paint',2.5)]}
+ ]},
+ {id:'blades',title:'Blades & tools',items:[
+  {id:'sword',name:'Sword',mat:'Iron',period:'Viking Age',size:'c. 90 cm long',
+   note:'A double-edged blade with a central fuller to lighten it, a straight crossguard and a leather-wrapped grip.',
+   parts:[F(P.e(100,14,18,10),'iron'),F(P.r(93,22,14,36,3),'leather'),L('M93,28L107,32M93,36L107,40M93,44L107,48M93,52L107,56','#2e1f15',1.5),F(P.r(60,56,80,11,4),'iron'),F('M87,67 L113,67 L111,174 L100,196 L89,174 Z','iron'),L('M100,72 L100,168','ironDk',2.5)]},
+  {id:'seax',name:'Seax knife',mat:'Iron and wood',period:'Early medieval',size:'c. 35 cm long',
+   note:'A single-edged knife with an angled back and no guard, used as a tool and a side-arm.',
+   parts:[F(P.r(89,8,22,60,6),'wood'),L('M92,20 L108,20 M92,56 L108,56','woodDk',1.5),F(P.r(87,64,26,9,2),'iron'),F('M87,73 L114,73 L116,138 L91,196 L87,178 Z','iron'),L('M110,78 L111,136','ironDk',1.5)]},
+  {id:'spear',name:'Spear',mat:'Iron and wood',period:'Early medieval',size:'head c. 30 cm',
+   note:'A leaf-shaped head on a split socket, riveted to an ash shaft.',
+   parts:[F(P.r(94,108,12,92,4),'wood'),F('M91,84 L109,84 L107,122 L93,122 Z','iron'),F(P.c(100,112,2.5),'ironDk'),F('M100,4 C124,36 122,66 105,86 L95,86 C78,66 76,36 100,4 Z','iron'),L('M100,12 L100,84','ironDk',2)]},
+  {id:'axe',name:'Bearded axe',mat:'Iron and wood',period:'Viking Age',size:'c. 70 cm long',
+   note:'The “beard” of the blade drops below the head, giving a long edge without much extra weight.',
+   parts:[F(P.r(92,28,16,172,6),'wood'),F('M84,22 L116,22 L118,38 C150,40 174,30 186,18 C190,70 172,102 150,108 C140,84 128,68 116,66 L84,66 Z','iron'),L('M150,50 C160,70 162,86 156,100','ironDk',1.5)]},
+  {id:'sickle',name:'Sickle',mat:'Iron and wood',period:'Iron Age',size:'c. 40 cm long',
+   note:'A curved harvesting blade for cutting grain stalks, with a socketed wooden handle.',
+   parts:[F(P.r(90,140,20,58,7),'wood'),F(P.r(87,132,26,11,3),'iron'),F('M104,134 C42,128 12,72 40,32 C62,2 122,2 156,28 C120,18 76,26 64,60 C54,96 76,120 110,126 Z','iron'),L('M58,42 C70,24 100,18 126,20','ironHi',1.5)]},
+  {id:'key',name:'Door key',mat:'Iron',period:'Medieval',size:'c. 18 cm long',
+   note:'A large key with a ring bow and a stepped bit cut to pass the wards inside the lock.',
+   parts:[F(P.ring(100,34,28,14),'iron',1),F(P.r(88,60,24,9,3),'iron'),F(P.r(93,66,14,108,4),'iron'),F('M107,138 L148,138 L148,178 L136,178 L136,164 L124,164 L124,178 L107,178 Z','iron')]}
+ ]},
+ {id:'bone',title:'Bone & antler',items:[
+  {id:'comb',name:'Double comb',mat:'Antler',period:'Viking Age',size:'c. 15 cm long',
+   note:'Fine and coarse teeth on either side of a riveted spine, decorated with ring-and-dot motifs.',
+   parts:[F(teeth,'bone'),F(P.r(8,80,184,40,7),'bone'),F(P.r(8,86,184,28,4),'boneDk'),F(combDots,'ironDk'),L(combRings,'boneLn',1.5)]},
+  {id:'flute',name:'Bone flute',mat:'Bone',period:'Medieval',size:'c. 16 cm long',
+   note:'Made from a hollow bird or sheep bone, with a whistle window near one end and finger holes along the top.',
+   parts:[F('M14,84 L190,80 L190,120 L14,116 Z','bone'),F(P.e(16,100,16,24),'bone'),F(P.e(190,100,6,20),'boneDk'),L('M40,92 C90,88 140,88 184,90','boneLn',1.2),F(P.r(30,92,10,16,2),'hole'),F(P.c(70,100,5.5)+P.c(92,100,5.5)+P.c(114,100,5.5)+P.c(136,100,5.5)+P.c(158,100,5.5),'hole')]},
+  {id:'skate',name:'Bone skate',mat:'Bone',period:'Viking Age',size:'c. 25 cm long',
+   note:'A horse leg bone, flattened and polished underneath by gliding over ice. Holes at the ends took straps.',
+   parts:[F('M10,90 C10,70 30,66 50,74 L150,74 C170,66 190,70 190,92 L190,112 C190,126 170,128 150,122 L50,122 C30,128 10,126 10,112 Z','bone'),L('M44,119 L156,119','boneDk',5),L('M60,88 C90,84 120,84 150,88','boneLn',1.4),F(P.c(26,100,7.5),'hole'),F(P.e(176,100,5,9),'hole')]},
+  {id:'spoon',name:'Spoon',mat:'Bone',period:'Roman',size:'c. 14 cm long',
+   note:'An oval bowl on a straight handle, carved from a cattle bone.',
+   parts:[F('M94,80 L106,80 L104,194 L96,194 Z','bone'),F(P.c(100,192,4),'bone'),F(P.e(100,44,36,40),'bone'),F(P.e(100,46,27,31),'boneDk'),L('M96,110 L104,116 M96,124 L104,130 M96,138 L104,144','boneLn',1.5)]},
+  {id:'fishhook',name:'Fish hook',mat:'Bone',period:'Mesolithic',size:'c. 6 cm long',
+   note:'Carved with a barb and an eye for the line, which was bound on below the eye.',
+   parts:[S('M126,26 L126,128 C126,190 50,190 52,126','bone',13),F('M45,128 L50,90 L59,128 Z','bone'),F('M57,118 L72,102 L57,108 Z','bone'),F(P.ring(126,18,12,6),'bone',1),L('M120,40 L132,44 M120,48 L132,52 M120,56 L132,60','#7a5a3a',2)]},
+  {id:'pin',name:'Hair pin',mat:'Bone',period:'Roman',size:'c. 12 cm long',
+   note:'A long dress or hair pin with a carved round head and a collar below it.',
+   parts:[F('M96,62 L104,62 L101.5,196 L98.5,196 Z','bone'),F(P.r(90,54,20,10,3),'boneDk'),F(P.c(100,32,26),'bone'),L(P.c(100,32,18),'boneLn',1.4),L('M86,22 L114,42 M86,42 L114,22 M100,10 L100,54 M78,32 L122,32','boneLn',1.6)]}
+ ]},
+ {id:'small',title:'Small finds',items:[
+  {id:'coin',name:'Coin',mat:'Gold',period:'Roman',size:'c. 2 cm across',
+   note:'A ruler’s head in profile, with a beaded border where the legend would run.',
+   parts:[F(P.c(100,100,90),'gilt'),F(P.ring(100,100,90,80),'giltDk',1),F(dots(100,100,85,36,1.8),'gilt'),F('M80,60 C100,40 130,52 128,80 C136,90 134,96 126,98 C130,112 122,126 108,130 L106,150 L76,150 C78,128 66,110 70,90 C66,78 70,66 80,60 Z','giltDk'),L('M84,70 C96,62 110,62 118,70','gilt',1.5)]},
+  {id:'ring',name:'Finger ring',mat:'Gold and garnet',period:'Early medieval',size:'c. 2.5 cm across',
+   note:'A gold band with a raised bezel holding a polished garnet.',
+   parts:[F(P.ring(100,114,74,58),'gilt',1),F(P.r(80,52,40,22,4),'gilt'),F(P.e(100,42,36,28),'gilt'),F(P.e(100,42,25,18),'garnet'),F(P.e(92,36,6,4),'garnetHi')]},
+  {id:'brooch',name:'Brooch',mat:'Gilt bronze',period:'Early medieval',size:'c. 7 cm across',
+   note:'A penannular brooch: an open ring with a long pin that swivels on the hoop to fasten a cloak.',
+   parts:[S('M62,166 A78,78 0 1,1 138,166','gilt',16),F(P.c(60,170,16),'gilt'),F(P.c(140,170,16),'gilt'),F(P.c(60,170,7)+P.c(140,170,7),'garnet'),S('M100,26 L100,194','giltDk',6),F(P.ring(100,20,10,5),'giltDk',1)]},
+  {id:'bracelet',name:'Bracelet',mat:'Gilt bronze',period:'Iron Age',size:'c. 7 cm across',
+   note:'A twisted open bangle with animal-head ends that face each other across the gap.',
+   parts:[S('M70,176 A82,82 0 1,1 130,176','gilt',15),L('M70,176 A82,82 0 1,1 130,176','giltDk',15,'2 7'),F(P.c(68,180,13),'gilt'),F(P.c(132,180,13),'gilt'),F(P.c(64,178,2.5)+P.c(136,178,2.5),'hole'),L('M62,190 L74,190 M126,190 L138,190','giltDk',1.5)]},
+  {id:'buckle',name:'Belt buckle',mat:'Gilt bronze',period:'Medieval',size:'c. 6 cm long',
+   note:'A D-shaped frame with a tongue, hinged to a riveted plate that held the belt end.',
+   parts:[F(P.r(4,52,40,96,5),'gilt'),F(P.c(16,72,4)+P.c(16,128,4),'giltDk'),F('M44,28 L110,28 C168,28 188,68 188,100 C188,132 168,172 110,172 L44,172 Z M52,46 L108,46 C150,46 168,76 168,100 C168,124 150,154 108,154 L52,154 Z','gilt',1),F(P.r(34,24,18,152,5),'gilt'),F('M44,93 L176,97 L176,103 L44,107 Z','giltDk')]}
+ ]}
+];
+const OBJ={},ALL=[];
+GROUPS.forEach(g=>g.items.forEach(o=>{o.group=g;OBJ[o.id]=o;ALL.push(o.id);}));
+
+// ---------- rendering ----------
+function renderParts(parts,mode){
+  let s='';
+  for(const it of parts){
+    const eo=it.eo?' fill-rule="evenodd"':'';
+    if(it.t==='f'){
+      const m=MAT[it.m];
+      if(mode==='real') s+=`<path d="${it.d}" fill="${m.f}" stroke="${m.s}" stroke-width="1.4" stroke-linejoin="round"${eo}/>`;
+      else{const dark=['hole','paint','garnet','ironDk','giltDk'].includes(it.m);
+        s+=`<path d="${it.d}" fill="${dark?INK:m.f}" fill-opacity="${dark?.6:.3}" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"${eo}/>`;}
+    }else if(it.t==='s'){
+      const m=MAT[it.m];
+      if(mode==='real') s+=`<path d="${it.d}" fill="none" stroke="${m.s}" stroke-width="${it.w+2.8}" stroke-linecap="round"/><path d="${it.d}" fill="none" stroke="${m.f}" stroke-width="${it.w}" stroke-linecap="round"/>`;
+      else s+=`<path d="${it.d}" fill="none" stroke="${INK}" stroke-width="${it.w+4.4}" stroke-linecap="round"/><path d="${it.d}" fill="none" stroke="#f6eedb" stroke-width="${it.w}" stroke-linecap="round"/><path d="${it.d}" fill="none" stroke="${m.f}" stroke-opacity=".3" stroke-width="${it.w}" stroke-linecap="round"/>`;
+    }else{
+      const c=MAT[it.c]?MAT[it.c].f:it.c, da=it.dash?` stroke-dasharray="${it.dash}"`:'';
+      if(mode==='real') s+=`<path d="${it.d}" fill="none" stroke="${c}" stroke-width="${it.w}" stroke-linecap="round"${da}/>`;
+      else s+=`<path d="${it.d}" fill="none" stroke="${INK}" stroke-opacity=".75" stroke-width="${Math.max(1.2,it.w*.7)}" stroke-linecap="round"${da}/>`;
+    }
+  }
+  return s;
+}
+const objSVG=(id,mode,cls='')=>`<svg class="${cls}" viewBox="-8 -8 216 216" aria-hidden="true">${renderParts(OBJ[id].parts,mode)}</svg>`;
+
+// ---------- seeded randomness & dates ----------
+function hash(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19;}return()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return(h^=h>>>16)>>>0;};}
+function rng(seed){let a=hash(String(seed))();return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(arr,R){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const EPOCH=Date.UTC(2026,10,5);
+const now=new Date();
+const dayIdx=Math.floor((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-EPOCH)/864e5);
+const digNo=dayIdx+1;
+function scheduleFor(d){
+  const n=ALL.length, cyc=Math.floor(d/n), pos=((d%n)+n)%n;
+  let perm=shuffle(ALL,rng('uts-cycle-'+cyc));
+  if(cyc===0){perm=perm.filter(x=>x!=='cauldron');perm.unshift('cauldron');} // Dig #1 = Owen's example
+  return perm[pos];
+}
+const SITES=['Ashby Fen','Hollow Lane','Coldharbour','Wether Down','Saltmarsh Field','Kestrel Rise','Mill Leat','Barrow Close','Stonepit Farm','Rook Hill','Ferry Meadow','Abbey Croft'];
+
+// ---------- puzzle ----------
+const N=8,C=45,W=N*C,K=225/200;
+const colL=c=>'ABCDEFGH'[c], cellName=i=>colL(i%N)+(Math.floor(i/N)+1);
+function applyT(ctx,pz){ctx.translate(pz.ox+112.5,pz.oy+112.5);ctx.rotate(pz.rot*Math.PI/180);ctx.scale(pz.mir*K,K);ctx.translate(-100,-100);}
+function coverage(pz){
+  const cv=document.createElement('canvas');cv.width=cv.height=W;const ctx=cv.getContext('2d');
+  applyT(ctx,pz);ctx.fillStyle='#000';ctx.strokeStyle='#000';ctx.lineCap='round';
+  for(const it of OBJ[pz.obj].parts){const p=new Path2D(it.d);if(it.t==='f')ctx.fill(p,it.eo?'evenodd':'nonzero');else if(it.t==='s'){ctx.lineWidth=it.w+2.8;ctx.stroke(p);}}
+  const d=ctx.getImageData(0,0,W,W).data, cov=new Array(N*N).fill(0);
+  for(let y=0;y<W;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>60)cov[Math.floor(y/C)*N+Math.floor(x/C)]++;
+  return cov.map(v=>v/(C*C));
+}
+function makePuzzle(objId,seed){
+  const R=rng(seed);
+  const pz={obj:objId,ox:Math.round(R()*135),oy:Math.round(R()*135),rot:[0,90,180,270][Math.floor(R()*4)],mir:R()<.5?-1:1};
+  pz.cov=coverage(pz);
+  let pool=pz.cov.map((v,i)=>[v,i]).filter(([v])=>v>=.22&&v<=.62).map(([,i])=>i);
+  if(!pool.length)pool=pz.cov.map((v,i)=>[Math.abs(v-.4),i]).sort((a,b)=>a[0]-b[0]).slice(0,3).map(x=>x[1]);
+  pz.start=pool[Math.floor(R()*pool.length)];
+  pz.site=SITES[Math.floor(R()*SITES.length)];pz.trench='ABCDEF'[Math.floor(R()*6)];pz.ctx=String(100+Math.floor(R()*900)).padStart(4,'0');
+  return pz;
+}
+
+// ---------- storage ----------
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const BUDGET=10,WRONG_COST=2;
+
+// ---------- state ----------
+let G; // current game
+function newGame(mode){
+  let objId,seed,saved=null;
+  if(mode==='daily'){objId=scheduleFor(dayIdx);seed='uts-day-'+dayIdx;saved=store.get('uts-day-'+dayIdx,null);}
+  else{objId=ALL[Math.floor(Math.random()*ALL.length)];seed='prac-'+Math.random();}
+  const pz=makePuzzle(objId,seed);
+  G={mode,pz,brushed:[pz.start],events:[],wrong:[],status:'play',sel:null,choice:null};
+  if(saved&&saved.obj===objId){G.brushed=saved.brushed;G.events=saved.events;G.wrong=saved.wrong;G.status=saved.status;}
+  buildSite();renderAll();
+  if(G.status!=='play'){finishInstant();}
+}
+const used=()=>G.events.reduce((s,e)=>s+(e==='b'?1:WRONG_COST),0);
+const left=()=>BUDGET-used();
+function save(){if(G.mode!=='daily')return;store.set('uts-day-'+dayIdx,{obj:G.pz.obj,brushed:G.brushed,events:G.events,wrong:G.wrong,status:G.status});}
+
+// ---------- site svg ----------
+const $=id=>document.getElementById(id);
+let svg,maskRects=[],particles=[];
+function buildSite(){
+  const pz=G.pz, R=rng('peb'+pz.ox+pz.oy+pz.obj);
+  let pebbles='';for(let i=0;i<70;i++){const x=R()*W,y=R()*W,r=1+R()*3.2;pebbles+=`<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(r)}" ry="${f1(r*.75)}" transform="rotate(${Math.floor(R()*180)} ${f1(x)} ${f1(y)})" fill="${['#b7a07a','#9f8a68','#c9b48c','#8d7a5d'][i%4]}" opacity=".85"/>`;}
+  let mask='';for(let i=0;i<N*N;i++)mask+=`<rect id="mk${i}" x="${(i%N)*C-.3}" y="${Math.floor(i/N)*C-.3}" width="${C+.6}" height="${C+.6}" fill="#fff"/>`;
+  let grid='';for(let k=0;k<=N;k++){grid+=`<line x1="${k*C}" y1="0" x2="${k*C}" y2="${W}"/><line x1="0" y1="${k*C}" x2="${W}" y2="${k*C}"/>`;}
+  let labels='';for(let k=0;k<N;k++){labels+=`<text x="${k*C+C/2}" y="-10" text-anchor="middle">${colL(k)}</text><text x="-13" y="${k*C+C/2+4}" text-anchor="middle">${k+1}</text>`;}
+  let stakes='';for(let k=0;k<=N;k++)for(const [x,y] of [[k*C,0],[k*C,W],[0,k*C],[W,k*C]])stakes+=`<circle cx="${x}" cy="${y}" r="2.6"/>`;
+  const tr=`translate(${pz.ox+112.5} ${pz.oy+112.5}) rotate(${pz.rot}) scale(${pz.mir*K} ${K}) translate(-100 -100)`;
+  $('site').innerHTML=`<svg id="dig" viewBox="-30 -30 420 420">
+   <defs>
+    <filter color-interpolation-filters="sRGB" id="spD" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .35  0 0 0 0 .26  0 0 0 0 .16  -3.2 0 0 0 1.45"/></filter>
+    <filter color-interpolation-filters="sRGB" id="spL" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 .96  0 0 0 0 .86  3.2 0 0 0 -1.85"/></filter>
+    <filter color-interpolation-filters="sRGB" id="mot" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".018" numOctaves="3" seed="2"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .4  0 0 0 0 .24  2 0 0 0 -.85"/></filter>
+    <filter color-interpolation-filters="sRGB" id="aged"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" values="0 0 0 0 .36  0 0 0 0 .27  0 0 0 0 .17  -2.2 0 0 0 1.0" result="sp"/><feComposite in="sp" in2="SourceGraphic" operator="in" result="s2"/><feDropShadow in="SourceGraphic" dx="0" dy="1.5" stdDeviation="1.6" flood-color="#140c05" flood-opacity=".7" result="sh"/><feMerge><feMergeNode in="sh"/><feMergeNode in="s2"/></feMerge></filter>
+    <mask id="cover" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${W}">${mask}</mask>
+    <clipPath id="plot"><rect x="0" y="0" width="${W}" height="${W}"/></clipPath>
+   </defs>
+   <rect x="-30" y="-30" width="420" height="420" fill="#efe5cf"/>
+   <g clip-path="url(#plot)">
+    <rect width="${W}" height="${W}" fill="#4b3725"/><rect width="${W}" height="${W}" filter="url(#mot)" opacity=".35"/><rect width="${W}" height="${W}" filter="url(#spD)"/>
+    <g class="riser" id="riser"><g transform="${tr}" filter="url(#aged)">${renderParts(OBJ[pz.obj].parts,'real')}</g></g>
+    <g mask="url(#cover)" id="coverG">
+     <rect width="${W}" height="${W}" fill="#d3b887"/><rect width="${W}" height="${W}" filter="url(#mot)" opacity=".55"/><rect width="${W}" height="${W}" filter="url(#spD)" opacity=".8"/><rect width="${W}" height="${W}" filter="url(#spL)" opacity=".8"/>${pebbles}
+    </g>
+    <g id="edges" fill="none" stroke="rgba(50,30,15,.45)" stroke-width="2"></g>
+   </g>
+   <g stroke="rgba(255,250,235,.7)" stroke-width=".9">${grid}</g>
+   <g fill="#b23a2a" stroke="#fff" stroke-width=".8">${stakes}</g>
+   <g font-family="IBM Plex Mono, monospace" font-size="11" fill="#6b5f4c">${labels}</g>
+   <g transform="translate(372 -18)" font-family="IBM Plex Mono, monospace" font-size="9" fill="#6b5f4c"><path d="M0,14 L4,0 L8,14 L4,10 Z" fill="#2f2a22"/><text x="4" y="24" text-anchor="middle">N</text></g>
+   <g id="tags"></g>
+   <rect id="hov" width="${C}" height="${C}" fill="rgba(255,255,255,.18)" stroke="#2f2a22" stroke-width="2" stroke-dasharray="5 4" visibility="hidden" pointer-events="none"/>
+   <g id="parts" pointer-events="none"></g>
+   <rect id="hit" x="0" y="0" width="${W}" height="${W}" fill="transparent" style="cursor:pointer"/>
+  </svg>`;
+  svg=$('dig');maskRects=[];for(let i=0;i<N*N;i++)maskRects.push($('mk'+i));
+  G.brushed.forEach(i=>maskRects[i].setAttribute('opacity','0'));
+  drawTags();
+  const hit=$('hit');
+  hit.addEventListener('pointermove',e=>{const i=cellAt(e);showHover(e.pointerType==='mouse'?i:G.sel);});
+  hit.addEventListener('pointerleave',()=>showHover(G.sel));
+  hit.addEventListener('click',e=>onCell(cellAt(e),e));
+}
+function cellAt(e){const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform($('hit').getScreenCTM().inverse());const c=Math.floor(p.x/C),r=Math.floor(p.y/C);return(c<0||r<0||c>=N||r>=N)?null:r*N+c;}
+function showHover(i){const h=$('hov');if(i==null||G.status!=='play'||G.brushed.includes(i)||left()<1){h.setAttribute('visibility','hidden');return;}h.setAttribute('x',(i%N)*C);h.setAttribute('y',Math.floor(i/N)*C);h.setAttribute('visibility','visible');}
+function drawTags(){
+  let t='',ed='';
+  G.brushed.forEach((i,n)=>{const x=(i%N)*C,y=Math.floor(i/N)*C;
+    t+=`<g transform="translate(${x+3} ${y+3})"><rect width="13" height="11" rx="1.5" fill="#fffdf4" stroke="#2f2a22" stroke-width=".8"/><text x="6.5" y="8.6" font-size="8.5" text-anchor="middle" font-family="IBM Plex Mono, monospace" fill="#2f2a22">${n}</text></g>`;
+    const c=i%N,r=Math.floor(i/N),b=j=>G.brushed.includes(j);
+    if(r>0&&!b(i-N))ed+=`M${x},${y+1}h${C}`;if(r<N-1&&!b(i+N))ed+=`M${x},${y+C-1}h${C}`;
+    if(c>0&&!b(i-1))ed+=`M${x+1},${y}v${C}`;if(c<N-1&&!b(i+1))ed+=`M${x+C-1},${y}v${C}`;});
+  $('tags').innerHTML=G.status==='play'?t:'';
+  $('edges').innerHTML=G.status==='play'?`<path d="${ed}"/>`:'';
+}
+const touchy=()=>!matchMedia('(hover:hover)').matches;
+function onCell(i,e){
+  if(i==null||G.status!=='play')return;
+  if(G.brushed.includes(i)){toast('Already brushed');return;}
+  if(left()<1){toast('No squares left — make your identification');return;}
+  if(touchy()&&G.sel!==i){G.sel=i;showHover(i);$('bBrush').disabled=false;$('bBrush').textContent='Brush '+cellName(i);status(`Square ${cellName(i)} marked. Tap it again to brush.`);return;}
+  brush(i);
+}
+function brush(i){
+  G.sel=null;$('bBrush').disabled=true;$('bBrush').textContent='Brush square';
+  G.brushed.push(i);G.events.push('b');save();
+  fadeCell(i,420);dust(i);sfx('brush');
+  drawTags();showHover(null);
+  const soil=G.pz.cov[i]<.01;
+  const L=left();
+  status(L<1?`${soil?'Just soil. ':''}Out of squares — make your identification.`:`${cellName(i)}: ${soil?'just soil.':'something there.'} ${L} square${L===1?'':'s'} left.`);
+  renderPegs();renderLog();
+}
+function fadeCell(i,ms){const r=maskRects[i],t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/ms);r.setAttribute('opacity',String(1-k*k*(3-2*k)));if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
+function dust(i){
+  const cx=(i%N)*C+C/2,cy=Math.floor(i/N)*C+C/2,g=$('parts');
+  for(let k=0;k<20;k++){const el=document.createElementNS('http://www.w3.org/2000/svg','circle');const a=Math.random()*Math.PI*2,sp=.6+Math.random()*2.2;
+    el.setAttribute('r',f1(.8+Math.random()*2));el.setAttribute('fill',['#d9c194','#c4a874','#e8d6ad','#a88d63'][k%4]);g.appendChild(el);
+    particles.push({el,x:cx+(Math.random()-.5)*C*.7,y:cy+(Math.random()-.5)*C*.7,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,life:1});}
+  if(!dust.on){dust.on=true;requestAnimationFrame(tickDust);}
+}
+function tickDust(){particles=particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.09;p.vx*=.97;p.life-=.028;if(p.life<=0){p.el.remove();return false;}p.el.setAttribute('cx',f1(p.x));p.el.setAttribute('cy',f1(p.y));p.el.setAttribute('opacity',f1(p.life));return true;});if(particles.length)requestAnimationFrame(tickDust);else dust.on=false;}
+
+// ---------- notebook ----------
+function renderCands(){
+  const g=OBJ[G.pz.obj].group;
+  $('cands').innerHTML=g.items.map(o=>{
+    const struck=G.wrong.includes(o.id), ans=G.status!=='play'&&o.id===G.pz.obj;
+    return `<button class="cand${struck?' struck':''}${G.choice===o.id?' sel':''}${ans?' answer':''}" data-id="${o.id}" ${struck||G.status!=='play'?'tabindex="-1"':''}>${objSVG(o.id,'sketch','sk')}<div class="lbl">${o.name}</div>${struck?'<svg class="x" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M10,12 L90,88 M88,10 L12,90" stroke="#b23a2a" stroke-width="4" stroke-linecap="round" fill="none"/></svg>':''}</button>`;}).join('');
+  $('cands').querySelectorAll('.cand').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id;if(G.status!=='play'||G.wrong.includes(id))return;
+    G.choice=G.choice===id?null:id;renderCands();renderId();});
+  renderId();
+}
+function renderId(){
+  const b=$('bId');
+  if(G.status!=='play'){b.disabled=true;b.textContent='Dig closed';$('idHint').textContent='';return;}
+  b.disabled=!G.choice;b.textContent=G.choice?`Identify as ${OBJ[G.choice].name.toLowerCase()}`:'Identify…';
+  $('idHint').textContent=G.choice?'':(left()<WRONG_COST?'A wrong identification now ends the dig.':'A wrong identification costs 2 squares.');
+}
+function identify(){
+  if(!G.choice||G.status!=='play')return;
+  const id=G.choice;G.choice=null;
+  if(id===G.pz.obj){G.status='won';save();sfx('win');finish(true);return;}
+  G.wrong.push(id);G.events.push('w');sfx('wrong');
+  $('siteCard').classList.remove('shake');void $('siteCard').offsetWidth;$('siteCard').classList.add('shake');
+  if(left()<0){G.status='lost';save();status(`Not a ${OBJ[id].name.toLowerCase()} — and that was your last chance.`);finish(false);return;}
+  save();const L=left();
+  status(`Not a ${OBJ[id].name.toLowerCase()}. That cost 2 squares — ${L} left.`);
+  renderCands();renderPegs();renderLog();showHover(null);
+}
+
+// ---------- pegs, log, header ----------
+function renderPegs(){
+  const seq=[];G.events.forEach(e=>{if(e==='b')seq.push('u');else{seq.push('w','w');}});
+  let html='';for(let k=0;k<BUDGET;k++){const s=seq[k]||'n';
+    const flag=s==='n'?'#d9762b':s==='w'?'#b23a2a':'#bdb19a', lean=s==='n'?0:-14;
+    html+=`<svg viewBox="0 0 22 40"><g transform="rotate(${lean} 11 38)"><line x1="8" y1="6" x2="8" y2="38" stroke="#5a4630" stroke-width="2.2" stroke-linecap="round"/><path d="M9,6 L20,10 L9,15 Z" fill="${flag}"/></g></svg>`;}
+  $('pegs').innerHTML=html;
+  const L=Math.max(0,left());$('pegcap').textContent=`${L} of ${BUDGET} squares left`;
+}
+function renderLog(){
+  let n=0;const items=[];
+  items.push(`<span>0 · ${cellName(G.pz.start)} (survey)</span>`);
+  let bi=1,wi=0;
+  G.events.forEach(e=>{if(e==='b'){const c=G.brushed[bi++];items.push(`<span>${bi-1} · ${cellName(c)}${G.pz.cov[c]<.01?' — soil':''}</span>`);}else{items.push(`<span class="w">${OBJ[G.wrong[wi++]].name}</span>`);}});
+  $('log').innerHTML='Field log: '+items.join('');
+}
+function status(t){$('status').textContent=t;}
+function renderHeader(){
+  const d=new Date();const ds=d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  $('sub').innerHTML=G.mode==='daily'?`Dig #${digNo} · ${ds}`:`<span class="practice">PRACTICE</span>doesn't count toward stats or your collection · <a href="#" id="backDaily" style="color:inherit">back to today's dig</a>`;
+  const b=$('backDaily');if(b)b.onclick=e=>{e.preventDefault();newGame('daily');};
+  $('siteName').textContent=`Site: ${G.pz.site} · Trench ${G.pz.trench}`;
+  $('siteCtx').textContent=`Context ${G.pz.ctx}`;
+  $('brushbar').classList.toggle('on',touchy()&&G.status==='play');
+  $('noteSub').textContent=`It's one of these ${OBJ[G.pz.obj].group.title.toLowerCase()}. It may be turned or flipped in the ground.`;
+}
+function renderAll(){
+  renderHeader();renderCands();renderPegs();renderLog();
+  if(G.status==='play'){const L=left();status(G.events.length?`${L} square${L===1?'':'s'} left. Brush another square or identify the find.`:`The survey team opened ${cellName(G.pz.start)}. Where will you brush next?`);}
+}
+
+// ---------- finishing ----------
+function finish(won){
+  G.sel=null;showHover(null);drawTags();renderCands();renderPegs();renderHeader();
+  const c0=G.pz,cx=c0.ox+112.5,cy=c0.oy+112.5;
+  const order=[...Array(N*N).keys()].filter(i=>!G.brushed.includes(i)).sort((a,b)=>Math.hypot((a%N)*C+22-cx,Math.floor(a/N)*C+22-cy)-Math.hypot((b%N)*C+22-cx,Math.floor(b/N)*C+22-cy));
+  order.forEach((i,k)=>setTimeout(()=>fadeCell(i,380),k*16));
+  status(won?`Identified: ${OBJ[G.pz.obj].name.toLowerCase()}!`:`It was a ${OBJ[G.pz.obj].name.toLowerCase()}.`);
+  if(G.mode==='daily')recordResult(won);
+  setTimeout(()=>{if(won)$('riser').classList.add('up');},order.length*16+200);
+  setTimeout(()=>showResult(won),order.length*16+1500);
+}
+function finishInstant(){
+  maskRects.forEach(r=>r.setAttribute('opacity','0'));drawTags();
+  if(G.status==='won')$('riser').classList.add('up');
+  status(G.status==='won'?`Identified: ${OBJ[G.pz.obj].name.toLowerCase()}. Come back tomorrow for a new dig.`:`It was a ${OBJ[G.pz.obj].name.toLowerCase()}. New dig tomorrow.`);
+  renderCands();renderPegs();renderHeader();
+}
+function recordResult(won){
+  const st=store.get('uts-stats',{played:0,won:0,streak:0,best:null,sum:0,last:null,done:{}});
+  if(st.done[dayIdx])return;st.done[dayIdx]=1;st.played++;
+  if(won){const u=used();st.won++;st.sum+=u;st.streak=st.last===dayIdx-1?st.streak+1:1;st.last=dayIdx;st.best=st.best==null?u:Math.min(st.best,u);
+    const col=store.get('uts-collection',{});if(!col[G.pz.obj])col[G.pz.obj]={dig:digNo,squares:u,date:new Date().toISOString().slice(0,10)};store.set('uts-collection',col);}
+  else st.streak=0;
+  store.set('uts-stats',st);updateCabBtn();
+}
+function rank(u){return u<=1?'Eagle-eyed':u<=3?'Site director':u<=5?'Senior archaeologist':u<=7?'Field assistant':'Keen volunteer';}
+function shareText(won){
+  let row='';G.events.forEach(e=>{row+=e==='b'?'🟫':'🟥🟥';});
+  let cnt=[...row].length;row=[...row].slice(0,BUDGET).join('');while([...row].length<BUDGET)row+='⬜';
+  return `Under the Surface #${digNo} ⛏️\n${won?`Identified with ${used()} of ${BUDGET} squares`:'Still in the ground'}\n${row}${won?' ✅':' ❌'}`;
+}
+function showResult(won){
+  const o=OBJ[G.pz.obj], u=used(), daily=G.mode==='daily';
+  const st=store.get('uts-stats',{played:0,won:0,streak:0,best:null,sum:0});
+  const col=store.get('uts-collection',{});const findNo=Object.keys(col).length;
+  $('resultSheet').innerHTML=`<button class="close" data-close>×</button>
+   <div class="mono">${won?(daily?'Catalogued':'Practice find — not catalogued'):'Unidentified'}</div>
+   <h2>${won?'Into the collection':'Lost to the spoil heap'}</h2>
+   <div class="entry"><div class="img">${objSVG(o.id,'real')}</div><div>
+     <div class="mono">${daily?`Find ${won?'no. '+String(findNo).padStart(4,'0')+' · ':''}Dig #${digNo}`:'Practice dig'} · ${G.pz.site}</div>
+     <h2 style="font-size:24px;margin-top:4px">${o.name}</h2><div class="meta">${o.mat} · ${o.period} · ${o.size}</div><p>${o.note}</p></div></div>
+   <div class="verdict">${won?`Identified with <b>${u}</b> of ${BUDGET} squares — ${rank(u)}`:`You ran out of squares. ${daily?'It stays out of your collection for now — it will turn up again.':''}`}</div>
+   ${daily?`<div class="share" id="shareTxt">${shareText(won)}</div>
+   <div class="row"><button class="btn" id="bCopy">Copy result</button><button class="btn ghost" id="bCab2">Collection (${Object.keys(col).length}/${ALL.length})</button></div>
+   <div class="stats"><div><b>${st.played}</b><span>Digs</span></div><div><b>${st.won}</b><span>Identified</span></div><div><b>${st.streak}</b><span>Streak</span></div><div><b>${st.won?(st.sum/st.won).toFixed(1):'–'}</b><span>Avg squares</span></div></div>
+   <div class="mono" style="text-align:center">Next dig in <span id="cd"></span></div>`:''}
+   <div class="row" style="justify-content:center"><button class="btn ghost" id="bPrac2">${daily?'Practice dig':'Another practice dig'}</button><button class="btn ghost" data-close>Back to the site</button></div>`;
+  openModal('mResult');
+  const cp=$('bCopy');if(cp)cp.onclick=()=>{navigator.clipboard.writeText(shareText(won)).then(()=>toast('Copied'),()=>toast('Copy failed — select the text instead'));};
+  const c2=$('bCab2');if(c2)c2.onclick=()=>{closeModals();openCab();};
+  $('bPrac2').onclick=()=>{closeModals();newGame('practice');};
+  tickCd();
+}
+function tickCd(){const el=$('cd');if(!el)return;const n=new Date(),m=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1);let s=Math.floor((m-n)/1000);const h=Math.floor(s/3600);s%=3600;el.textContent=`${String(h).padStart(2,'0')}:${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
+setInterval(tickCd,1000);
+
+// ---------- collection ----------
+function updateCabBtn(){const col=store.get('uts-collection',{});$('bCab').textContent=`Collection ${Object.keys(col).length}/${ALL.length}`;}
+function openCab(){
+  const col=store.get('uts-collection',{});
+  $('cabSheet').innerHTML=`<button class="close" data-close>×</button><div class="mono">Your finds cabinet</div><h2>${Object.keys(col).length} of ${ALL.length} catalogued</h2>
+   <p class="hint" style="margin:6px 0 0">Daily digs you identify are added here. Practice digs don't count.</p>`+
+   GROUPS.map(g=>`<h3>${g.title}</h3><div class="drawer">${g.items.map(o=>col[o.id]?`<div class="tile"><div class="box">${objSVG(o.id,'real')}</div><div class="nm">${o.name}</div><div class="dt">Dig #${col[o.id].dig} · ${col[o.id].squares} sq.</div></div>`:`<div class="tile miss"><div class="box">?</div><div class="nm">&nbsp;</div><div class="dt">not yet found</div></div>`).join('')}</div>`).join('');
+  openModal('mCab');
+}
+
+// ---------- modals, toast ----------
+function openModal(id){$(id).classList.add('on');}
+function closeModals(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('on'));}
+document.addEventListener('click',e=>{if(e.target.matches('[data-close]')||e.target.classList.contains('modal'))closeModals();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModals();});
+let tt;function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),1600);}
+
+// ---------- sound ----------
+let snd=store.get('uts-sound',true),AC=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC;}
+function sfx(kind){
+  if(!snd)return;const a=ac();if(!a)return;const t=a.currentTime;
+  if(kind==='brush'){
+    for(let k=0;k<3;k++){const len=.13,buf=a.createBuffer(1,a.sampleRate*len,a.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/d.length);
+      const src=a.createBufferSource();src.buffer=buf;const bp=a.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2600+k*500;bp.Q.value=.8;const g=a.createGain();g.gain.value=.07;src.connect(bp).connect(g).connect(a.destination);src.start(t+k*.09);}
+  }else if(kind==='win'){
+    [523.25,659.25,783.99,1046.5].forEach((f,k)=>{const o=a.createOscillator(),g=a.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0,t+k*.12);g.gain.linearRampToValueAtTime(.09,t+k*.12+.01);g.gain.exponentialRampToValueAtTime(.0005,t+k*.12+.9);o.connect(g).connect(a.destination);o.start(t+k*.12);o.stop(t+k*.12+1);});
+  }else{
+    const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(70,t+.25);g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.32);
+  }
+}
+function renderSnd(){$('bSnd').textContent=snd?'Sound on':'Sound off';}
+
+// ---------- wire up ----------
+$('bId').onclick=identify;
+$('bBrush').onclick=()=>{if(G.sel!=null)brush(G.sel);};
+$('bHow').onclick=()=>openModal('mHow');
+$('bCab').onclick=openCab;
+$('bPrac').onclick=()=>newGame('practice');
+$('bSnd').onclick=()=>{snd=!snd;store.set('uts-sound',snd);renderSnd();if(snd)sfx('brush');};
+renderSnd();updateCabBtn();
+newGame('daily');
+if(!store.get('uts-seen',false)){openModal('mHow');store.set('uts-seen',true);}
+window.__UTS={get G(){return G;},objSVG,OBJ,ALL,GROUPS,makePuzzle,scheduleFor,brush,identify:id=>{G.choice=id;identify();}};
+})();
+</script>
+</body>
+</html>
