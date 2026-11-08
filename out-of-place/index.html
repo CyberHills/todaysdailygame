@@ -105,7 +105,18 @@
   .practice-banner{background:#efe3cc;border:1px solid var(--line);padding:6px 6px 6px 12px;border-radius:6px;font-size:13px;display:none;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}
 </style>
 </head>
-<body>
+<body><!--tdg-bar--><style>
+#tdg-bar{position:relative;z-index:2147483000;display:flex;align-items:center;justify-content:space-between;gap:10px;
+height:38px;padding:0 12px;padding-top:env(safe-area-inset-top);box-sizing:content-box;background:#1e1c19;color:#f3eee4;
+font:600 13.5px/1 "Inter Tight",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+#tdg-bar a{color:#f3eee4;text-decoration:none;display:inline-flex;align-items:center;gap:7px;padding:8px 4px;border-radius:8px}
+#tdg-bar a:hover,#tdg-bar a:focus-visible{text-decoration:underline;outline:none}
+#tdg-bar .tdg-brand{opacity:.7;font-weight:500;white-space:nowrap}
+@media print{#tdg-bar{display:none}}
+</style>
+<nav id="tdg-bar" aria-label="Site"><a href="/" aria-label="Back to all games">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg-bar-->
 <div class="wrap">
   <header>
     <div class="brand">Out <em>of</em> Place</div>
