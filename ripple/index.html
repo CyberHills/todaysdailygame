@@ -382,6 +382,10 @@ function todayKey(){const d=new Date();return Date.UTC(d.getFullYear(),d.getMont
 function curDay(){return Math.floor((todayKey()-EPOCH)/864e5)+1}
 let dayNum=curDay(),playDay=dayNum; // playDay = the daily tray currently loaded (a tab can stay open past midnight)
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+let __tdgS=false,__tdgF=false,__tdgDays={};
+function __tdgInfo(){return {game:'ripple',mode:mode,day:mode==='daily'?playDay:dayNum}}
+function __tdgStart(){if(locked||__tdgS)return;__tdgS=true;if(mode==='daily'){if(__tdgDays[playDay])return;__tdgDays[playDay]=1}__tdgT('start',__tdgInfo())}
 let mode='daily',puzzle=null,seed=0,guesses=[null,null,null],locked=false,result=null,anim=null,pathAlpha=0;
 
 const $=id=>document.getElementById(id);
@@ -409,7 +413,7 @@ function load(newMode,newSeed){
   mode=newMode;seed=newSeed;if(mode==='daily')playDay=dayNum;
   document.body.classList.toggle('mode-practice',mode==='practice');
   puzzle=genPuzzle(seed);
-  locked=false;result=null;guesses=[null,null,null];pathAlpha=0;anim&&(cancelAnimationFrame(anim.raf),clearTimeout(anim.end));anim=null;
+  locked=false;result=null;guesses=[null,null,null];pathAlpha=0;__tdgS=false;__tdgF=false;anim&&(cancelAnimationFrame(anim.raf),clearTimeout(anim.end));anim=null;
   board.style.transform='';board.classList.remove('tilting');$('phase').classList.remove('show');$('sharebox')&&$('sharebox').remove();
   $('modePill').textContent=mode==='daily'?`Daily #${playDay}`:'Practice';
   $('modeBtn').textContent=mode==='daily'?'Practice':'Daily';
@@ -467,7 +471,7 @@ function settle(el){el.classList.remove('settle');void el.offsetWidth;el.classLi
 function keyMove(e,m){
   if(locked)return;
   const K={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
-  if(!K&&e.key!=='Escape')return;e.preventDefault();
+  if(!K&&e.key!=='Escape')return;if(K)__tdgStart();e.preventDefault();
   if(e.key==='Escape'){guesses[m.i]=null;toDock(m);m.el.focus();draw();updateUI();return}
   const stp=e.shiftKey?1:0.25,g=guesses[m.i]||{x:W/2,y:H/2};
   guesses[m.i]=guesses[m.i]?{x:Math.max(0.2,Math.min(W-0.2,g.x+K[0]*stp)),y:Math.max(0.2,Math.min(H-0.2,g.y+K[1]*stp))}:g;
@@ -475,7 +479,7 @@ function keyMove(e,m){
 }
 let drag=null;
 function startDrag(e,m){
-  if(locked)return;e.preventDefault();
+  if(locked)return;e.preventDefault();__tdgStart();
   const r=m.el.getBoundingClientRect();
   document.body.appendChild(m.el);
   m.el.style.position='fixed';m.el.classList.add('drag');
@@ -688,8 +692,9 @@ function explain(i){
   const s=bits.join(', ');return s.charAt(0).toUpperCase()+s.slice(1)+'.';
 }
 function finish(instant){
-  locked=true;
-  if(mode==='daily'){const sv=store.get('ripple-day-'+playDay);if(sv&&sv.revealed===false){sv.revealed=true;store.set('ripple-day-'+playDay,sv)}}
+  locked=true;let __first=mode!=='daily';
+  if(mode==='daily'){const sv=store.get('ripple-day-'+playDay);if(sv&&sv.revealed===false){sv.revealed=true;store.set('ripple-day-'+playDay,sv);__first=true}}
+  if(__first&&!__tdgF&&result){__tdgF=true;const i=__tdgInfo();i.score=result.total;i.max=100;i.result=result.total+'/100';__tdgT('finish',i)}
   setTimeout(checkNewDay,1500);pathAlpha=1;markers.forEach(m=>m.el.classList.add('locked'));
   $('goBtn').style.display='none';dock.style.display='none';$('hint').textContent=mode==='daily'?'A new tray arrives at midnight — or try a practice tray.':'Practice tray · try another, or go back to the daily.';
   draw();
@@ -731,7 +736,7 @@ $('goBtn').onclick=()=>{if(anim&&anim.skip&&locked){anim.skip();return}lockIn()}
 $('replayBtn').onclick=()=>{play()};
 $('practiceBtn').onclick=()=>load('practice',(Math.random()*1e9)|0);
 $('modeBtn').onclick=()=>{dayNum=curDay();mode==='daily'?load('practice',(Math.random()*1e9)|0):load('daily',hashStr('ripple-'+dayNum))};
-$('shareBtn').onclick=async()=>{const t=shareText();try{await navigator.clipboard.writeText(t);toast('Copied to clipboard')}catch(e){toast('Copy blocked here. Select the text below');let bx=$('sharebox');if(!bx){bx=document.createElement('pre');bx.id='sharebox';bx.className='sharebox';$('stats').after(bx)}bx.textContent=t}};
+$('shareBtn').onclick=async()=>{__tdgT('share',{game:'ripple',mode:mode});const t=shareText();try{await navigator.clipboard.writeText(t);toast('Copied to clipboard')}catch(e){toast('Copy blocked here. Select the text below');let bx=$('sharebox');if(!bx){bx=document.createElement('pre');bx.id='sharebox';bx.className='sharebox';$('stats').after(bx)}bx.textContent=t}};
 let modalFromBtn=false;
 function openModal(fromBtn){modalFromBtn=fromBtn===true;$('modal').classList.add('show');setTimeout(()=>$('closeModal').focus(),30)}
 function closeModal(){if(!$('modal').classList.contains('show'))return;$('modal').classList.remove('show');store.set('ripple-seen',1);if(modalFromBtn)$('helpBtn').focus({preventScroll:true})}

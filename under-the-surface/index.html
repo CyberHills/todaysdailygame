@@ -474,6 +474,10 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v)
 const BUDGET=10,WRONG_COST=3;
 
 // ---------- state ----------
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+let __tdgG=null,__tdgDaily=false;
+function __tdgInfo(){return {game:'under-the-surface',mode:G.mode,day:digNo}}
+function __tdgStart(){if(!G||G.status!=='play'||__tdgG===G)return;__tdgG=G;if(G.mode==='daily'){if(__tdgDaily)return;__tdgDaily=true}__tdgT('start',__tdgInfo())}
 let G; // current game
 function newGame(mode){
   let objId,seed,saved=null;
@@ -554,6 +558,7 @@ function drawTags(){
 const touchy=()=>!matchMedia('(hover:hover)').matches;
 function onCell(i,e){
   if(i==null||G.status!=='play')return;
+  __tdgStart();
   if(G.brushed.includes(i)){toast('Already brushed');return;}
   if(left()<1){toast('No squares left — make your identification');return;}
   if(touchy()&&G.sel!==i){G.sel=i;showHover(i);$('bBrush').disabled=false;$('bBrush').textContent='Brush '+cellName(i);status(`Square ${cellName(i)} marked. Tap it again to brush.`);return;}
@@ -589,6 +594,7 @@ function renderCands(){
     return `<button class="cand${struck?' struck':''}${G.choice===o.id?' sel':''}${ans?' answer':''}" data-id="${o.id}" ${struck||G.status!=='play'?'tabindex="-1"':''}>${objSVG(o.id,'sketch','sk').replace('<svg ',`<svg style="${skStyle()}" `)}<div class="lbl">${o.name}</div>${struck?'<svg class="x" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M10,12 L90,88 M88,10 L12,90" stroke="#b23a2a" stroke-width="4" stroke-linecap="round" fill="none"/></svg>':''}</button>`;}).join('');
   $('cands').querySelectorAll('.cand').forEach(b=>b.onclick=()=>{
     const id=b.dataset.id;if(G.status!=='play'||G.wrong.includes(id))return;
+    __tdgStart();
     G.choice=G.choice===id?null:id;renderCands();renderId();});
   renderId();
 }
@@ -650,6 +656,7 @@ function finish(won){
   order.forEach((i,k)=>setTimeout(()=>fadeCell(i,380),k*16));
   status(won?`Identified: ${OBJ[G.pz.obj].name.toLowerCase()}!`:`It was a ${OBJ[G.pz.obj].name.toLowerCase()}.`);
   if(G.mode==='daily')recordResult(won);
+  {const i=__tdgInfo(),u=used();i.score=u;i.max=BUDGET;i.result=won?'found':'lost';__tdgT('finish',i)}
   setTimeout(()=>{if(won)$('riser').classList.add('up');},order.length*16+200);
   setTimeout(()=>showResult(won),order.length*16+1500);
 }
@@ -690,7 +697,7 @@ function showResult(won){
    <div class="mono" style="text-align:center">Next dig in <span id="cd"></span></div>`:''}
    <div class="row" style="justify-content:center"><button class="btn ghost" id="bPrac2">${daily?'Practice dig':'Another practice dig'}</button><button class="btn ghost" data-close>Back to the site</button></div>`;
   openModal('mResult');
-  const cp=$('bCopy');if(cp)cp.onclick=()=>{navigator.clipboard.writeText(shareText(won)).then(()=>toast('Copied'),()=>toast('Copy failed — select the text instead'));};
+  const cp=$('bCopy');if(cp)cp.onclick=()=>{__tdgT('share',{game:'under-the-surface',mode:G.mode});navigator.clipboard.writeText(shareText(won)).then(()=>toast('Copied'),()=>toast('Copy failed — select the text instead'));};
   const c2=$('bCab2');if(c2)c2.onclick=()=>{closeModals();openCab();};
   $('bPrac2').onclick=()=>{closeModals();startPractice();};
   tickCd();

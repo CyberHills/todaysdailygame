@@ -349,6 +349,10 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
   const pose = { gx: 0, drop: 0, gloveX: 1.35, gloveY: 2.6, blockX: -1.35, blockY: 2.0 };
 
   let gen = 0;
+  function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+  let __tdgGen = -1, __tdgDays = {};
+  function __tdgInfo() { return { game: 'breakaway', mode: mode, day: day + 1 }; }
+  function __tdgStart() { if (__tdgGen === gen || !G || G.done) return; __tdgGen = gen; if (mode === 'daily') { if (__tdgDays[day]) return; __tdgDays[day] = 1; } __tdgT('start', __tdgInfo()); }
   function startMode(m) {
     gen++; shot = null; shownResults = -1; document.getElementById("flash").classList.remove("on");
     mode = m; day = dayIndex();
@@ -421,7 +425,7 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
 
   function action() {
     ensureAudio();
-    if (phase === "aimX") { phase = "aimY"; phaseT0 = clock; setBtn("Shoot", false); hint("Now the height. Tap to shoot."); }
+    if (phase === "aimX") { __tdgStart(); phase = "aimY"; phaseT0 = clock; setBtn("Shoot", false); hint("Now the height. Tap to shoot."); }
     else if (phase === "aimY") fire();
   }
   function fire() {
@@ -431,6 +435,8 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
     G.results.push(res); G.i++;
     if (G.i >= SHOTS) { G.done = true; recordStats(); }
     persist();
+    __tdgT('step', { game: 'breakaway', mode: mode, n: G.i });
+    if (G.done) { const i = __tdgInfo(), g = G.results.filter(r => r.k === 'goal').length; i.score = g; i.max = SHOTS; i.result = g + '/' + SHOTS; __tdgT('finish', i); }
     shot = { tx: aimX, ty: aimY, t0: clock, dur: FLIGHT, reactAt: clock + cur0().react, sim, res, done: false };
     phase = "flying"; setBtn("…", true); hint("");
   }
@@ -504,7 +510,7 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
     chart.append(miniNet(goalie.weak.zones, G.results), cap);
     card.querySelector(".grid").after(chart);
     const ta = card.querySelector("textarea"); ta.value = text;
-    card.querySelector("#copyBtn").addEventListener("click", async e => { try { await navigator.clipboard.writeText(text); e.target.textContent = "Copied"; } catch (err) { ta.hidden = false; ta.focus(); ta.select(); e.target.textContent = "Select and copy below"; } });
+    card.querySelector("#copyBtn").addEventListener("click", async e => { __tdgT('share', { game: 'breakaway', mode: mode }); try { await navigator.clipboard.writeText(text); e.target.textContent = "Copied"; } catch (err) { ta.hidden = false; ta.focus(); ta.select(); e.target.textContent = "Select and copy below"; } });
     card.querySelector("#againBtn").addEventListener("click", () => startMode("practice"));
     document.getElementById("resultBox").replaceChildren(card);
     if (!restoring) card.scrollIntoView({ behavior: RM ? "auto" : "smooth", block: "start" });

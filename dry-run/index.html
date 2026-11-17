@@ -823,6 +823,10 @@ var TODAY=dayNum(new Date());
 var ORDER=DR.ORDER,NY=ORDER.length;
 function variantFor(n){var k=(n-1)%(2*NY);return {i:ORDER[k%NY],m:k>=NY}}
 
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+var __tdgS=false,__tdgDaily=false;
+function __tdgInfo(){return {game:'dry-run',mode:S.mode,day:TODAY}}
+function __tdgStart(){if(__tdgS||S.phase!=='plan')return;if(S.mode==='daily'&&(__tdgDaily||store.get().days[TODAY]))return;__tdgS=true;if(S.mode==='daily')__tdgDaily=true;__tdgT('start',__tdgInfo())}
 var S={mode:'daily',v:null,yard:null,sps:[],sel:-1,armed:-1,phase:'plan',polys:[],res:null,run:null,react:{},parts:[],splash:[],wet:null,t:0,practiceV:0};
 
 // ---------- canvas sizing ----------
@@ -908,7 +912,7 @@ function paintGrass(wet){var d=gimg.data,h=himg.data,sd=simg.data,y=S.yard,front
   gctx.putImageData(gimg,0,0);hctx.putImageData(himg,0,0);sheenOn=front;if(front||sheenOn)sctx.putImageData(simg,0,0)}
 
 // ---------- yard setup ----------
-function setVariant(v,keepLayout){S.v=v;S.yard=DR.variant(v.i,v.m);
+function setVariant(v,keepLayout){__tdgS=false;S.v=v;S.yard=DR.variant(v.i,v.m);
   var kd=[];S.yard.sens.forEach(function(z){var l=DR.SENS[z.kind].label.replace(/^(the|a) /,'');if(z.kind==='window')l='windows';if(kd.indexOf(l)<0)kd.push(l)});$('keepDry').textContent='Keep dry: '+kd.join(', ');
   if(!keepLayout)S.sps=S.yard.kit.map(function(k,i){var s=DR.makeSprinkler(k,0,0,0);s.placed=false;s.label=LETTERS[i];return s});
   S.sel=-1;S.armed=-1;S.phase='plan';S.res=null;S.react={};S.parts=[];S.splash=[];S.wet=null;
@@ -926,7 +930,7 @@ function specText(k){var K=DR.KIT[k],a=K.arcMin===K.arcMax?'360° fixed':K.arcMi
 function buildTray(){var t=$('tray');t.innerHTML='';
   S.sps.forEach(function(s,i){var d=document.createElement('button');d.type='button';d.className='card';d.dataset.i=i;
     d.innerHTML=headSVG(s.kind)+'<div><div class="t">'+s.label+' · '+DR.KIT[s.kind].name+'</div><div class="s">'+specText(s.kind)+'</div><div class="st"></div></div>';
-    d.onclick=function(){if(S.phase!=='plan')return;if(s.placed){S.sel=i;S.armed=-1}else{S.armed=S.armed===i?-1:i;S.sel=-1;if(S.armed>=0)toast('Tap the yard to place '+DR.KIT[s.kind].short+' '+s.label)}updateUI()};
+    d.onclick=function(){if(S.phase!=='plan')return;__tdgStart();if(s.placed){S.sel=i;S.armed=-1}else{S.armed=S.armed===i?-1:i;S.sel=-1;if(S.armed>=0)toast('Tap the yard to place '+DR.KIT[s.kind].short+' '+s.label)}updateUI()};
     t.appendChild(d)})}
 function updateUI(){
   var cards=$('tray').children;
@@ -974,7 +978,7 @@ function handles(s){var K=DR.KIT[s.kind],o=[],a0=DR.arcStart(s),dl=Math.max(32,4
 function wrapPi(a){while(a>Math.PI)a-=TAU;while(a<-Math.PI)a+=TAU;return a}
 function cap(e){try{cv.setPointerCapture(e.pointerId)}catch(_){}}
 function tolFor(e){ptrTouch=e.pointerType==='touch'||e.pointerType==='pen';return (ptrTouch?24:18)/sc}
-cv.addEventListener('pointerdown',function(e){if(S.phase!=='plan')return;var p=pos(e),tol=tolFor(e);
+cv.addEventListener('pointerdown',function(e){if(S.phase!=='plan')return;__tdgStart();var p=pos(e),tol=tolFor(e);
   if(S.sel>=0){var s=S.sps[S.sel],hs=handles(s);for(var k=0;k<hs.length;k++){if(Math.hypot(p.x-hs[k].x,p.y-hs[k].y)<tol){drag={t:hs[k].t,i:S.sel,last:Math.atan2(p.y-s.y,p.x-s.x)};cap(e);return}}}
   for(var i=S.sps.length-1;i>=0;i--){var q=S.sps[i];if(q.placed&&Math.hypot(p.x-q.x,p.y-q.y)<tol){S.sel=i;S.armed=-1;drag={t:'move',i:i,dx:q.x-p.x,dy:q.y-p.y};cap(e);updateUI();return}}
   if(S.armed>=0){var sp=S.sps[S.armed],others=placed();
@@ -1002,13 +1006,14 @@ cv.addEventListener('pointerleave',function(){hoverH=null});
 cv.addEventListener('pointerup',endDrag);cv.addEventListener('pointercancel',endDrag);
 
 // ---------- run ----------
-$('runBtn').onclick=function(){if(S.mode==='daily'){modal('<h2>One official run</h2><p>This is today\'s scored attempt. Once the water goes on, your layout is locked in for <b>'+S.yard.name+'</b>.</p><p class="small">You can replay this yard as much as you like in practice afterwards.</p><div class="acts"><button class="btn ghost" data-close>Keep planning</button><button class="btn primary" id="goRun">Run it 💧</button></div>');
+$('runBtn').onclick=function(){__tdgStart();if(S.mode==='daily'){modal('<h2>One official run</h2><p>This is today\'s scored attempt. Once the water goes on, your layout is locked in for <b>'+S.yard.name+'</b>.</p><p class="small">You can replay this yard as much as you like in practice afterwards.</p><div class="acts"><button class="btn ghost" data-close>Keep planning</button><button class="btn primary" id="goRun">Run it 💧</button></div>');
   $('goRun').onclick=function(){closeModal();startRun(true)}}else startRun(true)};
 function startRun(animate){S.sel=-1;S.armed=-1;var res=DR.evaluate(S.yard,S.sps);S.res=res;S.react={};S.parts=[];S.splash=[];
   // when should each penalised object react?
   res.pens.forEach(function(p){if(!p.pts)return;var c=res.covers[p.by],f=1;for(var k=0;k<c.cells.length;k++)if(S.yard.sensGrid[c.cells[k]]===p.id&&c.frac[k]<f)f=c.frac[k];p.at=f});
   S.wet=new Float32Array(GW*GH);S.lvl=new Float32Array(GW*GH);for(var q=0;q<GW*GH;q++)if(res.wet[q])S.lvl[q]=S.yard.type[q]===T.LAWN?Math.max(0.3,DR.credit(res.water[q])):1;
   if(S.mode==='daily'&&animate)saveResult(res);
+  if(animate){var __i=__tdgInfo();__i.score=res.score;__i.max=100;__i.result=Math.floor(res.covPct)+'% lawn';__tdgT('finish',__i);__tdgS=false}
   if(!animate){S.wet.set(S.lvl);res.pens.forEach(function(p){if(p.pts)S.react[p.id]={t0:-99}});
     paintGrass(S.wet);finish(false);return}
   S.phase='run';S.run={t0:performance.now()};updateUI()}
@@ -1062,7 +1067,7 @@ function enterPractice(v,keep){S.mode='practice';S.practiceV=(v.m?NY:0)+v.i;var 
 function loadDaily(){S.mode='daily';var st=store.get().days[TODAY];setVariant(variantFor(TODAY),false);
   if(st){S.sps=st.sps.map(function(s,i){var o=Object.assign({},s);o.placed=true;o.label=LETTERS[i];return o});recalc();buildTray();startRun(false);
     if(!st.v2&&typeof st.score==='number'&&S.res){S.res.score=st.score;showResult()}}updateUI()}
-function share(){var r=S.res,n=Math.round(r.covPct/10),line='🟩'.repeat(n)+'🟫'.repeat(10-n);
+function share(){__tdgT('share',{game:'dry-run',mode:S.mode});var r=S.res,n=Math.round(r.covPct/10),line='🟩'.repeat(n)+'🟫'.repeat(10-n);
   var txt='Dry Run #'+TODAY+' 💧 '+r.score+'/100\n'+line+' '+Math.floor(r.covPct)+'% lawn\n'+((r.pens.filter(function(p){return p.pts}).map(function(p){return DR.SENS[p.kind].icon+' −'+p.pts}).concat(r.waste?['💦 −'+r.waste]:[]).join('  '))||'✨ no overspray');
   var done=function(){toast('Copied to clipboard')};
   try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}

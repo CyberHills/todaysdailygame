@@ -973,6 +973,10 @@ function streak(){let n=0;const d=new Date();if(!(store.days[dkey(d)]||{}).done)
 const $=s=>document.querySelector(s);
 const main=$('#main');
 let G=null,animTok=0;
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+let __tdgG=null,__tdgDaily=false;
+function __tdgInfo(){return {game:'eyewitness',mode:G.practice?'practice':'daily',day:dayNo}}
+function __tdgStart(){if(!G||G.idx>=3||__tdgG===G)return;__tdgG=G;if(!G.practice){if(__tdgDaily)return;__tdgDaily=true}__tdgT('start',__tdgInfo())}
 function newGame(key,practice){
   G={key,practice,scenes:buildScenes(key),idx:0,results:[]};
   if(!practice){
@@ -1015,6 +1019,7 @@ function ready(){
   $('#watch').onclick=()=>view(false);
 }
 function view(isReplay){
+  if(!isReplay)__tdgStart();
   const tok=++animTok;
   const sc=G.scenes[G.idx];
   const sbox=$('#sbox');
@@ -1130,6 +1135,8 @@ function reveal(){
   const r=[scorePlace(sc,a.place),scoreDir(sc,a.dir),scoreColor(sc,a.color)];
   const res={scores:r,assisted:cur.assisted,t:sc.tpl.id};
   G.results[G.idx]=res;persist();
+  __tdgT('step',{game:'eyewitness',mode:G.practice?'practice':'daily',n:G.idx+1});
+  if(G.idx===2&&G.results.length===3){const i=__tdgInfo(),t=G.results.reduce((s,q)=>s+q.scores.reduce((a,b)=>a+b,0),0);i.score=t;i.max=900;i.result=G.results.some(q=>q.assisted)?'assisted':'unassisted';__tdgT('finish',i)}
   const tot=r[0]+r[1]+r[2];
   main.innerHTML=stageWrap(sc,sceneSVG(sc,'reveal',{ans:a,res:r}),sc.tpl.icon+' '+sc.tpl.name,`${G.idx+1} / 3`)+`<div class="panel">
    <div class="sceneTotal"><span>Scene ${G.idx+1} ${cur.assisted?'<span class="assist">assisted</span>':''}</span><span class="big">${tot}<small style="font-size:15px;color:var(--muted);font-family:DM Sans"> / 300</small></span></div>
@@ -1171,7 +1178,7 @@ function final(){
    <textarea class="sharebox" id="sbx" readonly></textarea>
    ${G.practice?'<p class="hint"><button class="linkbtn" id="back">← Back to today’s case</button></p>':`<p class="hint" id="nextin" aria-live="off"></p>`}
   </div>`;
-  $('#share').onclick=()=>{const t=shareText();const fb=()=>{const b=$('#sbx');b.style.display='block';b.value=t;b.select();toast('Select and copy the text below')};try{navigator.clipboard.writeText(t).then(()=>toast('Copied — paste it anywhere'),fb)}catch(e){fb()}};
+  $('#share').onclick=()=>{__tdgT('share',{game:'eyewitness',mode:G.practice?'practice':'daily'});const t=shareText();const fb=()=>{const b=$('#sbx');b.style.display='block';b.value=t;b.select();toast('Select and copy the text below')};try{navigator.clipboard.writeText(t).then(()=>toast('Copied — paste it anywhere'),fb)}catch(e){fb()}};
   $('#again').onclick=()=>{newGame('practice-'+Date.now(),true);ready()};
   if(G.practice) $('#back').onclick=e=>{e.preventDefault();newGame(TODAY,false);G.idx>=3?final():intro()};
   else{const tick=()=>{const el=$('#nextin');if(!el)return;const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);const s=Math.max(0,Math.floor((m-n)/1000));if(s===0||dkey(n)!==TODAY){el.textContent='A new case is ready. Reload the page to play it.';return}el.textContent=`Next case in ${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor(s/60)%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;setTimeout(tick,1000)};tick()}

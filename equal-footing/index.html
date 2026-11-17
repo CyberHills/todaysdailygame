@@ -291,18 +291,22 @@ function dailyRounds(key){
 const numOf=k=>Math.floor((Date.UTC(...k.split('-').map((v,i)=>i==1?v-1:+v))-EPOCH)/864e5)+1;
 let today=localDateKey(), dayNum=numOf(today);
 let mode='daily', rounds, results, idx, phase, revealT0=0, tiles=null;
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+let __tdgS=false,__tdgDays={};
+function __tdgInfo(){return {game:'equal-footing',mode:mode,day:dayNum}}
+function __tdgStart(){if(__tdgS||phase!=='play')return;__tdgS=true;if(mode==='daily'){if(__tdgDays[today])return;__tdgDays[today]=1}__tdgT('start',__tdgInfo())}
 let cur=1, want=1; // displayed and wanted area ratio
 const $=id=>document.getElementById(id);
 const slider=$('slider'), cA=$('cA'), cB=$('cB');
 
 function ratioFromSlider(r=rounds[idx]){const v=slider.value/1000;return r.lo*Math.pow(r.hi/r.lo,v)}
 function startDaily(){
-  mode='daily';rounds=dailyRounds(today);
+  mode='daily';rounds=dailyRounds(today);__tdgS=false;
   const saved=store.get('ef:'+today);results=saved&&saved.results||[];
   idx=results.length; if(idx>=5){showSummary();return;} beginRound();
 }
 function startPractice(){
-  mode='practice';rounds=makeRounds((Math.random()*2**32)>>>0);results=[];idx=0;
+  mode='practice';rounds=makeRounds((Math.random()*2**32)>>>0);results=[];idx=0;__tdgS=false;
   $('summary').classList.add('hidden');$('controls').classList.remove('hidden');beginRound();
 }
 function beginRound(){
@@ -327,10 +331,11 @@ function renderDots(){
   $('dots').innerHTML=Array.from({length:5},(_,i)=>`<i class="${i<results.length?'done':i===idx&&phase!=='done'?'now':''}"></i>`).join('');
   $('tagline').textContent=mode==='practice'?'Practice — not counted':'Different shapes. Same amount of space.';
 }
-slider.addEventListener('input',()=>{if(phase==='play')want=ratioFromSlider()});
+slider.addEventListener('input',()=>{if(phase==='play'){__tdgStart();want=ratioFromSlider()}});
 
 function submit(){
   if(phase!=='play'||!$('help').classList.contains('hidden'))return;
+  __tdgStart();
   const g=ratioFromSlider(),err=(g-1)*100,score=Math.max(0,Math.round(100-2*Math.abs(err)));
   results.push({g,err,score,tk:rounds[idx].tk,ck:rounds[idx].ck});
   if(mode==='daily')store.set('ef:'+today,{results});
@@ -344,10 +349,11 @@ function submit(){
   const nb=$('nextBtn');nb.textContent=idx===4?'See results':'Next shape';nb.classList.remove('hidden');
   renderDots();$('tagB').textContent=trapNote(rounds[idx]);
   if(idx===4&&mode==='daily')updateStats();
+  __tdgT('step',{game:'equal-footing',mode:mode,n:idx+1});
 }
 function next(){
   if(phase!=='reveal')return;
-  idx++; if(idx>=5){showSummary();return;} beginRound();
+  idx++; if(idx>=5){showSummary();const i=__tdgInfo(),a=Math.round(results.reduce((s,r)=>s+r.score,0)/results.length);i.score=a;i.max=100;i.result=a+'/100';__tdgT('finish',i);return;} beginRound();
 }
 $('goBtn').onclick=submit;$('nextBtn').onclick=next;
 document.addEventListener('keydown',e=>{
@@ -488,7 +494,7 @@ function showSummary(){
   </div>`;
   s.classList.remove('hidden');$('controls').classList.add('hidden');
   const last=results[results.length-1],share=`Equal Footing #${dayNum} · ${avg}/100\n${results.map(r=>emoji(r.score)).join('')}\nAvg error ${avgErr.toFixed(1)}%`+(last?` · final trap: ${NAMES[last.tk]} → ${NAMES[last.ck]}`:'');
-  if($('copyBtn'))$('copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(share);toast('Copied')}catch(e){toast('Copy blocked — select the text instead')}};
+  if($('copyBtn'))$('copyBtn').onclick=async()=>{__tdgT('share',{game:'equal-footing',mode:mode});try{await navigator.clipboard.writeText(share);toast('Copied')}catch(e){toast('Copy blocked — select the text instead')}};
   $('practiceBtn').onclick=startPractice;
   if($('backBtn'))$('backBtn').onclick=()=>{$('controls').classList.remove('hidden');s.classList.add('hidden');startDaily()};
   tickCountdown();

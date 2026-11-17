@@ -4357,12 +4357,16 @@ const SCHEDULE = ["kitchen", "valleyforge", "iowa-kitchen-1912", "coffeeshop", "
 const dailyIndex = (()=>{ const n = SCHEDULE.length, k = (((DAYNUM - SCHEDULE_START) % n) + n) % n, i = SCENES.findIndex(s=>s.id===SCHEDULE[k]); return i < 0 ? 0 : i; })();
 
 let scene, sel = [], done = false, practice = false, zoom = false;
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+let __tdgS = false, __tdgDaily = false;
+function __tdgInfo(){ return { game:'out-of-place', mode: practice ? 'practice' : 'daily', day: DAYNUM+1 }; }
+function __tdgStart(){ if(__tdgS || done) return; __tdgS = true; if(!practice){ if(__tdgDaily) return; __tdgDaily = true; } __tdgT('start', __tdgInfo()); }
 
 const $ = id => document.getElementById(id);
 const stage = $('stage');
 
 function load(idx, isPractice){
-  scene = SCENES[idx]; practice = isPractice;
+  scene = SCENES[idx]; practice = isPractice; __tdgS = false;
   $('practiceBanner').style.display = practice ? 'flex' : 'none';
   $('kicker').textContent = scene.kicker;
   $('title').textContent = scene.title;
@@ -4515,7 +4519,7 @@ function pick(id){
   const i = sel.indexOf(id);
   if(i>=0){ sel.splice(i,1); toast(''); }
   else if(sel.length>=3){ toast(kb.on ? 'You already have three. Unmark one first (move to it and press Enter).' : 'You already have three. Tap a numbered one to undo it.', true); return false; }
-  else { sel.push(id); toast(''); }
+  else { __tdgStart(); sel.push(id); toast(''); }
   persist(); draw();
   return true;
 }
@@ -4527,6 +4531,7 @@ function submit(){
   if(sel.length!==3 || done) return;
   done = true; persist();
   if(!practice) updateStats(sel.filter(id=>scene.objects[id].out).length);
+  { const i = __tdgInfo(), sc = sel.filter(id=>scene.objects[id].out).length; i.score = sc; i.max = 3; i.result = sc+'/3'; __tdgT('finish', i); }
   draw();
   $('resultBox').scrollIntoView({behavior: reduceMotion() ? 'auto' : 'smooth', block:'start'});
 }
@@ -4572,6 +4577,7 @@ function renderResult(){
     </div>`;
   const sb = $('shareBtn');
   if(sb) sb.onclick = async ()=>{
+    __tdgT('share', { game:'out-of-place', mode: practice ? 'practice' : 'daily' });
     const txt = `Out of Place No. ${DAYNUM+1} · ${scene.short}\n${grid} ${score}/3`;
     try{ await navigator.clipboard.writeText(txt); $('shareMsg').textContent='Copied!'; }
     catch(e){ $('shareMsg').textContent = txt; }

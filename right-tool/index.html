@@ -1401,6 +1401,10 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
   let play = null;     // playback state
   let drag = null;
 
+  function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+  let __tdgS = false, __tdgDaily = false;
+  function __tdgInfo() { return { game: 'right-tool', mode: practice ? 'practice' : 'daily', day: today }; }
+  function __tdgStart() { if (__tdgS || locked()) return; if (!practice && __tdgDaily) return; __tdgS = true; if (!practice) __tdgDaily = true; __tdgT('start', __tdgInfo()); }
   function freshPlan() { return { digger: null, hauler: null, workers: 2, mats: false, panel: false, spotChoice: null, spot: null, wps: [] }; }
   let setup = null;
   function recompute() {
@@ -1912,6 +1916,7 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
     el.innerHTML = `<canvas class="ico" width="64" height="64"></canvas><div class="eqt"><div class="eqn">${item.name}<span class="price">${price}</span></div><div class="eqs">${stats.join(' · ')}</div><div class="eqpc"><span class="pro">+ ${item.pro}</span><span class="con">− ${item.con}</span></div></div>`;
     el.addEventListener('click', () => {
       if (locked()) return;
+      __tdgStart();
       if (group === 'dig') { if (plan.digger !== item.id) plan.spotChoice = null; plan.digger = item.id; } else plan.hauler = item.id;
       changed(); renderPanel();
     });
@@ -1977,13 +1982,13 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
       const desc = o.id === 'close' ? 'Tuck in right beside the bed' : o.id === 'back' ? 'Stay clear of everything' : 'Where it reaches the most without hitting anything';
       b.innerHTML = `<b>${o.label}</b><small>${desc}</small><small>${cov}</small><small>${sw}</small>`;
       b.disabled = locked();
-      b.addEventListener('click', () => { if (locked()) return; plan.spotChoice = o.id; changed(); renderPanel(); });
+      b.addEventListener('click', () => { if (locked()) return; __tdgStart(); plan.spotChoice = o.id; changed(); renderPanel(); });
       list.appendChild(b);
     }
   }
-  $$('.crew button').forEach(b => b.addEventListener('click', () => { if (locked()) return; plan.workers = +b.dataset.n; changed(); renderPanel(); }));
-  $('#mats').addEventListener('change', (e) => { plan.mats = e.target.checked; changed(); });
-  $('#panel').addEventListener('change', (e) => { plan.panel = e.target.checked; changed(); renderPanel(); });
+  $$('.crew button').forEach(b => b.addEventListener('click', () => { if (locked()) return; __tdgStart(); plan.workers = +b.dataset.n; changed(); renderPanel(); }));
+  $('#mats').addEventListener('change', (e) => { __tdgStart(); plan.mats = e.target.checked; changed(); });
+  $('#panel').addEventListener('change', (e) => { __tdgStart(); plan.panel = e.target.checked; changed(); renderPanel(); });
 
   function checks() {
     const out = [];
@@ -2055,6 +2060,7 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
   // ---------------- run + playback ----------------
   $('#start').addEventListener('click', () => {
     if (locked()) return;
+    __tdgStart();
 
     const fp = fullPlan();
     const r = RT.simulate(site, fp);
@@ -2063,6 +2069,7 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
       store.days[today] = { score: r.score, parts: r.parts, complete: r.complete, total: Math.round(r.total), cost: Math.round(r.cost), plan: fp, site: site.id, lines: r.lines };
       save();
     }
+    { const i = __tdgInfo(); i.score = r.score; i.max = 100; i.result = r.complete ? 'complete' : 'incomplete'; __tdgT('finish', i); __tdgS = false; }
     startPlayback(r);
   });
 
@@ -2336,6 +2343,7 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
     return `Right Tool #${today} 🚜 ${e.score}/100${par ? ` (best possible ${par.score})` : ''}\n${b(p.completion, 40)} Job ${e.complete ? 'done' : 'unfinished'}\n${b(p.protection, 25)} Site ${p.protection}/25\n${b(p.schedule, 20)} Time ${p.schedule}/20\n${b(p.cost, 15)} Cost ${p.cost}/15`;
   }
   $('#shareBtn').addEventListener('click', async () => {
+    __tdgT('share', { game: 'right-tool', mode: practice ? 'practice' : 'daily' });
     const t = shareText();
     try { await navigator.clipboard.writeText(t); $('#shareBtn').textContent = 'Copied!'; } catch (e) { $('#shareOut').hidden = false; $('#shareOut').value = t; $('#shareOut').select(); }
     setTimeout(() => $('#shareBtn').textContent = 'Copy result', 1800);

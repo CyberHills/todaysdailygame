@@ -795,6 +795,10 @@ store.days=store.days||{}; store.stats=store.stats||{played:0,streak:0,max:0,las
 
 const today=puzzleNumber();
 let mode='daily', num=today, ids=[], bufs=[], env=[];
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+let __tdgS=false;const __tdgDays={};
+function __tdgInfo(){return {game:'soundcheck',mode:mode,day:mode==='daily'?num:today}}
+function __tdgStart(){if(__tdgS||!st||st.done)return;__tdgS=true;if(mode==='daily'){if(__tdgDays[num])return;__tdgDays[num]=1}__tdgT('start',__tdgInfo())}
 let st; // {solved:[ids in slot order], wrong:[ids], focus:n, revealed:bool, done:bool}
 
 /* ---------- audio ---------- */
@@ -856,7 +860,7 @@ function applyGains(now){
 
 /* ---------- puzzle setup ---------- */
 function load(m, n){
-  mode=m; num=n; pause(); offset=0; focusIdx=-1; focusUntil=0; muted=[false,false,false,false];
+  mode=m; num=n; __tdgS=false; pause(); offset=0; focusIdx=-1; focusUntil=0; muted=[false,false,false,false];
   APP.classList.toggle('practice',m==='practice');
   ids = m==='daily'? puzzleFor(n) : pickSounds(n);
   st = m==='daily' && store.days[n] ? store.days[n] : {solved:[],wrong:[],focus:0,revealed:false,done:false};
@@ -940,6 +944,7 @@ function renderLib(){
 }
 function guess(id,btn){
   if(st.done||st.solved.includes(id)||st.wrong.includes(id)) return;
+  __tdgStart();
   if(ids.includes(id)){
     st.solved.push(id); lastSolved=st.solved.length-1;
     if(focusIdx===ids.indexOf(id)){ focusUntil=0; focusIdx=-1; applyGains(); }
@@ -961,6 +966,7 @@ let tt; function toast(t){ const el=$('toast'); el.textContent=t; el.classList.a
 let focusCycle=0;
 $('focus').onclick=async()=>{
   if(st.done||isFocusing()) return;
+  __tdgStart();
   const uns=ids.map((id,i)=>i).filter(i=>!st.solved.includes(ids[i])); if(!uns.length) return;
   if(!(await play())) return;
   focusIdx=uns[focusCycle++ % uns.length]; focusUntil=ctx.currentTime+LOOP;
@@ -971,12 +977,13 @@ $('reveal').onclick=()=>{
   if(st.done) return;
   const b=$('reveal');
   if(Date.now()-revealArm>3000){ revealArm=Date.now(); b.textContent='Tap again to reveal'; b.classList.add('warn'); setTimeout(()=>{ if(Date.now()-revealArm>=3000){ b.textContent='Reveal answers'; b.classList.remove('warn'); } },3050); return; }
-  b.textContent='Reveal answers'; b.classList.remove('warn'); finish(true);
+  b.textContent='Reveal answers'; b.classList.remove('warn'); __tdgStart(); finish(true);
 };
 function finish(revealed){
   st.revealed=revealed||st.solved.length<4; st.done=true; focusIdx=-1; focusUntil=0; applyGains();
   if(mode==='daily'){ const S=store.stats; if(S.last!==num){ S.played++; S.streak = (S.last===num-1? S.streak+1 : 1); S.max=Math.max(S.max,S.streak); S.total+=score(); S.last=num; } save(); }
   persist(); render();
+  {const i=__tdgInfo(),s=score();i.score=s;i.max=100;i.result=st.solved.length+'/4 found';__tdgT('finish',i)}
 }
 function shareText(){
   const g=[0,1,2,3].map(s=>s<st.solved.length?SQUARES[s]:'⬛').join('');
@@ -1005,6 +1012,7 @@ function updateNext(){
   const bd=$('backDaily'); if(bd) bd.onclick=e=>{e.preventDefault(); load('daily',today);};
 }
 $('share').onclick=async()=>{
+  __tdgT('share',{game:'soundcheck',mode:mode});
   const t=shareText();
   try{ await navigator.clipboard.writeText(t); toast('Result copied'); }
   catch(e){ const sb=$('sharebox'); sb.style.display='block'; sb.value=t; sb.select(); toast('Copy the text below'); }
@@ -1012,7 +1020,7 @@ $('share').onclick=async()=>{
 $('practice').onclick=()=>{ load('practice', Math.floor(Math.random()*1e6)+1000); window.scrollTo({top:0,behavior:'smooth'}); };
 
 /* ---------- controls ---------- */
-$('play').onclick=()=> playing? pause() : play();
+$('play').onclick=()=>{ if(!playing) __tdgStart(); playing? pause() : play(); };
 const volEl=$('vol');
 volEl.oninput=()=>{ vol=volEl.value/100; volEl.style.setProperty('--v',volEl.value+'%'); if(master) master.gain.setTargetAtTime(vol*0.75,ctx.currentTime,0.03); };
 volEl.style.setProperty('--v','80%');

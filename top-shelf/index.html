@@ -341,6 +341,10 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
   let soundOn = db.sound !== false;
   let restoring = false;
 
+  function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+  let __tdgGen=-1,__tdgDays={};
+  function __tdgInfo() { return { game: 'top-shelf', mode: mode, day: day + 1 }; }
+  function __tdgStart() { if (__tdgGen === gen || !G || G.done) return; __tdgGen = gen; if (mode === 'daily') { if (__tdgDays[day]) return; __tdgDays[day] = 1; } __tdgT('start', __tdgInfo()); }
   function freshProgress() { return { drill: 0, strokes: 0, pos: null, results: [], done: false }; }
   let gen = 0;
   function startMode(m, restore) {
@@ -384,7 +388,7 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
   // ---------- input ----------
   function action() {
     ensureAudio();
-    if (phase === "aim") { phase = "power"; phaseT0 = clock; setButton("Shoot", false, "power"); hint("Stop the meter to shoot. More power carries farther and bounces harder."); }
+    if (phase === "aim") { __tdgStart(); phase = "power"; phaseT0 = clock; setButton("Shoot", false, "power"); hint("Stop the meter to shoot. More power carries farther and bounces harder."); }
     else if (phase === "power") shoot();
   }
   // The shot is saved the moment it is taken. The physics runs on a fixed time step, so a saved shot
@@ -522,6 +526,8 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
     if (!last) G.drill++;
     else { G.done = true; recordStats(); }
     persist();
+    __tdgT('step', { game: 'top-shelf', mode: mode, n: G.results.length });
+    if (G.done) { const i = __tdgInfo(), t = totalDiff(), sh = G.results.reduce((a, r) => a + r.s, 0); i.score = t; i.result = sh + ' shots (' + fmtDiff(t) + ')'; __tdgT('finish', i); }
     renderBoard(); renderScorecard();
     setButton("…", true);
     const myGen = gen;
@@ -645,6 +651,7 @@ All games</a><a class="tdg-brand" href="/">todaysdailygame.com</a></nav><!--/tdg
     card.querySelector(".grid").textContent = text.split("\n").slice(1).join("\n");
     const ta = card.querySelector("#shareBox"); ta.value = text;
     card.querySelector("#copyBtn").addEventListener("click", async (e) => {
+      __tdgT('share', { game: 'top-shelf', mode: mode });
       try { await navigator.clipboard.writeText(text); e.target.textContent = "Copied ✓"; setTimeout(() => { e.target.textContent = "Copy result"; }, 2000); }
       catch (err) { ta.hidden = false; ta.focus(); ta.select(); e.target.textContent = "Select and copy below"; }
     });

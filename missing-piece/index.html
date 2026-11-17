@@ -3023,6 +3023,10 @@ let place=null,selected=null,curRot=0,anim=null,dragging=false,drag=null,reveali
 const reduceMotion=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){return false;}};
 const esc=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+let __tdgS=false,__tdgDaily=false;
+function __tdgInfo(){return {game:'missing-piece',mode:mode,day:puzzleNo}}
+function __tdgStart(){if(__tdgS||!mech||locked())return;__tdgS=true;if(mode==='daily'){if(__tdgDaily)return;__tdgDaily=true}__tdgT('start',__tdgInfo())}
 function saveRes(){if(mode==='daily')store.set('mp-'+dayKey,res);}
 /* v2: today's three stay out of practice until today's bench is finished (otherwise practice shows the answers) */
 function todayLeft(){const d=store.get('mp-'+dayKey)||{};return dailyOrder().filter(id=>!(d[id]&&d[id].done));}
@@ -3047,7 +3051,7 @@ function locked(){return (anim&&anim.running)||R().done;}
 function shownDone(){return R().done&&!(anim&&anim.running&&anim.fresh);}
 
 function start(m){
-  mode=m;const held=m==='daily'?[]:todayLeft();order=m==='daily'?dailyOrder():IDS.filter(id=>!held.includes(id));
+  __tdgS=false;mode=m;const held=m==='daily'?[]:todayLeft();order=m==='daily'?dailyOrder():IDS.filter(id=>!held.includes(id));
   res=m==='daily'?(store.get('mp-'+dayKey)||{}):{};
   $('modeBtn').textContent=m==='daily'?`Practice all ${IDS.length}`:'Back to today’s puzzle';
   $('dateLbl').textContent=m==='daily'?`${now.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})} · No. ${puzzleNo}`:(held.length?`Practice · ${order.length} of ${IDS.length}`:`Practice · all ${IDS.length} mechanisms`);
@@ -3120,12 +3124,12 @@ let toastT;function toast(m){const e=$('toast');e.textContent=m;e.classList.add(
 
 function resetAnim(){if(anim&&!anim.running&&!R().done){anim=null;$('feedback').classList.add('hidden');}}
 function selectPart(id){
-  if(locked())return;resetAnim();
+  if(locked())return;__tdgStart();resetAnim();
   if(selected!==id){selected=id;curRot=(place&&place.part===id)?place.rot:(mech.rot0||0);}
   renderAll();
 }
 function placePart(id,slot){
-  if(locked())return;resetAnim();
+  if(locked())return;__tdgStart();resetAnim();
   if(selected!==id){selected=id;curRot=(place&&place.part===id)?place.rot:(mech.rot0||0);}
   place={part:id,slot,rot:curRot};
   renderAll();
@@ -3197,6 +3201,8 @@ $('testBtn').onclick=()=>{
     if(out.ok){r.stars=4-r.tries.length;r.done=true;}
     else if(r.tries.length>=3){r.stars=0;r.done=true;}
     saveRes();
+    if(r.done){const nd=order.filter(id=>res[id]&&res[id].done).length;__tdgT('step',{game:'missing-piece',mode:mode,n:nd});
+      if(nd===order.length){const i=__tdgInfo(),tot=order.reduce((a,id)=>a+((res[id]&&res[id].stars)||0),0),mx=order.length*3;i.score=tot;i.max=mx;i.result=tot+'/'+mx;__tdgT('finish',i)}}
   }
   $('feedback').classList.add('hidden');setStageState('');
   runAnim(out,()=>{
@@ -3241,7 +3247,7 @@ function showSummary(){
   <div class="row acts"><button class="btn primary" style="margin-left:0" id="copyBtn">Copy result</button><button class="btn" id="reviewBtn">Review mechanisms</button><button class="btn" id="otherBtn">${mode==='daily'?`Practice all ${IDS.length}`:'Back to today’s puzzle'}</button></div>
   ${mode==='daily'?'<div class="cd" id="cd"></div>':''}</div>`;
   S.querySelectorAll('[data-replay]').forEach(x=>x.onclick=()=>replayMech(x.dataset.replay));
-  $('copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(share);$('copyBtn').textContent='Copied ✓';}catch(e){const rg=document.createRange();rg.selectNodeContents($('shareTxt'));const sl=getSelection();sl.removeAllRanges();sl.addRange(rg);$('copyBtn').textContent='Selected. Press Ctrl/⌘+C';}};
+  $('copyBtn').onclick=async()=>{__tdgT('share',{game:'missing-piece',mode:mode});try{await navigator.clipboard.writeText(share);$('copyBtn').textContent='Copied ✓';}catch(e){const rg=document.createRange();rg.selectNodeContents($('shareTxt'));const sl=getSelection();sl.removeAllRanges();sl.addRange(rg);$('copyBtn').textContent='Selected. Press Ctrl/⌘+C';}};
   $('reviewBtn').onclick=()=>{$('summary').classList.add('hidden');$('game').classList.remove('hidden');loadMech(0);};
   $('otherBtn').onclick=()=>start(mode==='daily'?'practice':'daily');
   clearTimeout(cdTimer);

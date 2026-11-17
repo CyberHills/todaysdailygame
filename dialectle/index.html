@@ -762,6 +762,10 @@ const LANGS = {
   // ---------- state ----------
   // v2: remember the last language picked, so a reload doesn't drop a Spanish player back into English.
   let lang = (db.lang && LANGS[db.lang]) ? db.lang : "en", mode = "daily", game;
+  function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+  let __tdgG = null; const __tdgDays = {};
+  function __tdgInfo() { return { game: 'dialectle', mode: game.mode, day: game.day + 1, lang: game.lang }; }
+  function __tdgStart() { if (!game || game.done || __tdgG === game) return; __tdgG = game; if (game.mode === 'daily') { const k = game.lang + game.day; if (__tdgDays[k]) return; __tdgDays[k] = 1; } __tdgT('start', __tdgInfo()); }
   function persist() { if (game.mode === "daily") { db.daily[game.lang] = game; save(db); } }
 
   // ---------- rendering ----------
@@ -801,7 +805,7 @@ const LANGS = {
         }
         return el("button", {
           class: cls, id: "s-" + c + "-" + k, "aria-pressed": String(q.picks[c] === k), disabled: q.checked,
-          onclick: () => { q.picks[c] = k; persist(); renderQuestion(false, "s-" + c + "-" + k); }
+          onclick: () => { __tdgStart(); q.picks[c] = k; persist(); renderQuestion(false, "s-" + c + "-" + k); }
         }, w.s[k]);
       });
       const verdict = q.checked ? (q.picks[c] === correct ? el("span", { class: "verdict ok" }, "Correct") : el("span", { class: "verdict no" }, "Missed")) : null;
@@ -838,6 +842,7 @@ const LANGS = {
   function check() {
     const q = game.qs[game.cur];
     q.checked = true; persist(); renderQuestion(false, null, true);
+    __tdgT('step', { game: 'dialectle', mode: game.mode, n: game.cur + 1 });
     const b = document.getElementById("nextBtn"); if (b) b.focus();
   }
   function next() {
@@ -859,8 +864,10 @@ const LANGS = {
       const t = totals(game); st.right += t.right; st.total += t.total;
       db.stats[game.lang] = st;
     }
+    const __first = !game.done;
     game.done = true; persist(); save(db);
     renderResult();
+    if (__first) { const i = __tdgInfo(), t = totals(game); i.score = t.right; i.max = t.total; i.result = t.right + '/' + t.total; __tdgT('finish', i); }
   }
 
   function shareText() {
@@ -892,6 +899,7 @@ const LANGS = {
     const box = el("textarea", { class: "sharebox", id: "shareBox", readonly: true, "aria-label": "Your result to share" });
     box.value = text;
     const copyBtn = el("button", { class: "btn", id: "copyBtn", onclick: async () => {
+      __tdgT('share', { game: 'dialectle', mode: game.mode });
       try {
         await navigator.clipboard.writeText(text);
         copyBtn.textContent = "Copied"; copyBtn.classList.add("copied");

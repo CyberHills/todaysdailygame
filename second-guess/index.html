@@ -443,8 +443,12 @@ let mode="daily", qs, ans, alloc, locked=false, revealing=false;
 let playKey=null, playIdx=0, timers=[], prevAlloc=null;
 const LETTERS="ABCD";
 
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+let __tdgS=false,__tdgDays={};
+function __tdgInfo(){return {game:'second-guess',mode:mode,day:playIdx+1}}
+function __tdgStart(){if(__tdgS||locked)return;__tdgS=true;if(mode==='daily'){if(__tdgDays[playKey])return;__tdgDays[playKey]=1}__tdgT('start',__tdgInfo())}
 function start(){
-  timers.forEach(clearTimeout);timers=[];animTok++;
+  __tdgS=false;timers.forEach(clearTimeout);timers=[];animTok++;
   locked=false;revealing=false;prevAlloc=null;
   playKey=todayKey();playIdx=dayIndex();
   if(mode==="daily"){qs=buildSet(playIdx,true)}else{qs=buildSet(Math.floor(Math.random()*1e9),false)}
@@ -509,6 +513,7 @@ function setAlloc(i,n){
 }
 $("#cards").addEventListener("click",e=>{
   if(locked)return;
+  if(e.target.closest(".opt,.step:not([disabled]),.slot"))__tdgStart();
   const o=e.target.closest(".opt");if(o){ans[+o.dataset.i]=+o.dataset.j;render();saveDraft();return}
   const s=e.target.closest(".step");if(s&&!s.disabled){const i=+s.dataset.i;setAlloc(i,alloc[i]+ +s.dataset.s);saveDraft();return}
   const sl=e.target.closest(".slot");if(sl){const i=+sl.dataset.i,n=+sl.dataset.n;setAlloc(i,n===alloc[i]&&n>1?n-1:n);saveDraft()}
@@ -528,6 +533,7 @@ $("#go").onclick=()=>{
     store.set(s);draft.clear();
   }
   finish(false);
+  {const i=__tdgInfo(),r=qs.map((Q,k)=>Q.opts[ans[k]].ok),tot=r.reduce((t,ok,k)=>t+(ok?10:-10)*alloc[k],0);i.score=tot;i.max=100;i.result=r.filter(Boolean).length+'/3 right';__tdgT('finish',i)}
 };
 
 function finish(instant){
@@ -598,7 +604,7 @@ function showAfter(res,total){
       <div class="cal">${calRows}</div>
       <div class="next">Accuracy by how many chips you placed. Well-calibrated players are right more often on their bigger bets.</div></div>`;
     a.innerHTML=html;
-    $("#copyBtn").onclick=()=>copy($("#shareTxt").textContent);
+    $("#copyBtn").onclick=()=>__tdgT('share',{game:'second-guess',mode:mode})||copy($("#shareTxt").textContent);
     $("#practiceBtn").onclick=()=>{mode="practice";start();window.scrollTo({top:0})};
     tick();
   }else{

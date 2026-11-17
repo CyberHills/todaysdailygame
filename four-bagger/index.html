@@ -268,6 +268,11 @@ const PNUM=Math.round((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-
 function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k));localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
 
 /* ---------- game state ---------- */
+function __tdgT(n,d){try{window.tdgTrack&&window.tdgTrack(n,d)}catch(e){}}
+let __tdgSG=null,__tdgDaily=false;
+function __tdgInfo(){return {game:'four-bagger',mode:G.mode,day:PNUM}}
+function __tdgStart(){if(!G||__tdgSG===G)return;__tdgSG=G;if(G.mode==='daily'){if(__tdgDaily||G.done)return;__tdgDaily=true}__tdgT('start',__tdgInfo())}
+function __tdgFinish(){const t=total(),d=G.day.target,i=__tdgInfo();i.score=t;i.result=(t-d>=0?'+':'')+(t-d)+' vs target '+d;__tdgT('finish',i)}
 let G=null, phase='intro', phaseT=0, aimX=0, powT=0, flight=null, settleQuiet=0, lastHit=0;
 let floaters=[],parts=[],shake=0,cheerT=0,toastTimer=null;
 function newGame(mode,seed){
@@ -292,7 +297,7 @@ function restore(s){Object.assign(G,s);if(!Array.isArray(G.throws))G.throws=[];w
 function tri(t,period){const x=(t/period)%1;return x<.5?x*2:2-x*2}
 function onTap(){
   ac();
-  if(phase==='aim'){sfx.click();setPhase('power')}
+  if(phase==='aim'){__tdgStart();sfx.click();setPhase('power')}
   else if(phase==='power'){throwBag()}
 }
 cv.addEventListener('pointerdown',e=>{e.preventDefault();onTap()});
@@ -373,8 +378,8 @@ function endFrame(){
   if(sc.four)h+=`<tr><td>🌽 Four-bagger bonus</td><td>+3</td></tr>`;
   h+=`</table><div class="muted">Running total: <b>${total()}</b> · target ${G.day.target}</div>`;
   h+=`<button class="btn" id="nextBtn">${last?'See today\'s result':'Next frame →'}</button>`;
-  showCard(h,true);
-  document.getElementById('nextBtn').onclick=()=>{hideCard();if(last){G.done=true;save();finishDay()}else{G.fi++;startFrame();save()}};
+  showCard(h,true);{const i=__tdgInfo();i.n=G.fi+1;__tdgT('step',{game:i.game,mode:i.mode,n:i.n})}
+  document.getElementById('nextBtn').onclick=()=>{hideCard();if(last){G.done=true;save();finishDay();__tdgFinish()}else{G.fi++;startFrame();save()}};
 }
 function total(){return G.frames.reduce((s,f)=>s+(f?f.total:0),0)}
 
@@ -556,7 +561,7 @@ function finishDay(){
   h+=`<button class="btn alt" id="pracBtn">Practice board</button>`;
   if(G.mode!=='daily')h+=`<button class="btn alt" id="dailyBtn">Back to today's game</button>`;
   showCard(h);
-  document.getElementById('copyBtn').onclick=async e=>{const txt=shareText();let ok=false;try{await navigator.clipboard.writeText(txt);ok=true}catch(_){try{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(__){}}
+  document.getElementById('copyBtn').onclick=async e=>{__tdgT('share',{game:'four-bagger',mode:G.mode});const txt=shareText();let ok=false;try{await navigator.clipboard.writeText(txt);ok=true}catch(_){try{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(__){}}
     if(ok)e.target.textContent='Copied ✓';else{e.target.textContent='Select the text above to copy';const r=document.createRange();r.selectNodeContents(document.getElementById('share'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r)}};
   document.getElementById('pracBtn').onclick=()=>{hideCard();newGame('practice',(Math.random()*1e9)|0);phase='intro';showIntro(false)};
   const db=document.getElementById('dailyBtn');if(db)db.onclick=()=>{hideCard();boot()};
@@ -573,7 +578,7 @@ function boot(){
   if(valid){try{restore(s);if(s.done){finishDay();return}
     if(G.pending)replayed=commitPending();
     if(!G.frames[G.fi]&&G.left<=0)recordFrame();
-    if(G.frames[G.fi]){G.fi++;if(G.fi>2){G.done=true;save();finishDay();return}G.bags=makeBlockers(G.day.frames[G.fi]);G.left=4;G.throws[G.fi]=[];save()}
+    if(G.frames[G.fi]){G.fi++;if(G.fi>2){G.done=true;save();finishDay();__tdgFinish();return}G.bags=makeBlockers(G.day.frames[G.fi]);G.left=4;G.throws[G.fi]=[];save()}
   }catch(e){newGame('daily',0);phase='intro'}}
   else if(s)ls('fb-'+TODAY+'-bad',s);
   showIntro(false);
